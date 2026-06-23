@@ -1,0 +1,4186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>INT X — Staffing & LAT Cockpit</title>
+<style>
+/* ═══════════════════════════════════════════════════════════════
+   INT X REDESIGN — Command-Center Layout
+   Design brief: Bloomberg terminal + ATC screen aesthetic.
+   Priority hierarchy is spatial: biggest number = most urgent.
+   Signature: horizontal live-fill gauge bars (REQ% / LAT%)
+              that color-shift green→amber→red as thresholds fall.
+   Palette  : void black · slate panels · electric amber primary
+              teal-green for pass · signal-red for fail
+   Type     : Inter (UI labels) · JetBrains Mono (all data)
+═══════════════════════════════════════════════════════════════ */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600;700&display=swap');
+
+:root {
+  /* Core palette */
+  --void:       #05080d;
+  --base:       #080d14;
+  --panel:      #0d1520;
+  --panel-hi:   #111d2c;
+  --edge:       #1a2d42;
+  --edge-hi:    #254060;
+  --text:       #c8d8e8;
+  --text-dim:   #7a98b2;
+  --text-ghost: #3d5570;
+
+  /* Status */
+  --pass:       #00d68f;
+  --pass-dim:   rgba(0,214,143,.10);
+  --pass-glow:  rgba(0,214,143,.22);
+  --fail:       #ff3d5a;
+  --fail-dim:   rgba(255,61,90,.10);
+  --fail-glow:  rgba(255,61,90,.20);
+  --warn:       #f5a623;
+  --warn-dim:   rgba(245,166,35,.10);
+  --warn-glow:  rgba(245,166,35,.18);
+
+  /* Accent — amber primary */
+  --accent:     #f5a623;
+  --accent-dim: rgba(245,166,35,.10);
+
+  /* Type */
+  --ui:   'Inter', system-ui, sans-serif;
+  --mono: 'JetBrains Mono', 'Cascadia Code', ui-monospace, monospace;
+
+  /* Layout */
+  --sidebar-w: 340px;
+  --topbar-h:  48px;
+  --shell-max: 900px;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body {
+  height: 100%;
+  background: var(--void);
+  color: var(--text);
+  font-family: var(--ui);
+  font-size: 13px;
+  line-height: 1.4;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+/* ── Scrollbar ─────────────────────────────────────────────── */
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--edge-hi); border-radius: 3px; }
+
+/* ═══════════════════════════════════════════════════════════════
+   TOP BAR
+═══════════════════════════════════════════════════════════════ */
+#topbar {
+  position: fixed;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(var(--shell-max), 100vw);
+  height: var(--topbar-h);
+  background: rgba(5,8,13,.97);
+  border-bottom: 1px solid var(--edge);
+  border-left: 1px solid var(--edge);
+  border-right: 1px solid var(--edge);
+  backdrop-filter: blur(12px);
+  display: flex;
+  align-items: center;
+  gap: 0;
+  z-index: 100;
+  padding: 0 16px;
+}
+
+.topbar-brand {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  flex-shrink: 0;
+}
+.topbar-brand .wordmark {
+  font-family: var(--mono);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 2.5px;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+.topbar-brand .tagline {
+  font-size: 10px;
+  color: var(--text-ghost);
+  letter-spacing: 0.5px;
+}
+
+.topbar-sep {
+  width: 1px;
+  height: 24px;
+  background: var(--edge);
+  margin: 0 16px;
+  flex-shrink: 0;
+}
+
+/* Freshness strip */
+#freshnessBar {
+  display: none;
+  align-items: center;
+  gap: 8px;
+}
+.fresh-dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  transition: background 0.4s, box-shadow 0.4s;
+}
+.fresh-dot.ok    { background: var(--pass); box-shadow: 0 0 6px var(--pass-glow); }
+.fresh-dot.warn  { background: var(--warn); box-shadow: 0 0 6px var(--warn-glow); }
+.fresh-dot.stale { background: var(--fail); box-shadow: 0 0 6px var(--fail-glow); }
+#freshElapsed { font-family: var(--mono); font-size: 11px; color: var(--text-dim); }
+.src-badge {
+  font-family: var(--mono); font-size: 9px; font-weight: 700;
+  letter-spacing: 1px; text-transform: uppercase;
+  padding: 2px 7px; border-radius: 3px;
+  background: var(--panel-hi); border: 1px solid var(--edge);
+  color: var(--accent);
+}
+
+/* Alert banner — inline in topbar */
+#alertBanner {
+  display: none;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--mono);
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--fail);
+  letter-spacing: 0.3px;
+  padding: 4px 10px;
+  background: var(--fail-dim);
+  border: 1px solid rgba(255,61,90,.3);
+  border-radius: 4px;
+  max-width: 500px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+#alertBanner.active { display: flex; }
+#alertBanner::before { content: '⚠'; font-size: 11px; }
+
+/* Right cluster */
+.topbar-right {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.topbar-clock {
+  font-family: var(--mono);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text);
+  letter-spacing: 1px;
+  min-width: 72px;
+  text-align: right;
+}
+
+/* Icon buttons */
+.icon-btn {
+  display: flex; align-items: center; justify-content: center;
+  width: 30px; height: 30px;
+  background: transparent;
+  border: 1px solid var(--edge);
+  border-radius: 6px;
+  color: var(--text-dim);
+  cursor: pointer;
+  font-size: 14px;
+  transition: border-color 0.15s, color 0.15s, background 0.15s;
+}
+.icon-btn:hover { border-color: var(--edge-hi); color: var(--text); }
+.icon-btn.active, .icon-btn.muted { border-color: var(--warn); color: var(--warn); }
+
+/* Text nav buttons */
+.nav-btn {
+  font-family: var(--ui);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+  padding: 5px 11px;
+  background: transparent;
+  border: 1px solid var(--edge);
+  border-radius: 5px;
+  color: var(--text-dim);
+  cursor: pointer;
+  transition: border-color 0.15s, color 0.15s;
+}
+.nav-btn:hover { border-color: var(--edge-hi); color: var(--text); }
+
+.storage-warn {
+  font-family: var(--mono); font-size: 9px; font-weight: 700;
+  color: var(--warn); letter-spacing: 0.5px;
+  display: none;
+}
+.storage-warn.visible { display: block; }
+
+/* Font scale */
+.fs-cluster { display: flex; gap: 2px; }
+.fs-btn {
+  font-family: var(--mono); font-size: 10px;
+  padding: 3px 7px;
+  background: transparent; border: 1px solid var(--edge);
+  border-radius: 4px; color: var(--text-ghost);
+  cursor: pointer; transition: all 0.12s;
+  line-height: 1;
+}
+.fs-btn:hover { color: var(--text-dim); }
+.fs-btn.active { background: var(--panel-hi); border-color: var(--edge-hi); color: var(--accent); }
+
+/* ═══════════════════════════════════════════════════════════════
+   MAIN LAYOUT — sidebar + content
+═══════════════════════════════════════════════════════════════ */
+#layout {
+  display: flex;
+  flex-direction: column;
+  width: min(var(--shell-max), 100vw);
+  margin: var(--topbar-h) auto 0;
+  height: calc(100vh - var(--topbar-h));
+}
+
+/* ── Sidebar ────────────────────────────────────────────────── */
+#sidebar {
+  width: 100%;
+  flex-shrink: 0;
+  height: auto;
+  overflow-y: auto;
+  background: var(--base);
+  border-right: none;
+  border-bottom: 1px solid var(--edge);
+  display: flex;
+  flex-direction: column;
+  transition: width 0.22s, opacity 0.22s;
+}
+#sidebar.collapsed {
+  width: 0;
+  max-height: 0;
+  opacity: 0;
+  overflow: hidden;
+}
+
+.sidebar-section {
+  border-bottom: 1px solid var(--edge);
+  padding: 14px 16px;
+}
+.sidebar-section:last-child { border-bottom: none; flex: 1; }
+
+.section-label {
+  font-family: var(--mono); font-size: 9px; font-weight: 700;
+  letter-spacing: 1.5px; text-transform: uppercase;
+  color: var(--text-ghost);
+  margin-bottom: 10px;
+  display: block;
+}
+
+/* Input tabs */
+.itabs {
+  display: flex;
+  gap: 2px;
+  background: var(--void);
+  border: 1px solid var(--edge);
+  border-radius: 6px;
+  padding: 3px;
+  margin-bottom: 10px;
+}
+.itab {
+  flex: 1; text-align: center;
+  padding: 4px 6px;
+  border-radius: 4px;
+  background: transparent; border: none;
+  cursor: pointer;
+  font-size: 10px; font-weight: 600; font-family: var(--ui);
+  color: var(--text-ghost);
+  letter-spacing: 0.2px;
+  transition: all 0.12s;
+}
+.itab:hover { color: var(--text-dim); }
+.itab.active { background: var(--panel-hi); color: var(--text); border: 1px solid var(--edge-hi); }
+
+.itabpane { display: none; }
+.itabpane.active { display: block; }
+
+/* Textarea */
+textarea {
+  width: 100%;
+  min-height: 110px;
+  background: var(--void);
+  color: var(--text);
+  border: 1px solid var(--edge);
+  border-radius: 6px;
+  padding: 9px 11px;
+  font-family: var(--mono);
+  font-size: 11px;
+  resize: vertical;
+  line-height: 1.5;
+  transition: border-color 0.15s;
+}
+textarea:focus { outline: none; border-color: var(--accent); }
+textarea::placeholder { color: var(--text-ghost); }
+
+.btn-row { display: flex; gap: 6px; align-items: center; margin-top: 8px; flex-wrap: wrap; }
+
+/* Primary button */
+.btn-primary {
+  font-family: var(--ui); font-size: 12px; font-weight: 700;
+  letter-spacing: 0.3px;
+  padding: 7px 14px;
+  background: var(--accent); color: #1a0d00;
+  border: none; border-radius: 5px;
+  cursor: pointer;
+  transition: opacity 0.15s, transform 0.1s;
+}
+.btn-primary:hover { opacity: 0.88; }
+.btn-primary:active { transform: translateY(1px); }
+.btn-primary:disabled { opacity: 0.25; cursor: not-allowed; }
+
+/* Secondary button */
+.btn-sec {
+  font-family: var(--ui); font-size: 11px; font-weight: 600;
+  padding: 5px 11px;
+  background: transparent; color: var(--text-dim);
+  border: 1px solid var(--edge);
+  border-radius: 5px; cursor: pointer;
+  transition: all 0.12s;
+}
+.btn-sec:hover { border-color: var(--edge-hi); color: var(--text); }
+.btn-sec:active { transform: translateY(1px); }
+.btn-sec:disabled { opacity: 0.25; cursor: not-allowed; }
+
+/* Small form inputs */
+input[type=number], input[type=text], select {
+  background: var(--void);
+  color: var(--text);
+  border: 1px solid var(--edge);
+  border-radius: 5px;
+  padding: 5px 8px;
+  font-size: 12px; font-family: var(--mono);
+  transition: border-color 0.15s;
+}
+input[type=number]:focus, input[type=text]:focus, select:focus {
+  outline: none; border-color: var(--accent);
+}
+select option { background: var(--panel); }
+
+/* Pill indicators */
+.pill {
+  display: inline-block;
+  padding: 2px 8px; border-radius: 10px;
+  font-family: var(--mono); font-size: 9px; font-weight: 700; letter-spacing: 0.5px;
+}
+.pill.on  { background: var(--pass-dim); color: var(--pass); }
+.pill.off { background: rgba(60,80,100,.12); color: var(--text-ghost); }
+
+.hint-text { font-size: 10px; color: var(--text-ghost); line-height: 1.5; margin-top: 6px; }
+.status-small { font-size: 10.5px; color: var(--text-dim); }
+
+/* ═══════════════════════════════════════════════════════════════
+   MAIN CONTENT AREA
+═══════════════════════════════════════════════════════════════ */
+#content {
+  flex: 1;
+  height: auto;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 16px;
+  min-width: 0;
+}
+
+/* ── Empty state ────────────────────────────────────────────── */
+#emptyState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 60%;
+  gap: 10px;
+  color: var(--text-ghost);
+}
+#emptyState .empty-icon { font-size: 36px; opacity: 0.3; }
+#emptyState .empty-title { font-family: var(--mono); font-size: 12px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; }
+#emptyState .empty-sub { font-size: 11px; }
+
+/* ═══════════════════════════════════════════════════════════════
+   LOB STRIPS — the redesigned card format
+   Layout: [status-bar] [name+badges] [3 hero numbers] [gauges] [expand▾]
+═══════════════════════════════════════════════════════════════ */
+#lobGrid {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.lobstrip {
+  background: var(--panel);
+  border: 1px solid var(--edge);
+  border-radius: 8px;
+  overflow: hidden;
+  transition: border-color 0.35s, box-shadow 0.35s;
+  cursor: default;
+}
+
+/* Status color via left bar + glow */
+.lobstrip.st-pass {
+  border-left: 3px solid var(--pass);
+  box-shadow: -3px 0 16px var(--pass-dim);
+}
+.lobstrip.st-fail-lat {
+  border-left: 3px solid var(--fail);
+  box-shadow: -3px 0 22px var(--fail-dim);
+}
+.lobstrip.st-fail-req {
+  border-left: 3px solid var(--warn);
+  box-shadow: -3px 0 14px var(--warn-dim);
+}
+.lobstrip.st-neutral {
+  border-left: 3px solid var(--edge);
+}
+
+/* ── Strip summary row (always visible) ─────────────────────── */
+.strip-summary {
+  display: grid;
+  grid-template-columns: 180px 1fr auto;
+  align-items: center;
+  gap: 0;
+  padding: 10px 14px;
+  min-height: 56px;
+}
+
+/* LOB name + badges column */
+.strip-id {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding-right: 12px;
+  border-right: 1px solid var(--edge);
+  min-width: 0;
+}
+.lob-name {
+  font-family: var(--mono);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.lob-alias-tag {
+  font-family: var(--mono); font-size: 9px;
+  color: var(--accent); background: var(--accent-dim);
+  border-radius: 3px; padding: 1px 5px; letter-spacing: 0.3px;
+  display: inline-block; margin-left: 4px;
+}
+.strip-badges { display: flex; gap: 4px; align-items: center; flex-wrap: wrap; }
+
+/* Badges */
+.badge {
+  font-family: var(--mono); font-size: 9px; font-weight: 700;
+  letter-spacing: 0.8px; text-transform: uppercase;
+  padding: 2px 7px; border-radius: 3px;
+  white-space: nowrap;
+}
+.badge.pass { background: var(--pass-dim); color: var(--pass); }
+.badge.fail { background: var(--fail-dim); color: var(--fail); }
+.badge.na   { background: rgba(60,80,100,.12); color: var(--text-ghost); }
+.badge.warn { background: var(--warn-dim); color: var(--warn); }
+
+/* ── Center metrics area ────────────────────────────────────── */
+.strip-metrics {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  padding: 0 16px;
+  overflow: hidden;
+}
+
+/* Hero trio: IN | Δ Staff | OUT */
+.hero-cluster {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  margin-right: 20px;
+  flex-shrink: 0;
+}
+
+.hero-item {
+  text-align: center;
+  min-width: 44px;
+}
+.hero-num {
+  font-family: var(--mono);
+  font-size: 26px;
+  font-weight: 700;
+  line-height: 1;
+  display: block;
+  letter-spacing: -0.5px;
+  transition: color 0.3s;
+}
+.hero-num.h-in   { color: var(--pass); }
+.hero-num.h-out  { color: var(--text-dim); }
+.hero-num.h-pos  { color: var(--pass); }
+.hero-num.h-neg  { color: var(--fail); }
+.hero-label {
+  font-family: var(--mono); font-size: 8px; font-weight: 700;
+  letter-spacing: 1.2px; text-transform: uppercase;
+  color: var(--text-ghost); display: block; margin-top: 3px;
+}
+
+.hero-divider {
+  width: 1px; height: 36px;
+  background: var(--edge);
+  flex-shrink: 0;
+}
+
+/* Gauge block */
+.gauge-block {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 120px;
+  max-width: 360px;
+}
+.gauge-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.gauge-lbl {
+  font-family: var(--mono); font-size: 9px; font-weight: 700;
+  letter-spacing: 0.8px; text-transform: uppercase;
+  color: var(--text-ghost);
+  width: 28px; flex-shrink: 0; text-align: right;
+}
+.gauge-track {
+  flex: 1;
+  height: 8px;
+  background: rgba(255,255,255,.05);
+  border-radius: 4px;
+  overflow: hidden;
+  min-width: 60px;
+}
+.gauge-fill {
+  height: 100%;
+  border-radius: 4px;
+  transition: width 0.6s cubic-bezier(.4,0,.2,1), background 0.4s;
+  min-width: 2px;
+}
+/* gauge color states */
+.gauge-fill.g-pass { background: var(--pass); box-shadow: 0 0 6px rgba(0,214,143,.4); }
+.gauge-fill.g-warn { background: var(--warn); }
+.gauge-fill.g-fail { background: var(--fail); box-shadow: 0 0 6px rgba(255,61,90,.4); }
+
+.gauge-val {
+  font-family: var(--mono); font-size: 12px; font-weight: 700;
+  width: 48px; flex-shrink: 0; text-align: right;
+  transition: color 0.3s;
+}
+.gauge-val.g-pass { color: var(--pass); }
+.gauge-val.g-warn { color: var(--warn); }
+.gauge-val.g-fail { color: var(--fail); }
+
+/* Extra counters strip */
+.count-strip {
+  display: flex;
+  gap: 10px;
+  margin-top: 4px;
+  padding-left: 36px; /* align with gauge tracks */
+}
+.count-item {
+  display: flex; align-items: baseline; gap: 4px;
+}
+.count-num {
+  font-family: var(--mono); font-size: 11px; font-weight: 700;
+  color: var(--text);
+}
+.count-lbl {
+  font-family: var(--mono); font-size: 8px; font-weight: 600;
+  letter-spacing: 0.8px; text-transform: uppercase;
+  color: var(--text-ghost);
+}
+
+/* Expand/collapse area */
+.strip-toggle {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 0 0 0 14px;
+  border-left: 1px solid var(--edge);
+  flex-shrink: 0;
+  cursor: pointer;
+  min-width: 40px;
+}
+.strip-toggle:hover .toggle-chevron { color: var(--text); }
+.toggle-chevron {
+  font-family: var(--mono); font-size: 10px;
+  color: var(--text-ghost);
+  transition: transform 0.2s, color 0.15s;
+  user-select: none;
+}
+.lobstrip.expanded .toggle-chevron { transform: rotate(180deg); }
+.mute-mini {
+  display: flex; align-items: center; justify-content: center;
+  width: 26px; height: 26px;
+  border-radius: 5px;
+  border: 1px solid var(--edge);
+  background: transparent;
+  cursor: pointer; font-size: 12px;
+  transition: border-color 0.12s;
+}
+.mute-mini:hover { border-color: var(--edge-hi); }
+.mute-mini.muted { border-color: var(--warn); opacity: 0.5; }
+
+/* ── Expandable panel ───────────────────────────────────────── */
+.strip-detail {
+  display: none;
+  border-top: 1px solid var(--edge);
+  padding: 14px;
+  background: var(--panel-hi);
+}
+.lobstrip.expanded .strip-detail { display: block; }
+
+/* Config row inside detail */
+.cfg-band {
+  display: flex;
+  gap: 14px;
+  align-items: flex-end;
+  flex-wrap: wrap;
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--edge);
+  margin-bottom: 14px;
+}
+.cfg-field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.cfg-label {
+  font-family: var(--mono); font-size: 9px; font-weight: 700;
+  letter-spacing: 0.8px; text-transform: uppercase;
+  color: var(--text-ghost);
+}
+.req-source {
+  font-family: var(--mono); font-size: 9px;
+  color: var(--accent); opacity: 0.8;
+}
+
+/* LAT override section */
+.lat-override-band {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 14px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--edge);
+}
+
+/* Checkbox pair */
+.check-group {
+  display: flex; align-items: center; gap: 5px; cursor: pointer;
+}
+.check-group input[type=checkbox] {
+  width: 14px; height: 14px;
+  accent-color: var(--accent);
+  cursor: pointer;
+}
+.check-label {
+  font-size: 11px; color: var(--text-dim); cursor: pointer;
+}
+
+/* Secondary metrics in detail (velocities, expected LAT, head detail) */
+.detail-metrics {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-bottom: 14px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--edge);
+}
+.detail-kv {
+  display: flex; flex-direction: column; gap: 3px;
+}
+.dkv-label {
+  font-family: var(--mono); font-size: 8px; font-weight: 700;
+  letter-spacing: 1px; text-transform: uppercase;
+  color: var(--text-ghost);
+}
+.dkv-val {
+  font-family: var(--mono); font-size: 16px; font-weight: 700;
+  color: var(--text);
+}
+.dkv-val.good { color: var(--pass); }
+.dkv-val.bad  { color: var(--fail); }
+
+/* Agent roster tables */
+.roster-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+.roster-col {
+  background: var(--panel);
+  border: 1px solid var(--edge);
+  border-radius: 6px;
+  overflow: hidden;
+}
+.roster-head {
+  padding: 6px 10px;
+  background: var(--void);
+  border-bottom: 1px solid var(--edge);
+  display: flex; justify-content: space-between; align-items: center;
+}
+.roster-head-label {
+  font-family: var(--mono); font-size: 9px; font-weight: 700;
+  letter-spacing: 1px; text-transform: uppercase;
+  color: var(--text-ghost);
+}
+.roster-head-count {
+  font-family: var(--mono); font-size: 11px; font-weight: 700;
+  color: var(--text);
+}
+.roster-scroll {
+  max-height: 180px;
+  overflow-y: auto;
+}
+.agent-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 4px 10px;
+  border-bottom: 1px solid rgba(26,45,66,.5);
+  gap: 8px;
+}
+.agent-row:last-child { border-bottom: none; }
+.agent-name {
+  font-family: var(--mono); font-size: 10px; color: var(--text);
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1;
+}
+.agent-state {
+  font-family: var(--mono); font-size: 9px; color: var(--text-dim);
+  flex-shrink: 0; white-space: nowrap;
+}
+.agent-timer {
+  font-family: var(--mono); font-size: 9px; color: var(--text-ghost);
+  flex-shrink: 0;
+}
+.roster-empty {
+  padding: 10px; font-size: 10px; color: var(--text-ghost); font-style: italic;
+}
+
+/* Metric trend inline */
+.metric-v { display: inline-flex; align-items: baseline; gap: 3px; }
+.metric-trend {
+  font-family: var(--mono); font-size: 9px;
+  color: var(--text-ghost);
+  transition: color 0.2s;
+}
+.metric-trend.up   { color: var(--pass); }
+.metric-trend.down { color: var(--fail); }
+.metric-trend.flat { color: var(--text-ghost); }
+@keyframes metricflash {
+  0%   { filter: brightness(1.4); }
+  100% { filter: brightness(1); }
+}
+.metric-flash { animation: metricflash 0.35s ease; }
+
+/* ═══════════════════════════════════════════════════════════════
+   SIDE DRAWERS (Setup, Diagnostics, Timeline) — unchanged structure
+═══════════════════════════════════════════════════════════════ */
+.side-drawer-overlay {
+  display: none;
+  position: fixed; inset: 0; z-index: 250;
+  background: rgba(0,0,0,.62);
+}
+.side-drawer-overlay.open { display: block; }
+.side-drawer {
+  position: absolute; top: 0; right: 0;
+  width: min(640px,92vw); height: 100%;
+  background: var(--panel);
+  border-left: 1px solid var(--edge);
+  box-shadow: -24px 0 80px rgba(0,0,0,.75);
+  transform: translateX(102%);
+  transition: transform 0.22s ease;
+  display: flex; flex-direction: column;
+}
+.side-drawer-overlay.open .side-drawer { transform: translateX(0); }
+.side-drawer-head {
+  display: flex; justify-content: space-between; align-items: center;
+  gap: 10px; padding: 14px 16px;
+  border-bottom: 1px solid var(--edge);
+  background: var(--void);
+}
+.side-drawer-head h3 {
+  font-family: var(--mono); font-size: 11px; font-weight: 700;
+  text-transform: uppercase; letter-spacing: 1.2px; color: var(--text);
+}
+.side-drawer-body {
+  flex: 1; overflow-y: auto; padding: 14px 16px 18px;
+}
+/* Keep .panel class for drawer content */
+.d-panel {
+  background: var(--panel-hi); border: 1px solid var(--edge);
+  border-radius: 8px; padding: 14px; margin-bottom: 12px;
+}
+.d-panel h2 {
+  font-family: var(--mono); font-size: 9px; font-weight: 700;
+  text-transform: uppercase; letter-spacing: 1.2px;
+  color: var(--text-ghost); margin-bottom: 10px;
+}
+.d-panel:last-child { margin-bottom: 0; }
+
+/* Legacy panel alias for drawer JS */
+.panel { background: var(--panel-hi); border: 1px solid var(--edge); border-radius: 8px; padding: 14px; margin-bottom: 12px; }
+.panel h2 { font-family: var(--mono); font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.2px; color: var(--text-ghost); margin-bottom: 10px; }
+
+/* Setup list items */
+.setup-row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin-bottom: 8px; }
+.small { font-size: 11px; color: var(--text-dim); }
+.statusline { font-size: 10.5px; color: var(--text-ghost); line-height: 1.6; margin-top: 4px; }
+.row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+
+/* State map table */
+.sm-table { width: 100%; border-collapse: collapse; font-size: 11px; font-family: var(--mono); }
+.sm-table th { font-size: 9px; text-transform: uppercase; color: var(--text-ghost); padding: 5px 8px; text-align: left; border-bottom: 1px solid var(--edge); letter-spacing: 0.6px; }
+.sm-table td { padding: 4px 6px; border-bottom: 1px solid rgba(26,45,66,.5); color: var(--text); vertical-align: middle; }
+.sm-table tbody tr:hover { background: rgba(245,166,35,.03); }
+.sm-input { background: var(--void); color: var(--text); border: 1px solid var(--edge); border-radius: 4px; padding: 2px 6px; font-size: 11px; font-family: var(--mono); }
+.sm-input:focus { outline: 1px solid var(--accent); border-color: var(--accent); }
+.sm-feedback { font-size: 10.5px; min-height: 1.4em; font-family: var(--mono); margin-top: 4px; }
+.sm-feedback.ok  { color: var(--pass); }
+.sm-feedback.err { color: var(--fail); }
+
+/* LOB alias tag for drawers */
+.lob-alias-tag { font-size: 9px; font-family: var(--mono); color: var(--accent); opacity: .85; background: var(--accent-dim); border-radius: 3px; padding: 1px 5px; margin-left: 6px; letter-spacing: .3px; vertical-align: middle; display: inline-block; }
+
+/* Timeline table */
+.tl-table { width: 100%; border-collapse: collapse; font-size: 11px; font-family: var(--mono); }
+.tl-table th { font-size: 9px; text-transform: uppercase; color: var(--text-ghost); padding: 5px 8px; text-align: left; border-bottom: 1px solid var(--edge); position: sticky; top: 0; background: var(--panel); letter-spacing: .6px; white-space: nowrap; }
+.tl-table td { padding: 4px 8px; border-bottom: 1px solid rgba(26,45,66,.5); white-space: nowrap; color: var(--text); }
+.tl-table tbody tr:hover { background: rgba(245,166,35,.03); }
+.tl-sum-cell { background: var(--panel); border: 1px solid var(--edge); border-radius: 7px; padding: 7px 8px; }
+.tl-sum-label { font-size: 8.5px; color: var(--text-ghost); text-transform: uppercase; letter-spacing: .6px; margin-bottom: 3px; }
+.tl-sum-val { font-size: 14px; font-weight: 700; color: var(--text); font-family: var(--mono); }
+.tl-chart-label { font-size: 9.5px; color: var(--text-dim); text-transform: uppercase; letter-spacing: .6px; margin-bottom: 4px; font-family: var(--mono); }
+
+/* REQ Schedule Modal */
+.req-modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.85); z-index: 200; align-items: center; justify-content: center; }
+.req-modal-overlay.open { display: flex; }
+.req-modal { background: var(--panel); border: 1px solid var(--edge); border-radius: 12px; padding: 20px; width: 430px; max-height: 82vh; display: flex; flex-direction: column; gap: 12px; box-shadow: 0 20px 80px rgba(0,0,0,.8); }
+.req-modal h3 { margin: 0; font-family: var(--mono); font-size: 12px; text-transform: uppercase; letter-spacing: 1px; color: var(--text); }
+.req-sched-table { overflow-y: auto; flex: 1; border: 1px solid var(--edge); border-radius: 7px; }
+.req-sched-table table { width: 100%; border-collapse: collapse; }
+.req-sched-table th { font-size: 9px; text-transform: uppercase; color: var(--text-ghost); padding: 5px 10px; text-align: left; border-bottom: 1px solid var(--edge); background: var(--void); position: sticky; top: 0; letter-spacing: .6px; white-space: nowrap; }
+.req-sched-table td { padding: 4px 8px; border-bottom: 1px solid rgba(26,45,66,.5); color: var(--text); font-family: var(--mono); font-size: 11px; white-space: nowrap; }
+.req-sched-table tbody tr:hover { background: rgba(245,166,35,.03); }
+.req-sched-input { background: var(--void); color: var(--text); border: 1px solid var(--edge); border-radius: 3px; padding: 2px 5px; font-family: var(--mono); font-size: 11px; width: 70px; text-align: right; }
+.req-sched-input:focus { outline: 1px solid var(--accent); border-color: var(--accent); }
+.req-sched-source { font-size: 9px; color: var(--text-ghost); letter-spacing: .3px; }
+.req-sched-cur { background: rgba(245,166,35,.08) !important; }
+
+/* Expected LOB setup (in drawer) */
+.expected-lob-card { background: var(--panel); border: 1px solid var(--edge); border-radius: 6px; padding: 10px 12px; margin-bottom: 8px; }
+.expected-lob-card:last-child { margin-bottom: 0; }
+
+/* Toast stack */
+.toast-stack { position: fixed; right: 16px; top: 60px; z-index: 500; display: flex; flex-direction: column; gap: 6px; max-width: 340px; pointer-events: none; }
+.toast { pointer-events: auto; background: var(--panel); border: 1px solid var(--edge); border-left: 3px solid var(--accent); border-radius: 8px; padding: 10px 12px; box-shadow: 0 10px 40px rgba(0,0,0,.6); animation: toastin .18s ease; opacity: 1; }
+.toast.info  { border-left-color: var(--accent); }
+.toast.warn  { border-left-color: var(--warn); }
+.toast.good  { border-left-color: var(--pass); }
+.toast.hide  { opacity: 0; transform: translateY(-4px); transition: .18s; }
+.t-title { font-family: var(--mono); font-size: 9px; font-weight: 700; margin-bottom: 3px; text-transform: uppercase; letter-spacing: .7px; color: var(--text-dim); }
+.t-body  { font-size: 11.5px; color: var(--text); white-space: pre-line; }
+@keyframes toastin { from { opacity: 0; transform: translateY(-5px); } to { opacity: 1; transform: translateY(0); } }
+
+/* Diag panel */
+#diagPanel { display: grid; grid-template-columns: repeat(auto-fit, minmax(148px, 1fr)); gap: 6px; margin-bottom: 14px; }
+
+/* Font scale applied at root */
+:root { --fs-scale: 1; }
+body  { font-size: calc(13px * var(--fs-scale)); }
+
+/* ── Sidebar toggle button (in topbar) ─────────────────────── */
+#btnToggleSidebar {
+  font-family: var(--mono); font-size: 11px;
+  padding: 4px 9px;
+  background: transparent; color: var(--text-ghost);
+  border: 1px solid var(--edge); border-radius: 5px;
+  cursor: pointer; transition: all 0.12s;
+  letter-spacing: 0.5px;
+  flex-shrink: 0;
+}
+#btnToggleSidebar:hover { color: var(--text); border-color: var(--edge-hi); }
+
+/* proc flash */
+.proc-flash { animation: pfade .4s ease; }
+@keyframes pfade { 0%{ opacity:.3; } 100%{ opacity:1; } }
+
+/* ── responsive ─────────────────────────────────────────────── */
+@media (max-width: 900px) {
+  #topbar, #layout { width: 100vw; }
+  #sidebar:not(.collapsed) { position: relative; inset: auto; z-index: 90; overflow-y: auto; }
+  .strip-summary { grid-template-columns: 160px 1fr auto; }
+  .hero-cluster { gap: 12px; }
+  .hero-num { font-size: 20px; }
+  .roster-grid { grid-template-columns: 1fr; }
+}
+
+/* minirow alias */
+.minirow { display: flex; gap: 10px; align-items: flex-end; flex-wrap: wrap; }
+
+/* headpos/headneg colors used by JS */
+.headpos { color: var(--pass); }
+.headneg { color: var(--fail); }
+
+/* font-scale bar in topbar */
+.font-scale-bar { display: flex; gap: 2px; }
+</style>
+</head>
+<body>
+
+<!-- ══ TOP BAR ══════════════════════════════════════════════════ -->
+<header id="topbar">
+  <button id="btnToggleSidebar" title="Toggle input panel">☰ Input</button>
+  <div class="topbar-sep"></div>
+  <div class="topbar-brand">
+    <span class="wordmark">INT X</span>
+    <span class="tagline">Staffing &amp; LAT Cockpit</span>
+  </div>
+  <div class="topbar-sep"></div>
+
+  <!-- Freshness -->
+  <div class="freshbar" id="freshnessBar" style="display:none;">
+    <div class="fresh-dot ok" id="freshDot"></div>
+    <span id="freshElapsed"></span>
+    <span class="src-badge" id="srcBadge"></span>
+  </div>
+
+  <!-- Alert banner inline -->
+  <div id="alertBanner"></div>
+
+  <!-- Right cluster -->
+  <div class="topbar-right">
+    <div class="storage-warn" id="storageWarn" title="localStorage usage is high">⚠ Storage</div>
+
+    <div class="font-scale-bar" title="Font size">
+      <button class="fs-btn" data-scale="compact" title="Compact">A−</button>
+      <button class="fs-btn active" data-scale="default" title="Default">A</button>
+      <button class="fs-btn" data-scale="readable" title="Readable">A+</button>
+    </div>
+
+    <button class="nav-btn" id="btnOpenSetupDrawer">Setup</button>
+    <button class="nav-btn" id="btnOpenDiagDrawer">Diagnostics</button>
+    <button class="nav-btn" id="btnOpenTimelineDrawer">Timeline</button>
+
+    <button class="icon-btn" id="btnGlobalMute" title="Mute / unmute all alerts">🔔</button>
+
+    <div class="topbar-clock" id="clock">--:--:--</div>
+  </div>
+</header>
+
+<!-- ══ MAIN LAYOUT ══════════════════════════════════════════════ -->
+<div id="layout">
+
+  <!-- ── SIDEBAR (Input Panel) ──────────────────────────────── -->
+  <aside id="sidebar">
+
+    <!-- Input mode tabs -->
+    <div class="sidebar-section">
+      <span class="section-label">Data Source</span>
+      <div class="itabs">
+        <button class="itab active" data-tab="manual">Paste</button>
+        <button class="itab" data-tab="file">File</button>
+        <button class="itab" data-tab="watch">Watch</button>
+        <button class="itab" data-tab="listener">Listener</button>
+      </div>
+
+      <!-- Manual paste -->
+      <div class="itabpane active" id="pane-manual">
+        <textarea id="rawInput" placeholder="Paste Alvaria RTA text here…"></textarea>
+        <div class="btn-row">
+          <button class="btn-primary" id="btnProcess">Process Snapshot</button>
+          <button class="btn-sec" id="btnClear">Clear</button>
+          <span class="status-small" id="manualStatus"></span>
+        </div>
+      </div>
+
+      <!-- File -->
+      <div class="itabpane" id="pane-file">
+        <div class="row" style="gap:8px;margin-bottom:6px;">
+          <input type="file" id="fileInput" accept=".json,.txt">
+          <span class="status-small" id="fileStatus">No file loaded.</span>
+        </div>
+        <div class="hint-text">JSON: uses <code>text</code> field (fallback: <code>snapshot</code>/<code>content</code>/<code>data</code>) and embedded <code>timestamp</code>. TXT: used as-is.</div>
+      </div>
+
+      <!-- Watch -->
+      <div class="itabpane" id="pane-watch">
+        <div class="row" style="gap:6px;flex-wrap:wrap;margin-bottom:6px;">
+          <button class="btn-primary" id="btnPickWatch">Select File</button>
+          <button class="btn-sec" id="btnStopWatch" disabled>Stop</button>
+          <label class="status-small">
+            Interval (s): <input type="number" id="watchInterval" value="20" min="3" style="width:55px;margin-left:4px;">
+          </label>
+          <span class="pill off" id="watchPill">OFF</span>
+        </div>
+        <div class="hint-text" id="watchStatus">Requires Chromium-based browser (Chrome/Edge/Brave).</div>
+      </div>
+
+      <!-- Listener -->
+      <div class="itabpane" id="pane-listener">
+        <div style="margin-bottom:8px;">
+          <label class="cfg-label">Listener URL</label>
+          <input type="text" id="listenerUrl" value="http://localhost:8000/" style="width:100%;margin-top:4px;">
+        </div>
+        <div class="row" style="gap:6px;flex-wrap:wrap;margin-bottom:6px;">
+          <button class="btn-primary" id="btnListenerToggle">Enable</button>
+          <label class="status-small">
+            Interval (s): <input type="number" id="listenerInterval" value="20" min="3" style="width:55px;margin-left:4px;">
+          </label>
+          <span class="pill off" id="listenerPill">OFF</span>
+        </div>
+        <div class="hint-text" id="listenerStatus">Polls <code>relay_server.py</code> — expects JSON <code>{timestamp, text}</code>.</div>
+      </div>
+    </div>
+
+  </aside>
+
+  <!-- ── CONTENT AREA ────────────────────────────────────────── -->
+  <main id="content">
+    <!-- Empty state -->
+    <div id="emptyState">
+      <div class="empty-icon">⬡</div>
+      <div class="empty-title">No Snapshot Loaded</div>
+      <div class="empty-sub">Paste Alvaria RTA data in the input panel to begin monitoring</div>
+    </div>
+
+    <!-- LOB grid -->
+    <div id="lobGrid" style="display:none;"></div>
+  </main>
+
+</div>
+
+<!-- ══ SIDE DRAWERS ═════════════════════════════════════════════ -->
+
+<!-- Setup Drawer -->
+<div class="side-drawer-overlay" id="setupDrawerOverlay" aria-hidden="true">
+ <div class="side-drawer" role="dialog" aria-modal="true" aria-labelledby="setupDrawerTitle">
+  <div class="side-drawer-head">
+   <h3 id="setupDrawerTitle">Expected LOB Setup</h3>
+   <button class="btn-sec" id="btnCloseSetupDrawer" style="padding:4px 10px;font-size:13px;">✕</button>
+  </div>
+  <div class="side-drawer-body">
+   <div class="panel" style="margin-bottom:12px;">
+    <h2>Pre-stage LOBs</h2>
+    <div class="setup-row">
+     <input type="text" id="expectedLobInput" placeholder="Add Expected LOB" style="width:220px;">
+     <button class="btn-primary" id="btnAddExpectedLob" style="font-size:11px;padding:5px 11px;">Add</button>
+     <span class="small" id="expectedLobStatus"></span>
+    </div>
+    <div class="statusline">Pre-stage LOB names, REQ, thresholds, and schedules before the first snapshot arrives. Settings persist and attach automatically when the matching LOB appears.</div>
+   </div>
+   <div class="setup-list" id="expectedLobList"></div>
+  </div>
+ </div>
+</div>
+
+<!-- Diagnostics Drawer -->
+<div class="side-drawer-overlay" id="diagDrawerOverlay" aria-hidden="true">
+ <div class="side-drawer" role="dialog" aria-modal="true" aria-labelledby="diagDrawerTitle">
+  <div class="side-drawer-head">
+   <h3 id="diagDrawerTitle">Parser &amp; Pipeline Diagnostics</h3>
+   <button class="btn-sec" id="btnCloseDiagDrawer" style="padding:4px 10px;font-size:13px;">✕</button>
+  </div>
+  <div class="side-drawer-body">
+   <div id="diagPanel"></div>
+   <div class="panel" style="margin-bottom:0;">
+    <h2>Unknown State Mappings</h2>
+    <p class="small" style="margin:0 0 8px;line-height:1.6;">
+     These mappings classify unrecognised AUX states as <b>IN</b> or <b>OUT</b> during snapshot processing.
+     Changes take effect on the next snapshot.
+    </p>
+    <div id="smCount" class="small" style="margin-bottom:6px;color:var(--text-ghost);"></div>
+    <div id="smTableWrap" style="max-height:240px;overflow-y:auto;margin-bottom:10px;"></div>
+    <div class="row" style="gap:8px;flex-wrap:wrap;margin-bottom:4px;">
+     <input type="text" id="smKeyInput" class="sm-input" placeholder="aux state (e.g. auxbreak)" style="width:160px;">
+     <select id="smValInput" style="width:90px;">
+      <option value="IN">IN</option>
+      <option value="OUT">OUT</option>
+     </select>
+     <button class="btn-primary" id="smAddBtn" style="font-size:11px;padding:5px 11px;">Add</button>
+    </div>
+    <div id="smFeedback" class="sm-feedback"></div>
+   </div>
+  </div>
+ </div>
+</div>
+
+<!-- Timeline Drawer -->
+<div class="side-drawer-overlay" id="timelineDrawerOverlay" aria-hidden="true">
+ <div class="side-drawer" style="width:min(900px,96vw);" role="dialog" aria-modal="true" aria-labelledby="timelineDrawerTitle">
+  <div class="side-drawer-head">
+   <h3 id="timelineDrawerTitle">Operational Timeline</h3>
+   <div style="display:flex;gap:8px;align-items:center;">
+    <button class="btn-sec" id="btnTLExport" style="padding:4px 10px;font-size:11px;">Export</button>
+    <button class="btn-sec" id="btnCloseTimelineDrawer" style="padding:4px 10px;font-size:13px;">✕</button>
+   </div>
+  </div>
+  <div class="side-drawer-body">
+   <div class="panel" style="margin-bottom:10px;">
+    <div class="row" style="gap:16px;flex-wrap:wrap;">
+     <div>
+      <label style="font-size:9px;color:var(--text-ghost);text-transform:uppercase;letter-spacing:.6px;display:block;margin-bottom:3px;font-family:var(--mono);font-weight:700;">Date</label>
+      <select id="tlDateSel" style="min-width:120px;"></select>
+     </div>
+     <div>
+      <label style="font-size:9px;color:var(--text-ghost);text-transform:uppercase;letter-spacing:.6px;display:block;margin-bottom:3px;font-family:var(--mono);font-weight:700;">LOB Filter</label>
+      <select id="tlLobSel" style="min-width:140px;"></select>
+     </div>
+    </div>
+   </div>
+   <div class="panel" id="tlSummary" style="display:none;margin-bottom:10px;"></div>
+   <div class="panel" id="tlCharts" style="display:none;margin-bottom:10px;">
+    <h2>Trend Charts</h2>
+    <div id="tlChartsInner"></div>
+   </div>
+   <div class="panel" style="margin-bottom:10px;">
+    <h2>Snapshot History</h2>
+    <div id="tlTableWrap" style="overflow-x:auto;max-height:320px;overflow-y:auto;"></div>
+   </div>
+   <div class="panel">
+    <h2>Alert History</h2>
+    <div id="tlAlertWrap" style="overflow-x:auto;max-height:240px;overflow-y:auto;"></div>
+   </div>
+  </div>
+ </div>
+</div>
+
+<!-- REQ Schedule Modal -->
+<div class="req-modal-overlay" id="reqSchedOverlay">
+ <div class="req-modal">
+  <div style="display:flex;justify-content:space-between;align-items:center;">
+   <h3>REQ Schedule — <span id="reqSchedLobName" style="color:var(--accent);"></span></h3>
+   <button class="btn-sec" id="reqSchedClose" style="padding:4px 10px;font-size:13px;">✕</button>
+  </div>
+  <div style="font-size:11px;color:var(--text-dim);">Daily schedule. All intervals are editable. Paste an Excel column of numbers into any REQ cell to fill from that row downward. Cleared by daily noon reset.</div>
+  <div class="req-sched-table" id="reqSchedTableWrap"></div>
+  <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+   <button class="btn-primary" id="reqSchedSave">Save Schedule</button>
+   <button class="btn-sec" id="reqSchedClear">Clear Schedule</button>
+  </div>
+ </div>
+</div>
+
+<!-- Toast stack -->
+<div class="toast-stack" id="toastStack" aria-live="polite" aria-atomic="false"></div>
+
+<script>
+(function(){
+ "use strict";
+
+ /* ============================================================
+    NormalizationModule — handles both real-newline (manual paste)
+    and literal 2-char "\n" (extension JSON capture) input, and
+    strips Private-Use-Area icon glyphs from the Alvaria grid.
+ ============================================================ */
+ const NormalizationModule = {
+   clean(raw){
+     if(!raw) return '';
+     let t = raw.replace(/\\n/g, '\n');           // literal backslash-n -> real newline
+     t = t.replace(/[\uE000-\uF8FF]/g, '');        // strip PUA icon glyphs (e.g. \ue61b, \uf013)
+     return t;
+   },
+   lines(text){
+     return text.split('\n').map(l=>l.trim()).filter(l=>l.length>0);
+   }
+ };
+
+ /* ============================================================
+    ParserModule — extracts raw facts only. Timestamp extraction is
+    tolerant and never blocks parsing.
+ ============================================================ */
+ const TIME_RE = /^\d{1,3}:\d{2}(:\d{2})?$/;
+ const TS_LABEL_RE = /(?:timestamp|snapshot(?:\s*time)?|captured(?:\s*at)?|generated(?:\s*at)?|created(?:\s*at)?|as of|received(?:\s*at)?|started(?:\s*at)?)\s*[:\-]?\s*(.+)$/i;
+
+ function _coerceTimestampCandidate(candidate){
+   if(!candidate) return null;
+   const cleaned = String(candidate)
+     .replace(/[•|]/g, ' ')
+     .replace(/[‎‏]/g, '')
+     .replace(/\s+/g, ' ')
+     .trim()
+     .replace(/[.,;]+$/,'');
+   const direct = new Date(cleaned);
+   if(!Number.isNaN(direct.getTime())) return direct.toISOString();
+   const dateOnly = cleaned.match(/\b\d{4}-\d{2}-\d{2}\b|\b\d{1,2}[\/-]\d{1,2}[\/-]\d{2,4}\b/);
+   if(dateOnly){
+     const parsed = new Date(cleaned);
+     if(!Number.isNaN(parsed.getTime())) return parsed.toISOString();
+   }
+   return null;
+ }
+
+ const ParserModule = {
+   parse(rawText){
+     const cleaned = NormalizationModule.clean(rawText);
+     const lines = NormalizationModule.lines(cleaned);
+     const lobs = [];
+     const warnings = [];
+     let i = 0;
+     let foundActions = false;
+
+     while(i < lines.length){
+       if(lines[i] === 'Actions'){
+         foundActions = true;
+         const lobName = lines[i-1] || ('LOB_'+(lobs.length+1));
+         i++;
+         const entries = [];
+         let guard = 0;
+
+         while(i < lines.length && !lines[i].startsWith('Employees :') && guard < 5000){
+           guard++;
+           const name = lines[i];
+           const state = lines[i+1];
+           const timer = lines[i+2];
+
+           if(name === 'Actions'){
+             break;
+           }
+
+           if(state !== undefined && timer !== undefined && TIME_RE.test(timer)){
+             entries.push({name, state, timer});
+             i += 3;
+           } else {
+             warnings.push(`Malformed triplet near "${name || 'UNKNOWN'}" in ${lobName}`);
+             while(i < lines.length && !lines[i].startsWith('Employees :') && lines[i] !== 'Actions'){
+               i++;
+             }
+             break;
+           }
+         }
+
+         lobs.push({name: lobName, entries});
+       } else {
+         i++;
+       }
+     }
+
+     if(!foundActions){
+       warnings.push('No Actions markers found.');
+     }
+     if(foundActions && lobs.length === 0){
+       warnings.push('No valid LOB blocks found.');
+     }
+
+     lobs.warnings = warnings;
+     return lobs;
+   },
+
+   extractTimestamp(rawText){
+     if(!rawText) return null;
+     const cleaned = NormalizationModule.clean(rawText);
+     const lines = NormalizationModule.lines(cleaned);
+     for(const line of lines.slice(0, 60)){
+       const labeled = line.match(TS_LABEL_RE);
+       if(labeled){
+         const ts = _coerceTimestampCandidate(labeled[1]);
+         if(ts) return ts;
+       }
+       if(/\d{4}-\d{2}-\d{2}/.test(line) || /\d{1,2}[\/-]\d{1,2}[\/-]\d{2,4}/.test(line)){
+         const ts = _coerceTimestampCandidate(line);
+         if(ts) return ts;
+       }
+     }
+     const blob = cleaned.match(/(?:timestamp|snapshot(?:\s*time)?|captured(?:\s*at)?|generated(?:\s*at)?|created(?:\s*at)?|as of|received(?:\s*at)?|started(?:\s*at)?)\s*[:\-]?\s*([^\n]+)/i);
+     if(blob){
+       return _coerceTimestampCandidate(blob[1]);
+     }
+     return null;
+   }
+ };
+ /* ============================================================
+    ClassificationModule — Closed IN / OUT / UNKNOWN mapping.
+
+    IN  (counts toward staffing / REQ coverage):
+      auxin  auxout  available  followup/outboundout
+      hold   busyin  acw        acwout
+
+    OUT (present on floor, not handling calls):
+      personal  system problems  break      lunch
+      coaching  nps              project    followup/outbound
+      auxwk     meeting          prep
+
+    UNKNOWN — anything not in either list (genuinely unrecognised
+      Alvaria state code, or an empty / null state string).
+      UNKNOWN agents are surfaced in the per-agent detail panel
+      so the TL can investigate; they never count as IN or OUT.
+ ============================================================ */
+ const IN_STATES = new Set([
+   'auxin','auxout','available','followup/outboundout',
+   'hold','busyin','acw','acwout'
+ ]);
+ const OUT_STATES = new Set([
+   'personal','system problems','break','lunch',
+   'coaching','nps','project','followup/outbound',
+   'auxwk','meeting','prep'
+ ]);
+
+ 
+// Phase2B Unknown State Mapping
+const STATE_MAP_KEY='intx_state_map_v1';
+function loadStateMap(){try{return JSON.parse(localStorage.getItem(STATE_MAP_KEY)||'{}')}catch(e){return {}}}
+function saveStateMap(m){try{localStorage.setItem(STATE_MAP_KEY,JSON.stringify(m))}catch(e){}}
+const USER_STATE_MAP=loadStateMap();
+
+function resolveUnknownStates(entries){
+ for(const e of entries){
+   const raw=(e.state||'').trim();
+   const key=raw.toLowerCase();
+   if(!raw) continue;
+   if(IN_STATES.has(key)||OUT_STATES.has(key)) continue;
+   if(!/^aux/i.test(raw)) continue; // apply this rule only to unknown AUX states
+
+   let mapped = USER_STATE_MAP[key];
+   const isNewMapping = !mapped;
+   if(!mapped){
+      if(/(IN|OUT)$/i.test(raw)) mapped = 'IN';
+      else mapped = 'OUT';
+
+      USER_STATE_MAP[key] = mapped;
+      saveStateMap(USER_STATE_MAP);
+   }
+
+   if(mapped === 'IN') IN_STATES.add(key);
+   else OUT_STATES.add(key);
+
+   if(isNewMapping){
+      NotificationCenter.notify({
+        kind:'warn',
+        title:'Unknown AUX mapped',
+        body:`${raw} → ${mapped}`,
+        ttl:8000
+      });
+      recordDiagEvent('AUX mapping', `${raw} → ${mapped}`);
+   }
+ }
+}
+const ClassificationModule = {
+   classify(stateRaw){
+     const s = (stateRaw||'').toLowerCase().trim();
+     if(!s)                return 'UNKNOWN'; // empty / null state
+     if(IN_STATES.has(s))  return 'IN';
+     if(OUT_STATES.has(s)) return 'OUT';
+     return 'UNKNOWN';                       // unrecognised state code
+   },
+   aggregate(entries){
+     let IN=0, OUT=0, UNKNOWN=0;
+     const detail = {IN:[], OUT:[], UNKNOWN:[]};
+     for(const e of entries){
+       const bucket = this.classify(e.state);
+       if(bucket==='IN') IN++;
+       else if(bucket==='OUT') OUT++;
+       else UNKNOWN++;
+       detail[bucket].push(e);
+     }
+     return {IN, OUT, UNKNOWN, TOTAL: IN+OUT+UNKNOWN, detail};
+   }
+ };
+
+ /* ============================================================
+    ConfigStore — persists ONLY Requirement + REQ% Threshold per
+    LOB (localStorage, keyed by LOB name). Never persists LAT%,
+    Available, Extra/Needed, or any parsed snapshot metric.
+ ============================================================ */
+ const CFG_PREFIX = 'intx_cockpit_cfg_';
+ const ConfigStore = {
+   get(lobName){
+     try{
+       const raw = localStorage.getItem(CFG_PREFIX+lobName);
+       if(raw){
+         const saved = JSON.parse(raw);
+         // Merge with defaults so fields added after first save are present
+         return {req:0, threshold:92.5, alertREQ:true, alertLAT:true, ...saved};
+       }
+     }catch(e){}
+     return {req:0, threshold:92.5, alertREQ:true, alertLAT:true};
+   },
+   set(lobName, cfg){
+     try{ localStorage.setItem(CFG_PREFIX+lobName, JSON.stringify(cfg)); }catch(e){}
+   }
+ };
+
+ /* ============================================================
+    ExpectedLobStore — pre-snapshot LOB setup list.
+    Shape: ["Sales", "Chat", ...]
+ ============================================================ */
+ const EXPECTED_LOBS_KEY = 'intx_expected_lobs_v1';
+ const ExpectedLobStore = (function(){
+   let _list = null;
+   function _load(){
+     if(_list === null){
+       try{
+         const raw = localStorage.getItem(EXPECTED_LOBS_KEY);
+         const parsed = raw ? JSON.parse(raw) : [];
+         _list = Array.isArray(parsed) ? parsed.map(v=>String(v).trim()).filter(Boolean) : [];
+       }catch(e){
+         _list = [];
+       }
+     }
+   }
+   function _save(){
+     try{ localStorage.setItem(EXPECTED_LOBS_KEY, JSON.stringify(_list)); }catch(e){}
+   }
+   function _norm(name){ return String(name || '').trim(); }
+   function _idx(name){
+     const target = _norm(name).toLowerCase();
+     return _list.findIndex(v => v.toLowerCase() === target);
+   }
+   return {
+     list(){ _load(); return [..._list]; },
+     has(name){ _load(); return _idx(name) >= 0; },
+     add(name){
+       _load();
+       const n = _norm(name);
+       if(!n) return false;
+       if(_idx(n) >= 0) return false;
+       _list.push(n);
+       _save();
+       return true;
+     },
+     remove(name){
+       _load();
+       const i = _idx(name);
+       if(i < 0) return false;
+       _list.splice(i, 1);
+       _save();
+       return true;
+     },
+     rename(oldName, newName){
+       _load();
+       const i = _idx(oldName);
+       const n = _norm(newName);
+       if(i < 0 || !n) return false;
+       const dup = _idx(n);
+       if(dup >= 0 && dup !== i) return false;
+       _list[i] = n;
+       _save();
+       return true;
+     }
+   };
+ })();
+
+ /* ============================================================
+    LATOverrideStore — manual LAT override per LOB per interval.
+    Shape: { lobName: { intervalKey: number, lat: number } }
+ ============================================================ */
+ const LAT_OVERRIDE_KEY = 'intx_lat_override_v1';
+ const LATOverrideStore = (function(){
+   let _d = null;
+   function _load(){ if(!_d){ try{ _d=JSON.parse(localStorage.getItem(LAT_OVERRIDE_KEY)||'{}'); }catch(e){ _d={}; } } }
+   function _save(){ try{ localStorage.setItem(LAT_OVERRIDE_KEY, JSON.stringify(_d)); }catch(e){} }
+   function _entry(lobName){ _load(); return _d[lobName] || null; }
+   return {
+     get(lobName, intervalKey){
+       const e = _entry(lobName);
+       if(!e) return null;
+       if(Number(e.intervalKey) !== Number(intervalKey)){
+         delete _d[lobName];
+         _save();
+         return null;
+       }
+       const lat = Number(e.lat);
+       return isFinite(lat) ? lat : null;
+     },
+     set(lobName, intervalKey, lat){
+       _load();
+       const v = Number(lat);
+       if(!isFinite(v)){
+         delete _d[lobName];
+       } else {
+         _d[lobName] = { intervalKey: Number(intervalKey), lat: v };
+       }
+       _save();
+     },
+     clear(lobName){
+       _load();
+       delete _d[lobName];
+       _save();
+     },
+     clearAll(){
+       _d = {};
+       try{ localStorage.removeItem(LAT_OVERRIDE_KEY); }catch(e){}
+     }
+   };
+ })();
+
+ /* ============================================================
+    REQScheduleStore — daily per-LOB REQ schedule (Part 2).
+    localStorage key: intx_req_schedule_v1
+    Shape: { lobName: { "HH:MM": number } }
+
+    Schedule rules:
+    · All intervals are editable in the UI.
+    · Current interval edit is handled as a manual override.
+    · Future interval edits update the schedule without touching history.
+    · Missing entry: carry forward the last scheduled value.
+    · Cleared by the daily noon reset.
+    · Does NOT affect thresholds, LAT state, or any other config.
+ ============================================================ */
+ const SCHED_KEY = 'intx_req_schedule_v1';
+ const REQScheduleStore = (function(){
+   let _d = null;
+   function _load(){ if(!_d){ try{ _d=JSON.parse(localStorage.getItem(SCHED_KEY)||'{}'); }catch(e){ _d={}; } } }
+   function _save(){ try{ localStorage.setItem(SCHED_KEY, JSON.stringify(_d)); }catch(e){} }
+   return {
+     getSchedule(lobName){ _load(); return _d[lobName]||{}; },
+     setSchedule(lobName, sched){ _load(); _d[lobName]=sched; _save(); },
+     getForInterval(lobName, intervalStart){
+       const sched = this.getSchedule(lobName);
+       const keys  = Object.keys(sched).sort();
+       if(!keys.length) return null;
+       const hhmm  = _hhmmOf(intervalStart);
+       let val = null;
+       for(const k of keys){ if(k <= hhmm) val = sched[k]; }
+       return val;
+     },
+     clearAll(){ _d={}; try{ localStorage.removeItem(SCHED_KEY); }catch(e){} }
+   };
+ })();
+
+ /* ============================================================
+    REQOverrideStore — manual current-interval REQ override.
+    localStorage key: intx_req_override_v1
+    Shape: { lobName: { intervalMs: number, req: number } }
+ ============================================================ */
+ const OVERRIDE_KEY = 'intx_req_override_v1';
+ const REQOverrideStore = (function(){
+   let _d = null;
+   function _load(){ if(!_d){ try{ _d=JSON.parse(localStorage.getItem(OVERRIDE_KEY)||'{}'); }catch(e){ _d={}; } } }
+   function _save(){ try{ localStorage.setItem(OVERRIDE_KEY, JSON.stringify(_d)); }catch(e){} }
+   return {
+     get(lobName, intervalMs){ _load(); const e=_d[lobName]; return(e&&e.intervalMs===intervalMs)?e.req:null; },
+     set(lobName, intervalMs, req){ _load(); _d[lobName]={intervalMs, req}; _save(); },
+     clear(lobName){ _load(); delete _d[lobName]; _save(); },
+     clearAll(){ _d={}; try{ localStorage.removeItem(OVERRIDE_KEY); }catch(e){} }
+   };
+ })();
+
+
+ /* ============================================================
+    LATVelocityStore — informational velocity history only.
+    Stores previous expected LAT sample per LOB so the live view
+    can compute:
+      (ExpectedLAT_now - ExpectedLAT_previous) / ElapsedMinutes
+    This metric is informational only and must not influence any
+    decision, badge, alert, or delta-staff calculation.
+ ============================================================ */
+ const LAT_VELOCITY_KEY = 'intx_lat_velocity_v1';
+ const LATVelocityStore = (function(){
+   let _d = null;
+   function _load(){ if(!_d){ try{ _d=JSON.parse(localStorage.getItem(LAT_VELOCITY_KEY)||'{}'); }catch(e){ _d={}; } } }
+   function _save(){ try{ localStorage.setItem(LAT_VELOCITY_KEY, JSON.stringify(_d)); }catch(e){} }
+   return {
+     get(lobName){ _load(); return _d[lobName] || null; },
+     set(lobName, when, expectedLAT){
+       _load();
+       _d[lobName] = {
+         when: (when instanceof Date ? when : new Date(when)).toISOString(),
+         expectedLAT: Number(expectedLAT) || 0
+       };
+       _save();
+     },
+     clear(lobName){ _load(); delete _d[lobName]; _save(); },
+     clearAll(){ _d={}; try{ localStorage.removeItem(LAT_VELOCITY_KEY); }catch(e){} }
+   };
+ })();
+
+ // Called on snapshot arrival (MetricsModule.compute) only.
+ // Computes velocity against the previous stored sample, then updates
+ // the store so the next snapshot has a reference point.
+ // Must never be called from the 1-second UI tick.
+ function resolveLATVelocity(lobName, when, expectedLAT){
+   const prev = LATVelocityStore.get(lobName);
+   let velocity = null;
+   if(prev && prev.when){
+     const prevWhen = new Date(prev.when);
+     const currentWhen = when instanceof Date ? when : new Date(when);
+     const elapsedMin = (currentWhen - prevWhen) / 60000;
+     if(elapsedMin > 0 && isFinite(elapsedMin)){
+       velocity = (Number(expectedLAT) - Number(prev.expectedLAT || 0)) / elapsedMin;
+     } else {
+       velocity = 0;
+     }
+   }
+   LATVelocityStore.set(lobName, when, expectedLAT); // persists on snapshot events only
+   return velocity;
+ }
+
+ /* ============================================================
+    Phase C — HistoryStore
+    localStorage key: intx_history_v1
+    Records one record per accepted snapshot (result === 'ok').
+    NEVER written during live tick, render loop, or chart redraw.
+    7-day retention; duplicate/ignored snapshots are never stored.
+ ============================================================ */
+ const HISTORY_KEY = 'intx_history_v1';
+ const HISTORY_MAX_MS = 7 * 24 * 60 * 60 * 1000;
+ const HistoryStore = (function(){
+   function _load(){
+     try{ return JSON.parse(localStorage.getItem(HISTORY_KEY)||'[]'); }
+     catch(e){ return []; }
+   }
+   function _save(arr){
+     try{ localStorage.setItem(HISTORY_KEY, JSON.stringify(arr)); }catch(e){}
+   }
+   function _prune(arr){
+     const cutoff = Date.now() - HISTORY_MAX_MS;
+     return arr.filter(r => new Date(r.timestamp).getTime() >= cutoff);
+   }
+   return {
+     save(snapshot, source, now){
+       if(!snapshot || !snapshot.length) return;
+       const arr = _prune(_load());
+       arr.push({
+         timestamp: (now instanceof Date ? now : new Date(now)).toISOString(),
+         source: source || 'Unknown',
+         lobs: snapshot.map(lob => ({
+           name:        lob.name,
+           IN:          lob.agg.IN,
+           OUT:         lob.agg.OUT,
+           UNKNOWN:     lob.agg.UNKNOWN,
+           TOTAL:       lob.agg.TOTAL,
+           req:         lob.metrics.req,
+           reqPct:      lob.metrics.reqPct,
+           currentLAT:  lob.metrics.currentLAT,
+           expectedLAT: lob.metrics.expectedLAT,
+           threshold:   lob.metrics.threshold,
+           head:        lob.metrics.head,
+           pass:        lob.metrics.pass,
+           reqPass:     lob.metrics.reqPass
+         }))
+       });
+       _save(arr);
+     },
+     getDateList(){
+       const arr = _prune(_load());
+       const dates = new Set(arr.map(r => r.timestamp.slice(0,10)));
+       return [...dates].sort().reverse();
+     },
+     getForDate(dateStr){
+       const arr = _prune(_load());
+       return arr.filter(r => r.timestamp.slice(0,10) === dateStr).reverse();
+     }
+   };
+ })();
+
+ /* ============================================================
+    Phase C — AlertHistoryStore
+    localStorage key: intx_alert_history_v1
+    Captures REQ alerts, LAT alerts, and REQ verifications.
+    Uses parallel throttle tracking that mirrors AlertEngine
+    conditions WITHOUT modifying AlertEngine internals.
+    7-day retention.
+ ============================================================ */
+ const ALERT_HISTORY_KEY = 'intx_alert_history_v1';
+ const AlertHistoryStore = (function(){
+   const THROTTLE_MS = 60 * 1000; // matches AlertEngine throttle
+   const _th = {};                // parallel throttle map (not shared with AlertEngine)
+   function _load(){
+     try{ return JSON.parse(localStorage.getItem(ALERT_HISTORY_KEY)||'[]'); }
+     catch(e){ return []; }
+   }
+   function _save(arr){
+     try{ localStorage.setItem(ALERT_HISTORY_KEY, JSON.stringify(arr)); }catch(e){}
+   }
+   function _prune(arr){
+     const cutoff = Date.now() - 7 * 24 * 60 * 60 * 1000;
+     return arr.filter(r => new Date(r.timestamp).getTime() >= cutoff);
+   }
+   function _record(lob, type, details){
+     const arr = _prune(_load());
+     arr.push({ timestamp: new Date().toISOString(), lob, type, details });
+     _save(arr);
+   }
+   return {
+     // Called each tick — mirrors AlertEngine.check conditions for audit only.
+     // No state is shared with AlertEngine; throttle tracks independently.
+     check(lobName, metrics, cfg){
+       if(AlertEngine.isGlobalMuted() || AlertEngine.isLobMuted(lobName) || metrics.req <= 0) return;
+       if(!_th[lobName]) _th[lobName] = {req:0, lat:0};
+       const t = _th[lobName];
+       const now = Date.now();
+       if(cfg.alertREQ !== false && metrics.reqPct < 100 && (now - t.req) > THROTTLE_MS){
+         t.req = now;
+         const inNow = Math.round(metrics.reqPct / 100 * metrics.req);
+         _record(lobName, 'REQ Alert',
+           `REQ%: ${metrics.reqPct.toFixed(1)}% — IN: ${inNow}/${metrics.req}`);
+       }
+       if(cfg.alertLAT !== false && metrics.currentLAT > 0 && !metrics.pass && (now - t.lat) > THROTTLE_MS){
+         t.lat = now;
+         _record(lobName, 'LAT Alert',
+           `Current LAT: ${metrics.currentLAT.toFixed(1)}% | Expected: ${metrics.expectedLAT.toFixed(1)}% | Threshold: ${metrics.threshold}%`);
+       }
+     },
+     // Called from showREQVerificationAlert (additive call — does not modify that function).
+     recordVerification(lobName, req){
+       _record(lobName, 'REQ Verification', `REQ: ${req}`);
+     },
+     loadAll(){
+       return _prune(_load()).reverse(); // newest first
+     }
+   };
+ })();
+
+/* ============================================================
+   Phase 3 — Canonical LOB Name Matching
+   Maps tier alias strings to canonical forms for config/schedule
+   lookups ONLY. Original display names are never modified.
+   Matching is case-insensitive. Priority: exact → alias.
+============================================================ */
+const _CANON_ALIASES = {
+  'tier1':'T1','tier 1':'T1','t1':'T1',
+  'tier2':'T2','tier 2':'T2','t2':'T2',
+  'spanish':'SP','spainish':'SP','sp':'SP',
+  'sp t1':'SP','spanish t1':'SP'
+};
+
+function canonicalizeLobName(name){
+  const lower = String(name||'').toLowerCase().trim();
+  return _CANON_ALIASES[lower] || String(name||'').trim();
+}
+
+// Returns {cfg, configKey, canonicalName} for a parsed LOB name.
+// configKey = the key to use for config/schedule/override lookups.
+// canonicalName = non-null only when an alias was matched (for display).
+function resolveCanonicalConfig(parsedName){
+  const original = String(parsedName||'').trim();
+  if(ExpectedLobStore.has(original))
+    return { cfg:ConfigStore.get(original), configKey:original, canonicalName:null };
+  try{
+    if(localStorage.getItem(CFG_PREFIX+original)!==null)
+      return { cfg:ConfigStore.get(original), configKey:original, canonicalName:null };
+  }catch(e){}
+  const canonical = canonicalizeLobName(original);
+  if(canonical !== original){
+    if(ExpectedLobStore.has(canonical))
+      return { cfg:ConfigStore.get(canonical), configKey:canonical, canonicalName:canonical };
+    try{
+      if(localStorage.getItem(CFG_PREFIX+canonical)!==null)
+        return { cfg:ConfigStore.get(canonical), configKey:canonical, canonicalName:canonical };
+    }catch(e){}
+  }
+  return { cfg:ConfigStore.get(original), configKey:original, canonicalName:null };
+}
+
+ // Called from the 1-second UI tick (MetricsModule.liveTick) only.
+ // Computes the current velocity display value by comparing expectedLAT to
+ // the last stored snapshot reference — NO localStorage write ever occurs.
+ // This preserves the invariant: the UI tick must never write localStorage.
+ function readLATVelocity(lobName, when, expectedLAT){
+   const prev = LATVelocityStore.get(lobName);
+   if(!prev || !prev.when) return null;
+   const prevWhen = new Date(prev.when);
+   const currentWhen = when instanceof Date ? when : new Date(when);
+   const elapsedMin = (currentWhen - prevWhen) / 60000;
+   if(elapsedMin <= 0 || !isFinite(elapsedMin)) return 0;
+   return (Number(expectedLAT) - Number(prev.expectedLAT || 0)) / elapsedMin;
+ }
+
+ // Returns "HH:MM" string for a Date — used as schedule map keys.
+ function _hhmmOf(date){
+   return `${String(date.getHours()).padStart(2,'0')}:${String(date.getMinutes()).padStart(2,'0')}`;
+ }
+
+ // Central REQ resolver. Priority:
+ // 1) manual current-interval override
+ // 2) scheduled REQ
+ // 3) default config REQ
+ function resolveEffectiveREQ(lobName, when, baseCfg){
+   const at = when instanceof Date ? when : new Date(when);
+   const iStart = LATEngine.intervalStartFor(at);
+   const intervalKey = iStart.getTime();
+   const override = REQOverrideStore.get(lobName, intervalKey);
+   if(override != null && override > 0){
+     return { req: override, source: 'Manual Override', intervalStart: iStart, intervalKey };
+   }
+   const scheduled = REQScheduleStore.getForInterval(lobName, iStart);
+   if(scheduled != null && scheduled > 0){
+     return { req: scheduled, source: 'Schedule', intervalStart: iStart, intervalKey };
+   }
+   return {
+     req: Number(baseCfg && baseCfg.req) || 0,
+     source: 'Default',
+     intervalStart: iStart,
+     intervalKey
+   };
+ }
+
+function toText(value){
+   if(typeof value === 'string') return value;
+   if(value == null) return null;
+   if(typeof value === 'object'){
+     try{ return JSON.stringify(value); }catch(e){ return String(value); }
+   }
+   return String(value);
+ }
+
+ /* ============================================================
+    LATEngine — Fixed 30-minute interval model (spec §3–§8).
+
+    Core rules implemented:
+    §1.3  First-snapshot backfill: first snapshot received inside an
+          interval is treated as valid from intervalStart (not from its
+          arrival time). Implemented by placing its segment startMs at
+          intervalStart when segments[] is empty.
+    §1.4  Subsequent snapshots take effect at their actual timestamp.
+    §3.1  LAT denominator is ALWAYS 30 minutes — never elapsed or observed.
+    §4    currentLAT  = Σ(REQ%×dt) to now  / 30
+    §5    expectedLAT = (accum_now + currREQ%×remaining) / 30
+    §6    PASS/FAIL drives off expectedLAT (consumed by MetricsModule).
+    §8    REQ change → full recalculation is automatic: segments store
+          raw inValue (not REQ%), so computeArea() always uses current req.
+    §9    Interval rollover carries forward last staffing state as a seed
+          segment so calculations are continuous at boundaries.
+    §12   Persists: intervalStart, segments, lastREQ, lastSnapshotTime.
+
+    State shape (per LOB, in-memory + localStorage key intx_lat2_*):
+      intervalStart     Date       — start of current 30-min window
+      segments          Array      — [{startMs:ms, inValue:n}] ordered;
+                                     "from startMs, IN = inValue until next"
+      lastREQ           number     — REQ at last update() (for info only)
+      lastSnapshotTime  Date|null  — wall-clock of last update() call
+
+    NOTE: old localStorage keys 'intx_cockpit_lat_*' are silently ignored
+    (incompatible format). They will expire naturally in the browser.
+ ============================================================ */
+ const LATEngine = (function(){
+   const LAT_STORAGE_PREFIX = 'intx_lat2_';        // new key; old format ignored
+   const LAT_STALE_MS       = 4 * 60 * 60 * 1000; // discard state older than 4 h
+   const INTERVAL_MS        = 30 * 60 * 1000;      // fixed 30-minute window (§1.1)
+   const INTERVAL_MIN       = 30;                  // denominator is always 30 (§3.1)
+   const state = {};
+
+   // Returns the start of the 30-minute wall-clock interval containing date.
+   function intervalStartFor(date){
+     const d = new Date(date.getTime());
+     d.setSeconds(0, 0);
+     d.setMinutes(d.getMinutes() < 30 ? 0 : 30);
+     return d;
+   }
+
+   function loadState(lobName, now){
+     try{
+       const raw = localStorage.getItem(LAT_STORAGE_PREFIX + lobName);
+       if(!raw) return null;
+       const s = JSON.parse(raw);
+       if(!s || !s.intervalStart || !Array.isArray(s.segments)) return null;
+       const loaded = {
+         intervalStart:    new Date(s.intervalStart),
+         segments:         s.segments.map(sg => ({
+                             startMs: Number(sg.startMs),
+                             inValue: Number(sg.inValue) || 0
+                           })),
+         lastREQ:          Number(s.lastREQ) || 0,
+         lastSnapshotTime: s.lastSnapshotTime ? new Date(s.lastSnapshotTime) : null,
+         needsREQVerification: !!s.needsREQVerification,
+       };
+       // Discard if suspiciously future or stale (>4 h since last snapshot)
+       if(isExpiredState(loaded, now)){
+         try{ localStorage.removeItem(LAT_STORAGE_PREFIX + lobName); }catch(e){}
+         return null;
+       }
+       return loaded;
+     }catch(e){ return null; }
+   }
+
+   function saveState(lobName, st){
+     try{
+       localStorage.setItem(LAT_STORAGE_PREFIX + lobName, JSON.stringify({
+         intervalStart:    st.intervalStart.toISOString(),
+         segments:         st.segments,          // [{startMs, inValue}]
+         lastREQ:          st.lastREQ,
+         lastSnapshotTime: st.lastSnapshotTime
+                             ? st.lastSnapshotTime.toISOString()
+                             : null,
+         needsREQVerification: !!st.needsREQVerification,
+       }));
+     }catch(e){}
+   }
+
+   function isExpiredState(st, now){
+     if(!st) return false;
+     const refTime = st.lastSnapshotTime || st.intervalStart;
+     if(!(refTime instanceof Date) || isNaN(refTime.getTime())) return true;
+     if(refTime > now) return true;
+     return (now.getTime() - refTime.getTime()) > LAT_STALE_MS;
+   }
+
+   function discardState(lobName){
+     delete state[lobName];
+     try{ localStorage.removeItem(LAT_STORAGE_PREFIX + lobName); }catch(e){}
+   }
+
+   // Returns (or creates) in-memory state for lobName, loading from
+   // localStorage on first access.
+   function ensure(lobName, now){
+     if(state[lobName] && isExpiredState(state[lobName], now)){
+       discardState(lobName);
+     }
+     if(!state[lobName]){
+       state[lobName] = loadState(lobName, now) || {
+         intervalStart:    intervalStartFor(now),
+         segments:         [],
+         lastREQ:          0,
+         lastSnapshotTime: null,
+         needsREQVerification:false,
+       };
+     }
+     return state[lobName];
+   }
+
+   // Rolls state forward past any 30-minute boundaries between
+   // st.intervalStart and now. For each boundary crossed:
+   //   1. The last known inValue is carried forward as a seed segment at
+   //      the new intervalStart (§9: "carry forward latest staffing state").
+   //      This provides continuous coverage — the next real snapshot
+   //      becomes a subsequent snapshot (§1.4), not a backfill (§1.3).
+   //   2. segments resets to only the carry-forward entry (or empty if
+   //      no prior staffing was known).
+   //
+   // IMPORTANT: calls saveState only when a boundary is crossed (never on every-second live() ticks).
+   // Sets st.needsREQVerification = true on each crossing so the first real snapshot of
+   // the new interval triggers the per-LOB REQ verification alert (§10).
+   function rollBoundaries(st, lobName, now){
+     let guard = 0;
+     let crossed = false;
+     while(guard < 200){
+       guard++;
+       const nextBoundary = new Date(st.intervalStart.getTime() + INTERVAL_MS);
+       if(now.getTime() < nextBoundary.getTime()) break; // still inside current interval
+
+       // Capture last known staffing before resetting
+       const lastIN = st.segments.length > 0
+         ? st.segments[st.segments.length - 1].inValue
+         : 0;
+
+       st.intervalStart = nextBoundary;
+       st.segments      = [];
+       st.needsREQVerification = true;
+
+       // Carry-forward: seed the new interval so calculations are continuous
+       // even before the first real snapshot of the new interval arrives.
+       st.segments.push({ startMs: nextBoundary.getTime(), inValue: lastIN });
+       crossed = true;
+     }
+     // PART 1 FIX: persist immediately on boundary crossing so needsREQVerification
+     // survives a page refresh before the first snapshot of the new interval arrives.
+     // This is safe: each 30-minute boundary is crossed exactly once, so this
+     // generates at most one localStorage write per interval — not every second.
+     if(crossed && lobName) saveState(lobName, st);
+   }
+
+   // Computes REQ%-minute area from intervalStart up to targetMs.
+   // Uses req for ALL segments (§8: REQ change recalculation is automatic
+   // because segments store raw inValue, not pre-computed REQ%).
+   // Caller divides by INTERVAL_MIN (30) — denominator is always 30 (§3.1).
+   function computeArea(st, req, targetMs){
+     if(st.segments.length === 0 || req <= 0) return 0;
+     const intervalEndMs = st.intervalStart.getTime() + INTERVAL_MS;
+     const clamped       = Math.min(targetMs, intervalEndMs);
+     let area = 0;
+     for(let i = 0; i < st.segments.length; i++){
+       const segStart  = st.segments[i].startMs;
+       const segEnd    = i + 1 < st.segments.length
+                         ? st.segments[i + 1].startMs
+                         : clamped;
+       const effectEnd = Math.min(segEnd, clamped);
+       const dtMin     = Math.max(0, (effectEnd - segStart) / 60000);
+       const reqPct    = (st.segments[i].inValue / req) * 100;
+       area += reqPct * dtMin;
+     }
+     return area;
+   }
+
+   return {
+
+     // Called on every processed snapshot (from MetricsModule.compute).
+     // inValue = IN agent count. req = configured REQ for this LOB.
+     update(lobName, now, inValue, req){
+       const st = ensure(lobName, now);
+       rollBoundaries(st, lobName, now);
+
+       // §1.3 First-snapshot backfill: if no segments exist yet in this
+       //      interval, retroactively apply this snapshot from intervalStart.
+       // §1.4 Subsequent snapshots: take effect at their actual timestamp.
+       const isFirst        = st.segments.length === 0;
+       const effectiveStart = isFirst
+         ? st.intervalStart.getTime()   // §1.3 backfill to interval start
+         : now.getTime();               // §1.4 arrival time
+
+       st.segments.push({ startMs: effectiveStart, inValue });
+       st.lastREQ          = req;
+       st.lastSnapshotTime = now;
+
+       saveState(lobName, st); // persist on snapshot arrival only — never in live()
+     },
+
+     // Called every 1-second tick and after update() to compute display values.
+     // Returns {currentLAT, expectedLAT, remainingMin} without modifying localStorage.
+     live(lobName, now, req){
+       let st = state[lobName];
+       if(!st){
+         st = loadState(lobName, now);
+         if(!st) return { currentLAT: 0, expectedLAT: 0, remainingMin: 0, accumToNow: 0 };
+         state[lobName] = st;
+       }
+       if(isExpiredState(st, now)){
+         discardState(lobName);
+         return { currentLAT: 0, expectedLAT: 0, remainingMin: 0, accumToNow: 0 };
+       }
+       if(req <= 0) return { currentLAT: 0, expectedLAT: 0, remainingMin: 0, accumToNow: 0 };
+
+       rollBoundaries(st, lobName, now); // advance interval; persists on crossing (Part 1 fix)
+
+       if(st.segments.length === 0)
+         return { currentLAT: 0, expectedLAT: 0, remainingMin: 0, accumToNow: 0 };
+
+       const intervalEndMs = st.intervalStart.getTime() + INTERVAL_MS;
+       const remainingMin  = Math.max(0, (intervalEndMs - now.getTime()) / 60000);
+
+       // Current LAT: average observed REQ% across elapsed time of this interval.
+       // Denominator is elapsed minutes (not full 30) — reflects actual performance so far.
+       // Guard: return 0 at exact interval start (elapsedMin = 0) to avoid division by zero.
+       let accumToNow  = computeArea(st, req, now.getTime());
+       const elapsedMin  = Math.max(0, (now.getTime() - st.intervalStart.getTime()) / 60000);
+       const latOverride = LATOverrideStore.get(lobName, st.intervalStart.getTime());
+       const overrideActive = latOverride != null && isFinite(latOverride);
+
+       if(overrideActive){
+         accumToNow = Number(latOverride) * elapsedMin;
+       }
+
+       const currentLAT  = overrideActive
+         ? Number(latOverride)
+         : (elapsedMin > 0 ? accumToNow / elapsedMin : 0);
+
+       // Expected LAT: projected final interval average if current REQ% holds for remaining time.
+       // Denominator remains fixed 30 minutes — this is the interval-close prediction metric.
+       const lastIN        = st.segments[st.segments.length - 1].inValue;
+       const currentReqPct = (lastIN / req) * 100;
+       const expectedArea  = accumToNow + currentReqPct * remainingMin;
+       const expectedLAT   = expectedArea / INTERVAL_MIN; // denominator ALWAYS 30 (§3.1)
+
+       // No saveState — live() must never write localStorage on the 1-second tick.
+       // accumToNow returned so callers never reconstruct it via currentLAT*30 (denominators differ).
+       return { currentLAT, expectedLAT, remainingMin, accumToNow };
+     },
+
+     // Exposed for diagnostics / unit testing.
+     _stateFor(lobName){ return state[lobName] || null; },
+
+     // Persist the in-memory state after non-snapshot flag changes.
+     _persist(lobName){
+       const st = state[lobName];
+       if(st) saveState(lobName, st);
+     },
+
+     clear(lobName){
+       delete state[lobName];
+       try{ localStorage.removeItem(LAT_STORAGE_PREFIX + lobName); }catch(e){}
+     },
+
+     // Exposed so the REQ priority system can compute the current interval start
+     // without duplicating the snap-to-:00/:30 logic.
+     intervalStartFor,
+   };
+ })();
+
+ /* ============================================================
+    computeDeltaStaff — simulation-based Δ Staff (spec §7).
+
+    Determines how many heads can be removed (positive) or must
+    be added (negative) while still achieving PASS at interval end.
+
+    Math: solve for IN_needed so that:
+      (accumToNow + (IN_needed/req × 100) × remaining) / 30 = threshold
+      → IN_needed = req × (threshold×30 − accumToNow) / (remaining×100)
+      → rawDelta  = IN_needed − currentIN
+
+    Conservative rounding (§7.4):
+      excess  (+): floor(-rawDelta)  e.g. +2.9 → +2
+      deficit (−): ceil(rawDelta)    e.g. −2.1 → −3
+
+    Returns 0 when remaining ≤ 0 (interval over) or req ≤ 0 (no target).
+ ============================================================ */
+ function projectExpectedLATForIN(testIN, req, accumToNow, remainingMin){
+   if(req <= 0) return 0;
+   return (accumToNow + ((Number(testIN) || 0) / req) * 100 * remainingMin) / 30;
+ }
+
+ function computeDeltaStaff(currentIN, currentOUT, req, accumToNow, remainingMin, threshold){
+   if(req <= 0 || remainingMin <= 0) return 0;
+
+   const inCount = Math.max(0, Math.floor(Number(currentIN) || 0));
+   const outCount = Math.max(0, Math.floor(Number(currentOUT) || 0));
+   const maxPositive = inCount + 10;
+   const maxNegative = outCount + 10;
+
+   const passes = (n) => projectExpectedLATForIN(n, req, accumToNow, remainingMin) >= threshold;
+   const currentPass = passes(inCount);
+
+   if(currentPass){
+     let lo = 0;
+     let hi = inCount;
+     while(lo < hi){
+       const mid = Math.floor((lo + hi) / 2);
+       if(passes(mid)) hi = mid;
+       else lo = mid + 1;
+     }
+     const removable = Math.max(0, inCount - lo);
+     return Math.min(removable, maxPositive);
+   }
+
+   let lo = inCount;
+   let hi = inCount + maxNegative;
+   if(!passes(hi)) return -maxNegative;
+
+   while(lo < hi){
+     const mid = Math.floor((lo + hi) / 2);
+     if(passes(mid)) hi = mid;
+     else lo = mid + 1;
+   }
+   const additions = Math.max(0, lo - inCount);
+   return -Math.min(additions, maxNegative);
+ }
+
+ /* ============================================================
+    MetricsModule — REQ%, Current/Expected LAT%, Δ Staff
+    (simulation-based, §7), PASS/FAIL (expectedLAT per §6).
+ ============================================================ */
+ const MetricsModule = {
+   compute(lobName, agg, cfg, now, options = {}){
+     const req       = Number(options.req != null ? options.req : cfg.req) || 0;
+     const threshold = Number(cfg.threshold);
+     const reqPct    = req > 0 ? (agg.IN / req) * 100 : 0;
+
+     if(options.recordSnapshot !== false){
+       LATEngine.update(lobName, now, agg.IN, req);
+     }
+     const live = LATEngine.live(lobName, now, req);
+
+     const pass    = live.expectedLAT >= threshold;
+     const reqPass = req <= 0 || agg.IN >= req;
+     const accumToNow = live.accumToNow;  // use value returned by live() directly — denominators differ after spec change
+     const head       = computeDeltaStaff(agg.IN, agg.OUT, req, accumToNow, live.remainingMin, threshold);
+     const latVelocity = resolveLATVelocity(lobName, now, live.expectedLAT);
+
+     return { reqPct, currentLAT: live.currentLAT, expectedLAT: live.expectedLAT, head, pass, reqPass, req, threshold, remainingMin: live.remainingMin, latVelocity };
+   },
+   liveTick(lobName, cfg, now, options = {}){
+     const req       = Number(options.req != null ? options.req : cfg.req) || 0;
+     const threshold = Number(cfg.threshold);
+     const live = LATEngine.live(lobName, now, req);
+     const currentIN = (lastSnapshot.find(l=>l.name===lobName)?.agg.IN) || 0;
+     const reqPct = req > 0 ? (currentIN / req) * 100 : 0;
+     const pass = live.expectedLAT >= threshold;
+     const reqPass = req <= 0 || currentIN >= req;
+     const currentOUT = (lastSnapshot.find(l=>l.name===lobName)?.agg.OUT) || 0;
+     const head = computeDeltaStaff(currentIN, currentOUT, req, live.accumToNow, live.remainingMin, threshold);
+     // Read-only: computes display velocity from the last snapshot reference
+     // without writing to localStorage. The 1-second tick must never persist state.
+     const latVelocity = readLATVelocity(lobName, now, live.expectedLAT);
+     return { reqPct, currentLAT: live.currentLAT, expectedLAT: live.expectedLAT, head, pass, reqPass, req, threshold, latVelocity, remainingMin: live.remainingMin };
+   }
+ };
+
+ /* ============================================================
+    AlertEngine — per-LOB breach alerts with 60-second throttle,
+    per-LOB mute, and global mute.
+
+    Two alert types:
+      REQ  — fires when IN < REQ (reqPct < 100). Indicates live
+             headcount is below requirement right now. Uses a short
+             high-pitched pip (C5, 0.35 s).
+      LAT  — fires when currentLAT < threshold AND currentLAT > 0
+             (LAT% is failing and we have real interval data). Uses
+             a longer lower tone (F4, 0.65 s) to distinguish it
+             audibly from a REQ pip.
+
+    Throttle: each alert type fires at most once per 60 s per LOB,
+    regardless of how often the 1-second tick runs.
+
+    Mute hierarchy:
+      Global mute  → silences all audio and clears the banner.
+      LOB mute     → silences audio + excludes from banner for
+                     that LOB only. Other LOBs unaffected.
+
+    AudioContext is created lazily on first user gesture (Web Audio
+    API requirement in modern browsers). Call AlertEngine.unlock()
+    from any button click handler to pre-warm the context.
+ ============================================================ */
+
+ const AlertEngine = (function(){
+   const THROTTLE_MS  = 60 * 1000; // 60 s between beeps per LOB per type
+   const _times       = {};         // lobName -> {req: ms, lat: ms}
+   const _lobMute     = {};         // lobName -> bool
+   let   _globalMute  = false;
+   let   _audioCtx    = null;
+
+   function ctx(){
+     if(!_audioCtx){
+       try{ _audioCtx = new (window.AudioContext || window.webkitAudioContext)(); }catch(e){}
+     }
+     return _audioCtx;
+   }
+
+   function beep(freq, dur, vol){
+     const c = ctx();
+     if(!c) return;
+     try{
+       const osc  = c.createOscillator();
+       const gain = c.createGain();
+       osc.type   = 'sine';
+       osc.connect(gain);
+       gain.connect(c.destination);
+       osc.frequency.value = freq;
+       gain.gain.setValueAtTime(vol || 0.25, c.currentTime);
+       gain.gain.exponentialRampToValueAtTime(0.0001, c.currentTime + dur);
+       osc.start(c.currentTime);
+       osc.stop(c.currentTime + dur + 0.05);
+     }catch(e){}
+   }
+
+   function times(lobName){
+     if(!_times[lobName]) _times[lobName] = {req:0, lat:0};
+     return _times[lobName];
+   }
+
+   return {
+     // Call on any user gesture to pre-warm the AudioContext.
+     unlock(){ ctx(); },
+
+     setGlobalMute(on){
+       _globalMute = on;
+       const btn = document.getElementById('btnGlobalMute');
+       if(btn){ btn.textContent = on ? '🔕' : '🔔'; }
+       if(on){
+         const b = document.getElementById('alertBanner');
+         if(b){ b.classList.remove('active'); b.textContent = ''; }
+       }
+     },
+     isGlobalMuted(){ return _globalMute; },
+
+     toggleLobMute(lobName){
+       _lobMute[lobName] = !_lobMute[lobName];
+       return _lobMute[lobName];
+     },
+     isLobMuted(lobName){ return !!_lobMute[lobName]; },
+
+     // Called every 1-second tick. metrics must include:
+     // {reqPct, currentLAT, pass, req, threshold}
+     // cfg must include: {alertREQ, alertLAT}
+     check(lobName, metrics, cfg){
+       if(_globalMute || _lobMute[lobName] || metrics.req <= 0) return;
+       const now = Date.now();
+       const t   = times(lobName);
+
+       // REQ% alert: at least one agent slot unfilled right now
+       if(cfg.alertREQ !== false && metrics.reqPct < 100 && (now - t.req) > THROTTLE_MS){
+         t.req = now;
+         beep(523, 0.35, 0.28); // C5 — short pip
+       }
+
+       // LAT% alert: interval average below threshold, real data present
+       if(cfg.alertLAT !== false && metrics.currentLAT > 0 && !metrics.pass && (now - t.lat) > THROTTLE_MS){
+         t.lat = now;
+         beep(349, 0.65, 0.28); // F4 — longer lower tone
+       }
+     }
+   };
+ })();
+
+ /* ============================================================
+    App state + render
+ ============================================================ */
+ let lastSnapshot = []; // [{name, entries, agg, cfg, metrics}]
+ let lastProcessedTimestamp = null;
+ let lastParseWarnings = [];
+ let lastListenerSignature = null;
+
+ // ── P2: freshness + source tracking ──────────────────────────
+ let _lastSnapshotWall      = null; // Date — wall-clock when last snapshot completed
+ let _lastSnapshotTimestamp = null; // Date — parsed snapshot time (null if not embedded in payload)
+ let _lastSnapshotSource    = null; // 'Manual' | 'File' | 'Watch' | 'Listener' | 'Extension'
+
+ // ── Gap fixes: diagnostics tracker ────────────────────────────
+ const _diag = {
+   lastResult:       null,  // 'ok'|'duplicate'|'ignored'|'empty'|'locked'|'no_lobs'
+   lastResultTime:   null,  // Date
+   totalProcessed:   0,     // successful pipeline completions
+   duplicatesCaught: 0,     // Guard 4 hits (content hash match)
+   ignoredOOO:       0,     // Guard 3 hits (out-of-order / same timestamp)
+   lastLOBCount:     0,
+   lastEntryCount:   0,
+   lastUnknownCount: 0,
+   lastWarnings:     [],
+   events:           [],
+ };
+
+ // ── P1: duplicate detection ──────────────────────────────────
+ // FNV-1a–inspired 32-bit hash over the full snapshot payload.
+ function _contentSig(rawText){
+   let h = 0x811c9dc5;
+   const s = (rawText||'').trim();
+   for(let i = 0; i < s.length; i++){
+     h = Math.imul(h ^ s.charCodeAt(i), 0x01000193) >>> 0;
+   }
+   return h;
+ }
+ // Composite signature: "<timestamp>::<contentHash>"
+ // Manual-paste snapshots use "manual" as the timestamp token so
+ // two identical pastes in a row are still caught.
+ let _lastProcessedSig = null;
+
+ // ── P1: processing lock ───────────────────────────────────────
+ // Prevents re-entrant / concurrent pipeline runs. The pipeline is
+ // synchronous but file-watch and listener ticks can fire before a
+ // previous synchronous run has returned if the event loop is busy.
+ let _processing = false;
+
+ function buildStatusMessage(prefix, count, timestamp){
+   let msg = `${prefix} — ${count} LOB(s) found.`;
+   if(timestamp) msg += ` • snapshot time: ${timestamp}`;
+   if(lastParseWarnings.length) msg += ` • warnings: ${lastParseWarnings.length}`;
+   return msg;
+ }
+
+ function fmtPct(n){ return (isFinite(n)?n:0).toFixed(1)+'%'; }
+ function fmtVelocity(n){
+   if(n == null || !isFinite(n)) return '—';
+   const sign = n > 0 ? '+' : '';
+   return `${sign}${n.toFixed(2)} pp/min`;
+ }
+ function esc(s){
+   return String(s==null?'':s).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+ }
+
+
+ function trendClass(curr, prev){
+   const a = Number(curr);
+   const b = Number(prev);
+   if(!isFinite(a) || !isFinite(b)) return 'flat';
+   const delta = a - b;
+   if(Math.abs(delta) < 0.0005) return 'flat';
+   return delta > 0 ? 'up' : 'down';
+ }
+ function trendGlyph(cls){
+   return cls === 'up' ? '↑' : cls === 'down' ? '↓' : '→';
+ }
+ function metricMarkup(value, cls, trend='flat', metricName=''){
+   return `<div class="v metric-v ${cls || ''}" data-metric="${metricName}"><span class="metric-num">${value}</span><span class="metric-trend ${trend}">${trendGlyph(trend)}</span></div>`;
+ }
+
+const NotificationCenter = (function(){
+   const host = document.getElementById('toastStack') || (()=>{
+     const el = document.createElement('div');
+     el.id = 'toastStack';
+     el.className = 'toast-stack';
+     el.setAttribute('aria-live','polite');
+     el.setAttribute('aria-atomic','false');
+     document.body.appendChild(el);
+     return el;
+   })();
+   let seq = 0;
+   function notify({kind='info', title='Notice', body='', ttl=8000}){
+     const node = document.createElement('div');
+     node.className = `toast ${kind}`;
+     node.dataset.toastId = String(++seq);
+     node.innerHTML = `<div class="t-title">${esc(title)}</div><div class="t-body">${esc(body)}</div>`;
+     host.appendChild(node);
+     const remove = ()=>{
+       if(!node.isConnected) return;
+       node.classList.add('hide');
+       window.setTimeout(()=>{ if(node.isConnected) node.remove(); }, 250);
+     };
+     window.setTimeout(remove, Math.max(3000, Number(ttl)||8000));
+     return node.dataset.toastId;
+   }
+   return { notify };
+ })();
+
+ function recordDiagEvent(kind, message){
+   _diag.events.unshift({ kind, message, at: new Date().toLocaleTimeString() });
+   if(_diag.events.length > 5) _diag.events.length = 5;
+   renderDiag();
+ }
+
+ function showREQVerificationAlert(lobName, req){
+   const body = `LOB: ${lobName}
+Current REQ: ${req}
+Please verify the requirement for the new interval.`;
+   NotificationCenter.notify({kind:'info', title:'REQ verification required', body, ttl:9000});
+   recordDiagEvent('REQ verification', `${lobName} current REQ ${req}`);
+   AlertHistoryStore.recordVerification(lobName, req); // Phase C additive
+ }
+
+ function openDrawer(which){
+   const overlay = document.getElementById(which);
+   if(!overlay) return;
+   overlay.classList.add('open');
+   overlay.setAttribute('aria-hidden','false');
+ }
+ function closeDrawer(which){
+   const overlay = document.getElementById(which);
+   if(!overlay) return;
+   overlay.classList.remove('open');
+   overlay.setAttribute('aria-hidden','true');
+ }
+ function attachDrawerBehavior(overlayId, closeBtnId){
+   const overlay = document.getElementById(overlayId);
+   const closeBtn = document.getElementById(closeBtnId);
+   if(closeBtn) closeBtn.addEventListener('click', ()=>closeDrawer(overlayId));
+   if(overlay){
+     overlay.addEventListener('click', e=>{
+       if(e.target === overlay) closeDrawer(overlayId);
+     });
+   }
+ }
+
+
+ function recomputeOne(idx){
+   const lob  = lastSnapshot[idx];
+   const now  = new Date();
+   const base = lob._baseCfg || lob.cfg || {};
+   const er   = resolveEffectiveREQ(lob._configKey || lob.name, now, base); // Phase 3
+   lob._effectiveREQ = er.req;
+   lob._reqSource = er.source;
+   lob._intervalKey = er.intervalKey;
+   lob.cfg = {...base};
+   lob.metrics = MetricsModule.compute(
+     lob.name, lob.agg, lob.cfg, now, { recordSnapshot:false, req: er.req }
+   );
+}
+
+ /* Live ticking — updates LAT%/Expected LAT%/badge every second between snapshots.
+    P2 additions: freshness indicator, AlertEngine.check per LOB, alert banner. */
+ setInterval(()=>{
+   const now = new Date();
+
+   if(_lastSnapshotWall || _lastSnapshotTimestamp){
+     const reference = _lastSnapshotTimestamp || _lastSnapshotWall;
+     const ageS = Math.round((now - reference) / 1000);
+     const fd = document.getElementById('freshDot');
+     const fe = document.getElementById('freshElapsed');
+     if(fe) fe.textContent = ageS < 60
+       ? `${ageS} s ago`
+       : `${Math.floor(ageS/60)}m ${ageS%60}s ago`;
+     if(fd) fd.className = 'fresh-dot ' +
+       (ageS < 60 ? 'ok' : ageS < 180 ? 'warn' : 'stale');
+   }
+
+   if(lastSnapshot.length === 0){
+     const banner = document.getElementById('alertBanner');
+     if(banner){ banner.classList.remove('active'); banner.textContent=''; }
+     return;
+   }
+
+   lastSnapshot.forEach(lob=>{
+     const base = lob._baseCfg || lob.cfg || {};
+     const er = resolveEffectiveREQ(lob._configKey || lob.name, now, base); // Phase 3
+     lob._effectiveREQ = er.req;
+     lob._reqSource = er.source;
+     lob._intervalKey = er.intervalKey;
+     lob.cfg = {...base};
+     const t = MetricsModule.liveTick(lob.name, lob.cfg, now, { req: er.req });
+     lob.metrics.req       = t.req;
+     lob.metrics.reqPct    = t.reqPct;
+     lob.metrics.currentLAT  = t.currentLAT;
+     lob.metrics.expectedLAT = t.expectedLAT;
+     lob.metrics.head        = t.head;
+     lob.metrics.pass        = t.pass;
+     lob.metrics.reqPass     = t.reqPass;
+     lob.metrics.latVelocity  = t.latVelocity;
+   });
+
+   // DOM update per LOB strip (new render engine)
+   lastSnapshot.forEach(lob => _updateStripDOM(lob));
+
+   lastSnapshot.forEach(lob=>{
+     AlertEngine.check(lob.name, lob.metrics, lob.cfg);
+     AlertHistoryStore.check(lob.name, lob.metrics, lob.cfg); // Phase C additive
+   });
+
+   const banner = document.getElementById('alertBanner');
+   if(banner){
+     if(AlertEngine.isGlobalMuted()){
+       banner.classList.remove('active');
+       banner.textContent = '';
+     } else {
+       const failing = lastSnapshot.filter(l=>
+         !AlertEngine.isLobMuted(l.name) &&
+         l.metrics.req > 0 &&
+         (l.metrics.reqPct < 100 || (!l.metrics.pass && l.metrics.currentLAT > 0))
+       );
+       if(failing.length){
+         const msg = '⚠ ' + failing.map(l=>{
+           const parts = [];
+           if(l.metrics.reqPct < 100)
+             parts.push(`REQ ${l.metrics.reqPct.toFixed(0)}% (${Math.round(l.metrics.reqPct/100*l.metrics.req)}/${l.metrics.req})`);
+           if(!l.metrics.pass && l.metrics.expectedLAT > 0)
+             parts.push(`LAT ${l.metrics.expectedLAT.toFixed(1)}% < ${l.metrics.threshold}%`);
+           return `${l.name}: ${parts.join(', ')}`;
+         }).join(' • ');
+         if(banner.textContent !== msg) banner.textContent = msg;
+         banner.classList.add('active');
+       } else {
+         banner.classList.remove('active');
+         banner.textContent = '';
+       }
+     }
+   }
+ }, 1000);
+ /* ============================================================
+    Snapshot processing pipeline (shared by every input method)
+
+    Guards:
+    1. Empty input returns early.
+    2. Processing lock prevents re-entrant runs.
+    3. Duplicate content uses the full payload hash and the active
+       timestamp token.
+    4. Out-of-order checks ignore only strictly older timestamps.
+       Same timestamps remain eligible when content differs.
+ ============================================================ */
+ function processSnapshot(rawText, timestamp, source){
+   if(!rawText || !rawText.trim()){
+     lastParseWarnings = ['Empty input — nothing to process.'];
+     renderGrid();
+     return {result:'empty', count:0};
+   }
+
+   if(_processing) return {result:'locked', count:lastSnapshot.length};
+   _processing = true;
+
+   try{
+     const parsedTimestamp = ParserModule.extractTimestamp(rawText);
+     const resolvedTimestamp = parsedTimestamp || timestamp || null;
+     const now = resolvedTimestamp ? new Date(resolvedTimestamp) : new Date();
+
+     if(resolvedTimestamp && lastProcessedTimestamp &&
+        now.getTime() < lastProcessedTimestamp.getTime()){
+       lastParseWarnings = ['Out-of-order snapshot — ignored.'];
+       _diag.ignoredOOO++;
+       _diag.lastResult = 'ignored';
+       _diag.lastResultTime = new Date();
+       renderGrid();
+       renderDiag();
+       return {result:'ignored', count:lastSnapshot.length};
+     }
+
+     const sig = `${resolvedTimestamp || 'manual'}::${_contentSig(rawText)}`;
+     if(sig === _lastProcessedSig){
+       _diag.duplicatesCaught++;
+       _diag.lastResult = 'duplicate';
+       _diag.lastResultTime = new Date();
+       renderDiag();
+       return {result:'duplicate', count:lastSnapshot.length};
+     }
+
+     const lobs = ParserModule.parse(rawText);
+     lastParseWarnings = Array.isArray(lobs.warnings) ? lobs.warnings : [];
+     lastSnapshot = lobs.map(lob=>{
+       resolveUnknownStates(lob.entries);
+       const agg = ClassificationModule.aggregate(lob.entries);
+       // Phase 3: canonical alias resolution for config/schedule/override lookups
+       const { cfg: baseCfg, configKey: _configKey, canonicalName: _canonicalName } = resolveCanonicalConfig(lob.name);
+       const er = resolveEffectiveREQ(_configKey, now, baseCfg);
+       const cfg = {...baseCfg};
+       const metrics = MetricsModule.compute(lob.name, agg, cfg, now, { req: er.req });
+       return {
+         name: lob.name,
+         _canonicalName, // Phase 3: null=direct match; string=canonical alias used
+         _configKey,     // Phase 3: key for all config/schedule/override lookups
+         entries: lob.entries,
+         agg,
+         cfg,
+         _baseCfg: baseCfg,
+         _reqSource: er.source,
+         _effectiveREQ: er.req,
+         _intervalKey: er.intervalKey,
+         metrics
+       };
+     });
+
+     _lastProcessedSig = sig;
+     _lastSnapshotWall = new Date();
+     _lastSnapshotTimestamp = resolvedTimestamp ? new Date(resolvedTimestamp) : null;
+     _lastSnapshotSource = source || 'Manual';
+     if(resolvedTimestamp) lastProcessedTimestamp = now;
+
+     _diag.lastResult       = lastSnapshot.length > 0 ? 'ok' : 'no_lobs';
+     _diag.lastResultTime   = new Date();
+     _diag.totalProcessed++;
+     _diag.lastLOBCount     = lastSnapshot.length;
+     _diag.lastEntryCount   = lastSnapshot.reduce((s,l) => s + l.agg.TOTAL, 0);
+     _diag.lastUnknownCount = lastSnapshot.reduce((s,l) => s + l.agg.UNKNOWN, 0);
+     _diag.lastWarnings     = [...lastParseWarnings];
+
+     if((source === 'Manual' || source === 'Extension') && lastSnapshot.length > 0){
+       const ta = document.getElementById('rawInput');
+       if(ta && ta.value.trim()){ ta.value = ''; }
+     }
+
+     const fb = document.getElementById('freshnessBar');
+     const sb = document.getElementById('srcBadge');
+     const fd = document.getElementById('freshDot');
+     const fe = document.getElementById('freshElapsed');
+     if(fb){ fb.style.display = 'flex'; }
+     if(sb){ sb.textContent = _lastSnapshotSource; }
+     if(fd){ fd.className = 'fresh-dot ok'; }
+     if(fe){ fe.textContent = '0 s ago'; }
+
+     lastSnapshot.forEach(lob=>{
+       const st = LATEngine._stateFor(lob.name);
+       if(st && st.needsREQVerification){
+         st.needsREQVerification = false;
+         LATEngine._persist(lob.name);
+         showREQVerificationAlert(lob.name, lob._effectiveREQ ?? lob.cfg.req ?? 0);
+       }
+     });
+
+     renderGrid();
+     renderDiag();
+     // Phase C additive: save accepted snapshot to history, refresh timeline if open
+     HistoryStore.save(lastSnapshot, source, now);
+     if(_tlOpen) renderTimelineDrawer();
+     return {result: _diag.lastResult, count: lastSnapshot.length};
+   } finally {
+     _processing = false;
+   }
+ }
+
+function extractFromJSON(obj){
+   if(typeof obj === 'string') return {text:obj, timestamp:null};
+   if(obj && typeof obj === 'object'){
+     const rawText = obj.text ?? obj.snapshot ?? obj.content ?? obj.data ?? null;
+     return {text: toText(rawText), timestamp: obj.timestamp || null};
+   }
+   return {text:null, timestamp:null};
+ }
+
+ // Converts a processSnapshot() result object into a human-readable status string.
+ function _statusMsg(r, prefix, timestamp){
+   if(r.result === 'duplicate') return 'Duplicate snapshot — already processed, no update.';
+   if(r.result === 'ignored')   return 'Out-of-order snapshot — ignored.';
+   if(r.result === 'empty')     return 'Nothing to process.';
+   if(r.result === 'locked')    return 'Pipeline busy — skipped.';
+   return buildStatusMessage(prefix, r.count, timestamp);
+ }
+
+ // Renders the diagnostics panel from _diag session state.
+ function renderDiag(){
+   const panel = document.getElementById('diagPanel');
+   if(!panel) return;
+   const resultLabel = {
+     ok:'✓ Accepted', no_lobs:'⚠ No LOBs found', duplicate:'⊘ Duplicate',
+     ignored:'⊘ Out-of-order', empty:'— Empty', locked:'— Locked', null:'—'
+   };
+   const t = _diag.lastResultTime
+     ? _diag.lastResultTime.toLocaleTimeString()
+     : '—';
+   const warnText = _diag.lastWarnings.length
+     ? _diag.lastWarnings.slice(0,3).join('; ') + (_diag.lastWarnings.length > 3 ? '…' : '')
+     : 'None';
+   const eventText = _diag.events.length
+     ? _diag.events.slice(0,3).map(e=>`${e.at} • ${e.kind} • ${e.message}`).join('; ')
+     : 'None';
+   panel.innerHTML = [
+     ['Last result',   resultLabel[_diag.lastResult] || '—'],
+     ['At',           t],
+     ['LOBs parsed',  _diag.lastLOBCount],
+     ['Entries',      _diag.lastEntryCount],
+     ['UNKNOWN states',_diag.lastUnknownCount],
+     ['Duplicates (session)',  _diag.duplicatesCaught],
+     ['Out-of-order (session)',_diag.ignoredOOO],
+     ['Total processed',       _diag.totalProcessed],
+     ['Warnings',     warnText],
+     ['Recent events', eventText],
+   ].map(([label, val])=>`
+     <div style="background:var(--panel);border:1px solid var(--border);border-radius:7px;padding:7px 10px;">
+       <div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;margin-bottom:3px;">${label}</div>
+       <div style="font-size:12px;color:var(--text);word-break:break-word;">${esc(String(val))}</div>
+     </div>`).join('');
+}
+
+ /* ============================================================
+    Phase C — Timeline UI
+    All render functions are read-only. They load from HistoryStore
+    and AlertHistoryStore on demand. Charts are rebuilt only when
+    the drawer opens, date/LOB changes, or a new snapshot arrives.
+ ============================================================ */
+ let _tlOpen = false;
+ let _tlDate  = '';
+ let _tlLob   = 'All LOBs';
+
+ function _tlFmtTime(iso){
+   try{ return new Date(iso).toLocaleTimeString(); }catch(e){ return iso||'—'; }
+ }
+ function _tlFmtPct(n){ return (isFinite(+n)?+n:0).toFixed(1)+'%'; }
+
+ function renderTimelineDrawer(){
+   if(!_tlOpen) return;
+
+   // ── Date population ──────────────────────────────────────────
+   const dates = HistoryStore.getDateList();
+   const today = new Date().toISOString().slice(0,10);
+   if(!_tlDate || !dates.includes(_tlDate)){
+     _tlDate = dates.includes(today) ? today : (dates[0] || today);
+   }
+   const dateSelEl = document.getElementById('tlDateSel');
+   if(dateSelEl){
+     dateSelEl.innerHTML = dates.length
+       ? dates.map(d=>`<option value="${d}"${d===_tlDate?' selected':''}>${d}</option>`).join('')
+       : `<option value="${today}">${today}</option>`;
+   }
+
+   // ── Records for selected date ─────────────────────────────────
+   const allRecs = HistoryStore.getForDate(_tlDate); // newest first
+
+   // ── LOB population ───────────────────────────────────────────
+   const lobSet = new Set();
+   allRecs.forEach(r => r.lobs.forEach(l => lobSet.add(l.name)));
+   const lobList = ['All LOBs', ...[...lobSet].sort()];
+   if(!lobList.includes(_tlLob)) _tlLob = 'All LOBs';
+   const lobSelEl = document.getElementById('tlLobSel');
+   if(lobSelEl){
+     lobSelEl.innerHTML = lobList.map(l=>`<option value="${esc(l)}"${l===_tlLob?' selected':''}>${esc(l)}</option>`).join('');
+   }
+
+   // ── Filter records by LOB ─────────────────────────────────────
+   const filtered = _tlLob === 'All LOBs'
+     ? allRecs
+     : allRecs
+         .map(r=>({...r, lobs: r.lobs.filter(l=>l.name===_tlLob)}))
+         .filter(r=>r.lobs.length>0);
+
+   _tlRenderSummary(filtered);
+   _tlRenderCharts(filtered);
+   _tlRenderTable(filtered);
+   _tlRenderAlerts();
+ }
+
+ // Part 6 — Interval Summary
+ function _tlRenderSummary(records){
+   const el = document.getElementById('tlSummary');
+   if(!el) return;
+   if(_tlLob === 'All LOBs' || !records.length){ el.style.display='none'; return; }
+   el.style.display='';
+   const exp=[], req=[], inV=[];
+   records.forEach(r=>r.lobs.forEach(l=>{
+     if(isFinite(l.expectedLAT)) exp.push(+l.expectedLAT);
+     if(isFinite(l.reqPct))      req.push(+l.reqPct);
+     if(isFinite(l.IN))          inV.push(+l.IN);
+   }));
+   function sp(arr,unit){
+     if(!arr.length) return {hi:'—',lo:'—',avg:'—'};
+     const sum=arr.reduce((a,b)=>a+b,0);
+     return {
+       hi:(Math.max(...arr)).toFixed(1)+unit,
+       lo:(Math.min(...arr)).toFixed(1)+unit,
+       avg:(sum/arr.length).toFixed(1)+unit
+     };
+   }
+   const e=sp(exp,'%'), r=sp(req,'%');
+   const inHi = inV.length ? Math.max(...inV) : '—';
+   const inLo = inV.length ? Math.min(...inV) : '—';
+   el.innerHTML = `
+     <h2 style="margin:0 0 10px;">Interval Summary — ${esc(_tlLob)}</h2>
+     <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:6px;">
+       <div class="tl-sum-cell"><div class="tl-sum-label">Exp LAT High</div><div class="tl-sum-val">${e.hi}</div></div>
+       <div class="tl-sum-cell"><div class="tl-sum-label">Exp LAT Low</div><div class="tl-sum-val">${e.lo}</div></div>
+       <div class="tl-sum-cell"><div class="tl-sum-label">Exp LAT Avg</div><div class="tl-sum-val">${e.avg}</div></div>
+       <div class="tl-sum-cell"><div class="tl-sum-label">REQ% High</div><div class="tl-sum-val">${r.hi}</div></div>
+       <div class="tl-sum-cell"><div class="tl-sum-label">REQ% Low</div><div class="tl-sum-val">${r.lo}</div></div>
+       <div class="tl-sum-cell"><div class="tl-sum-label">REQ% Avg</div><div class="tl-sum-val">${r.avg}</div></div>
+       <div class="tl-sum-cell"><div class="tl-sum-label">Max IN</div><div class="tl-sum-val">${inHi}</div></div>
+       <div class="tl-sum-cell"><div class="tl-sum-label">Min IN</div><div class="tl-sum-val">${inLo}</div></div>
+       <div class="tl-sum-cell"><div class="tl-sum-label">Snapshots</div><div class="tl-sum-val">${records.length}</div></div>
+     </div>`;
+ }
+
+ // Part 4 — Mini SVG Trend Charts (no libraries, pure SVG polyline)
+ function _tlRenderCharts(records){
+   const outer = document.getElementById('tlCharts');
+   const el    = document.getElementById('tlChartsInner');
+   if(!outer || !el) return;
+   if(_tlLob === 'All LOBs' || !records.length){
+     outer.style.display='none'; return;
+   }
+   outer.style.display='';
+   // Chronological order for charting (records are newest-first)
+   const pts = [...records].reverse().map(r=>r.lobs[0]).filter(Boolean);
+   if(!pts.length){ el.innerHTML=''; return; }
+
+   function mkChart(values, color, label){
+     const W=260, H=58, P=5;
+     const clean = values.map(v=>isFinite(+v)?+v:0);
+     const lo = Math.min(...clean);
+     const hi = Math.max(...clean);
+     const rng = hi-lo || 1;
+     const px = i => P+(i/(Math.max(clean.length-1,1)))*(W-P*2);
+     const py = v => H-P-((v-lo)/rng)*(H-P*2);
+     const pts2 = clean.map((v,i)=>`${px(i).toFixed(1)},${py(v).toFixed(1)}`).join(' ');
+     return `<div style="margin-bottom:10px;">
+       <div class="tl-chart-label">${label}</div>
+       <svg width="${W}" height="${H}"
+         style="display:block;background:var(--panel2);border-radius:6px;border:1px solid var(--border);"
+         aria-hidden="true">
+         <polyline points="${pts2}" fill="none"
+           stroke="${color}" stroke-width="1.8"
+           stroke-linejoin="round" stroke-linecap="round"/>
+         <text x="${P+2}" y="${H-P-2}" font-size="7.5"
+           fill="rgba(205,217,229,.3)" font-family="monospace">${lo.toFixed(1)}</text>
+         <text x="${P+2}" y="${P+8}" font-size="7.5"
+           fill="rgba(205,217,229,.3)" font-family="monospace">${hi.toFixed(1)}</text>
+       </svg>
+     </div>`;
+   }
+
+   el.innerHTML =
+     mkChart(pts.map(p=>p.expectedLAT), 'var(--accent)', 'Expected LAT%') +
+     mkChart(pts.map(p=>p.reqPct),      'var(--warn)',   'REQ%') +
+     mkChart(pts.map(p=>p.IN),          'var(--good)',   'IN Staffing');
+ }
+
+ // Part 3 — Snapshot Timeline Table
+ function _tlRenderTable(records){
+   const el = document.getElementById('tlTableWrap');
+   if(!el) return;
+   if(!records.length){
+     el.innerHTML='<div class="small" style="opacity:.6;padding:12px 4px;">No history for selected filters.</div>';
+     return;
+   }
+   const rows = [];
+   records.forEach(r=>{
+     r.lobs.forEach(l=>{
+       const latOk  = l.pass   ? 'color:var(--good)' : 'color:var(--bad)';
+       const reqOk  = l.reqPass? 'color:var(--good)' : 'color:var(--bad)';
+       const delta  = l.head>=0
+         ? `<span style="color:var(--good)">+${l.head}</span>`
+         : `<span style="color:var(--bad)">${l.head}</span>`;
+       rows.push(`<tr>
+         <td>${_tlFmtTime(r.timestamp)}</td>
+         <td>${esc(l.name)}</td>
+         <td>${l.IN}</td>
+         <td>${l.OUT}</td>
+         <td>${l.req}</td>
+         <td>${_tlFmtPct(l.reqPct)}</td>
+         <td>${_tlFmtPct(l.currentLAT)}</td>
+         <td>${_tlFmtPct(l.expectedLAT)}</td>
+         <td>${l.threshold}%</td>
+         <td>${delta}</td>
+         <td style="${latOk}">${l.pass?'PASS':'FAIL'}</td>
+         <td style="${reqOk}">${l.reqPass?'PASS':'FAIL'}</td>
+       </tr>`);
+     });
+   });
+   el.innerHTML = `<table class="tl-table">
+     <thead><tr>
+       <th>Time</th><th>LOB</th><th>IN</th><th>OUT</th>
+       <th>REQ</th><th>REQ%</th><th>LAT%</th><th>Exp LAT%</th>
+       <th>Threshold</th><th>Δ Staff</th><th>LAT Status</th><th>REQ Status</th>
+     </tr></thead>
+     <tbody>${rows.join('')}</tbody>
+   </table>`;
+ }
+
+ // Part 5 — Alert History section
+ function _tlRenderAlerts(){
+   const el = document.getElementById('tlAlertWrap');
+   if(!el) return;
+   const alerts = AlertHistoryStore.loadAll();
+   if(!alerts.length){
+     el.innerHTML='<div class="small" style="opacity:.6;padding:12px 4px;">No alert history recorded yet.</div>';
+     return;
+   }
+   const rows = alerts.map(a=>`<tr>
+     <td>${_tlFmtTime(a.timestamp)}</td>
+     <td>${esc(a.lob)}</td>
+     <td>${esc(a.type)}</td>
+     <td style="max-width:300px;white-space:normal;">${esc(a.details)}</td>
+   </tr>`).join('');
+   el.innerHTML = `<table class="tl-table">
+     <thead><tr><th>Time</th><th>LOB</th><th>Type</th><th>Details</th></tr></thead>
+     <tbody>${rows}</tbody>
+   </table>`;
+ }
+
+ // Part 7 — Export Timeline as JSON blob download
+ function _tlExport(){
+   const records = HistoryStore.getForDate(_tlDate);
+   const out = _tlLob === 'All LOBs'
+     ? records
+     : records
+         .map(r=>({...r, lobs:r.lobs.filter(l=>l.name===_tlLob)}))
+         .filter(r=>r.lobs.length>0);
+   const blob = new Blob([JSON.stringify(out, null, 2)], {type:'application/json'});
+   const url  = URL.createObjectURL(blob);
+   const a    = document.createElement('a');
+   const ds   = (_tlDate||new Date().toISOString().slice(0,10)).replace(/-/g,'');
+   a.href     = url;
+   a.download = `INTX_Timeline_${ds}.json`;
+   document.body.appendChild(a);
+   a.click();
+   document.body.removeChild(a);
+   URL.revokeObjectURL(url);
+ }
+
+ function renderExpectedLobsPanel(){
+   const wrap = document.getElementById('expectedLobList');
+   if(!wrap) return;
+   const activeEl = document.activeElement;
+   const preserveFocus = activeEl && wrap.contains(activeEl) ? {
+     className: activeEl.className || '',
+     name: activeEl.dataset ? activeEl.dataset.name || '' : '',
+     value: 'value' in activeEl ? activeEl.value : '',
+     start: typeof activeEl.selectionStart === 'number' ? activeEl.selectionStart : null,
+     end: typeof activeEl.selectionEnd === 'number' ? activeEl.selectionEnd : null
+   } : null;
+   const items = ExpectedLobStore.list();
+   if(!items.length){
+     wrap.innerHTML = '<div class="small" style="opacity:.6;">No expected LOBs yet.</div>';
+     return;
+   }
+   wrap.innerHTML = items.map(name=>{
+     const cfg = ConfigStore.get(name);
+     return `
+       <div class="setup-item" data-name="${esc(name)}">
+         <div class="name">${esc(name)}</div>
+         <div class="minirow">
+           <div>
+             <label>REQ</label>
+             <input type="number" class="expected-req" data-name="${esc(name)}" min="0" step="1" value="${esc(String(cfg.req ?? 0))}" style="width:90px;">
+           </div>
+           <div>
+             <label>Threshold</label>
+             <select class="expected-th" data-name="${esc(name)}">
+               <option value="92.5" ${Number(cfg.threshold)===92.5?'selected':''}>92.5%</option>
+               <option value="100.5" ${Number(cfg.threshold)===100.5?'selected':''}>100.5%</option>
+             </select>
+           </div>
+         </div>
+         <div class="minirow">
+           <button class="secondary expected-sched" data-name="${esc(name)}" style="font-size:11px;padding:4px 9px;">REQ Schedule</button>
+           <button class="secondary expected-remove" data-name="${esc(name)}" style="font-size:11px;padding:4px 9px;">Remove</button>
+         </div>
+       </div>`;
+   }).join('');
+
+   wrap.querySelectorAll('.expected-req').forEach(inp=>{
+     inp.addEventListener('change', e=>{
+       const name = e.currentTarget.dataset.name;
+       const cfg = ConfigStore.get(name);
+       cfg.req = Number(e.currentTarget.value) || 0;
+       ConfigStore.set(name, cfg);
+       const idx = lastSnapshot.findIndex(l=>l.name===name);
+       if(idx >= 0){ recomputeOne(idx); renderGrid(); }
+     });
+   });
+
+   wrap.querySelectorAll('.expected-th').forEach(sel=>{
+     sel.addEventListener('change', e=>{
+       const name = e.currentTarget.dataset.name;
+       const cfg = ConfigStore.get(name);
+       cfg.threshold = Number(e.currentTarget.value);
+       ConfigStore.set(name, cfg);
+       const idx = lastSnapshot.findIndex(l=>l.name===name);
+       if(idx >= 0){ recomputeOne(idx); renderGrid(); }
+     });
+   });
+
+   wrap.querySelectorAll('.expected-sched').forEach(btn=>{
+     btn.addEventListener('click', e=>{
+       openREQScheduleModal(e.currentTarget.dataset.name);
+     });
+   });
+
+   wrap.querySelectorAll('.expected-remove').forEach(btn=>{
+     btn.addEventListener('click', e=>{
+       const name = e.currentTarget.dataset.name;
+       if(ExpectedLobStore.remove(name)){
+         renderExpectedLobsPanel();
+         NotificationCenter.notify({kind:'warn', title:'Expected LOB removed', body:name, ttl:5000});
+       }
+     });
+   });
+
+   if(preserveFocus){
+     let target = null;
+     if(preserveFocus.className.includes('expected-req') && preserveFocus.name){
+       target = wrap.querySelector(`.expected-req[data-name="${preserveFocus.name}"]`);
+     } else if(preserveFocus.className.includes('expected-th') && preserveFocus.name){
+       target = wrap.querySelector(`.expected-th[data-name="${preserveFocus.name}"]`);
+     }
+     if(target){
+       try{
+         if('value' in target) target.value = preserveFocus.value;
+         target.focus({preventScroll:true});
+         if(typeof preserveFocus.start === 'number' && typeof preserveFocus.end === 'number' &&
+            typeof target.setSelectionRange === 'function'){
+           target.setSelectionRange(preserveFocus.start, preserveFocus.end);
+         }
+       }catch(e){}
+     }
+   }
+}
+
+// Debounced auto-process for the manual paste textarea.
+ // Routes through the same pipeline as every other source so behaviour is identical.
+ let _pasteTimer = null;
+ document.getElementById('rawInput').addEventListener('input', ()=>{
+   clearTimeout(_pasteTimer);
+   _pasteTimer = setTimeout(()=>{
+     const raw = document.getElementById('rawInput').value;
+     if(!raw.trim()) return;
+     AlertEngine.unlock();
+     const r = processSnapshot(raw, null, 'Manual');
+     const el = document.getElementById('manualStatus');
+     el.textContent = _statusMsg(r, `Auto-processed at ${new Date().toLocaleTimeString()}`, null);
+     if(r.result === 'ok' || r.result === 'no_lobs'){
+       el.classList.remove('proc-flash'); void el.offsetWidth; el.classList.add('proc-flash');
+     }
+   }, 700); // 700 ms debounce — long enough for a full paste to settle
+ });
+
+ /* ---------------- Manual paste tab ---------------- */
+ document.getElementById('btnProcess').addEventListener('click', ()=>{
+   AlertEngine.unlock();
+   const raw = document.getElementById('rawInput').value;
+   const r = processSnapshot(raw, null, 'Manual');
+   const el = document.getElementById('manualStatus');
+   el.textContent = _statusMsg(r, `Processed at ${new Date().toLocaleTimeString()}`, null);
+   if(r.result === 'ok' || r.result === 'no_lobs'){
+     el.classList.remove('proc-flash'); void el.offsetWidth; el.classList.add('proc-flash');
+   }
+ });
+
+ // Clear resets the manual input field and also clears the duplicate
+ // guard explicitly, so a deliberate manual re-entry can be processed
+ // again after an explicit operator reset.
+ document.getElementById('btnClear').addEventListener('click', ()=>{
+   document.getElementById('rawInput').value = '';
+   _lastProcessedSig = null;
+   document.getElementById('manualStatus').textContent = '';
+ });
+
+ /* ---------------- JSON / TXT one-shot file load ---------------- */
+ document.getElementById('fileInput').addEventListener('change', async (e)=>{
+   const file = e.target.files[0];
+   if(!file) return;
+   const raw = await file.text();
+   let text = raw, timestamp = null;
+   if(file.name.toLowerCase().endsWith('.json')){
+     try{
+       const parsed = JSON.parse(raw);
+       const ex = extractFromJSON(parsed);
+       if(ex.text != null){ text = ex.text; timestamp = ex.timestamp; }
+     }catch(err){ /* not valid JSON, fall back to raw text */ }
+   }
+   text = toText(text) || '';
+   document.getElementById('rawInput').value = text.replace(/\\n/g,'\n');
+   const r = processSnapshot(text, timestamp, 'File');
+   document.getElementById('fileStatus').textContent =
+     _statusMsg(r, `Loaded "${file.name}"`, timestamp || null);
+ });
+
+ /* ---------------- Auto File Watch (File System Access API) ---------------- */
+ let watchHandle = null, watchTimer = null, lastWatchedRaw = null;
+
+ async function watchTick(){
+   if(!watchHandle) return;
+   try{
+     const file = await watchHandle.getFile();
+     const raw = await file.text();
+     if(raw !== lastWatchedRaw){
+       lastWatchedRaw = raw;
+       let text = raw, timestamp = null;
+       if(file.name.toLowerCase().endsWith('.json')){
+         try{
+           const parsed = JSON.parse(raw);
+           const ex = extractFromJSON(parsed);
+           if(ex.text != null){ text = ex.text; timestamp = ex.timestamp; }
+         }catch(err){}
+       }
+       text = toText(text) || '';
+       const r = processSnapshot(text, timestamp, 'Watch');
+       document.getElementById('watchStatus').textContent =
+         _statusMsg(r, `Change detected at ${new Date().toLocaleTimeString()}`, timestamp || null);
+     }
+   }catch(err){
+     document.getElementById('watchStatus').textContent = 'Watch error: '+err.message;
+   }
+ }
+
+ document.getElementById('btnPickWatch').addEventListener('click', async ()=>{
+   if(!window.showOpenFilePicker){
+     NotificationCenter.notify({kind:'warn', title:'Auto File Watch unavailable', body:'Use a Chromium-based browser (Brave, Chrome, or Edge).', ttl:8000});
+     return;
+   }
+   try{
+     const [handle] = await window.showOpenFilePicker({types:[{description:'Text or JSON', accept:{'text/plain':['.txt'], 'application/json':['.json']}}]});
+     watchHandle = handle;
+     lastWatchedRaw = null;
+     const secs = Math.max(3, Number(document.getElementById('watchInterval').value)||20);
+     if(watchTimer) clearInterval(watchTimer);
+     watchTimer = setInterval(watchTick, secs*1000);
+     watchTick();
+     document.getElementById('watchPill').className='pill on';
+     document.getElementById('watchPill').textContent='ON';
+     document.getElementById('btnStopWatch').disabled=false;
+     document.getElementById('watchStatus').textContent = `Watching "${handle.name}" every ${secs}s.`;
+   }catch(err){ /* user cancelled the picker */ }
+ });
+
+ document.getElementById('btnStopWatch').addEventListener('click', ()=>{
+   if(watchTimer) clearInterval(watchTimer);
+   watchTimer=null; watchHandle=null;
+   document.getElementById('watchPill').className='pill off';
+   document.getElementById('watchPill').textContent='OFF';
+   document.getElementById('btnStopWatch').disabled=true;
+   document.getElementById('watchStatus').textContent='Watch stopped.';
+ });
+
+ document.getElementById('watchInterval').addEventListener('change', ()=>{
+   if(watchTimer){
+     const secs = Math.max(3, Number(document.getElementById('watchInterval').value)||20);
+     clearInterval(watchTimer);
+     watchTimer = setInterval(watchTick, secs*1000);
+     document.getElementById('watchStatus').textContent = `Interval updated to ${secs}s.`;
+   }
+ });
+
+ /* ---------------- Localhost Listener (polls relay_server.py) ---------------- */
+ let listenerTimer = null, lastListenerRaw = null;
+
+ async function listenerTick(){
+   const url = document.getElementById('listenerUrl').value.trim();
+   if(!url) return;
+   try{
+     const res = await fetch(url, {cache:'no-store'});
+     if(!res.ok){
+       document.getElementById('listenerStatus').textContent = `Listener error: HTTP ${res.status}`;
+       return;
+     }
+     const contentType = res.headers.get('content-type') || '';
+     if(contentType && !contentType.toLowerCase().includes('application/json')){
+       document.getElementById('listenerStatus').textContent = `Listener error: unexpected response type`;
+       return;
+     }
+     const data = await res.json();
+     const ex = extractFromJSON(data);
+     const sig = `${ex.timestamp || ''}::${toText(ex.text) || ''}`;
+     if(ex.text != null && sig !== lastListenerSignature){
+       lastListenerSignature = sig;
+       lastListenerRaw = toText(ex.text);
+       const r = processSnapshot(toText(ex.text) || '', ex.timestamp, 'Listener');
+       document.getElementById('listenerStatus').textContent =
+         _statusMsg(r, `Update received at ${new Date().toLocaleTimeString()}`, ex.timestamp || null);
+     }
+   }catch(err){
+     document.getElementById('listenerStatus').textContent = 'Listener unreachable: '+err.message;
+   }
+ }
+
+ document.getElementById('btnListenerToggle').addEventListener('click', (e)=>{
+   if(listenerTimer){
+     clearInterval(listenerTimer); listenerTimer=null;
+     document.getElementById('listenerPill').className='pill off';
+     document.getElementById('listenerPill').textContent='OFF';
+     e.target.textContent='Enable Listener';
+   } else {
+     const secs = Math.max(3, Number(document.getElementById('listenerInterval').value)||20);
+     listenerTimer = setInterval(listenerTick, secs*1000);
+     listenerTick();
+     document.getElementById('listenerPill').className='pill on';
+     document.getElementById('listenerPill').textContent='ON';
+     e.target.textContent='Disable Listener';
+   }
+ });
+
+ document.getElementById('listenerInterval').addEventListener('change', ()=>{
+   if(listenerTimer){
+     const secs = Math.max(3, Number(document.getElementById('listenerInterval').value)||20);
+     clearInterval(listenerTimer);
+     listenerTimer = setInterval(listenerTick, secs*1000);
+     document.getElementById('listenerStatus').textContent = `Interval updated to ${secs}s.`;
+   }
+ });
+
+ /* ---------------- Extension postMessage channel (alternate path) ---------------- */
+ window.addEventListener('message', (event)=>{
+   const data = event.data;
+   if(data && data.type === 'INTX_SNAPSHOT'){
+     const payloadText = toText(data.text);
+     if(payloadText != null){
+       document.getElementById('rawInput').value = payloadText;
+       const r = processSnapshot(payloadText, data.timestamp||null, 'Extension');
+       document.getElementById('manualStatus').textContent =
+         _statusMsg(r, `Received via extension at ${new Date().toLocaleTimeString()}`, data.timestamp||null);
+     }
+   }
+ });
+
+ /* ---------------- Global mute toggle ---------------- */
+ document.getElementById('btnGlobalMute').addEventListener('click', ()=>{
+   AlertEngine.unlock(); // warm AudioContext on first click
+   AlertEngine.setGlobalMute(!AlertEngine.isGlobalMuted());
+ });
+
+ document.getElementById('btnOpenSetupDrawer').addEventListener('click', ()=>openDrawer('setupDrawerOverlay'));
+ document.getElementById('btnOpenDiagDrawer').addEventListener('click', ()=>openDrawer('diagDrawerOverlay'));
+ attachDrawerBehavior('setupDrawerOverlay', 'btnCloseSetupDrawer');
+ attachDrawerBehavior('diagDrawerOverlay', 'btnCloseDiagDrawer');
+
+ /* ── Phase C — Timeline drawer event wiring ───────────────── */
+ document.getElementById('btnOpenTimelineDrawer').addEventListener('click', ()=>{
+   AlertEngine.unlock();
+   _tlOpen = true;
+   openDrawer('timelineDrawerOverlay');
+   renderTimelineDrawer();
+ });
+
+ document.getElementById('btnCloseTimelineDrawer').addEventListener('click', ()=>{
+   _tlOpen = false;
+   closeDrawer('timelineDrawerOverlay');
+ });
+
+ document.getElementById('timelineDrawerOverlay').addEventListener('click', e=>{
+   if(e.target === e.currentTarget){ _tlOpen = false; closeDrawer('timelineDrawerOverlay'); }
+ });
+
+ document.getElementById('tlDateSel').addEventListener('change', e=>{
+   _tlDate = e.target.value;
+   _tlLob  = 'All LOBs'; // reset LOB filter when date changes
+   renderTimelineDrawer();
+ });
+
+ document.getElementById('tlLobSel').addEventListener('change', e=>{
+   _tlLob = e.target.value;
+   renderTimelineDrawer();
+ });
+
+ document.getElementById('btnTLExport').addEventListener('click', ()=>{
+   _tlExport();
+ });
+
+ /* ============================================================
+    REQ Schedule Modal (Part 2)
+ ============================================================ */
+ let _schedLobName = null;
+
+ function _intervalList(){
+   const r=[];
+   for(let h=0;h<24;h++) for(let m=0;m<60;m+=30)
+     r.push(`${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}`);
+   return r;
+ }
+
+
+ function _renderSchedTable(lobName){
+   const wrap = document.getElementById('reqSchedTableWrap');
+   if(!wrap) return;
+   const sched      = REQScheduleStore.getSchedule(lobName);
+   const now        = new Date();
+   const iStart     = LATEngine.intervalStartFor(now);
+   const curHHMM    = _hhmmOf(iStart);
+   const intervals  = _intervalList();
+   const currentReq = resolveEffectiveREQ(lobName, now, ConfigStore.get(lobName));
+   const rows = intervals.map(hhmm=>{
+     const isPast    = hhmm < curHHMM;
+     const isCurrent = hhmm === curHHMM;
+     const rowClass  = isCurrent ? 'row-current' : isPast ? 'row-past' : '';
+     const val       = isCurrent ? currentReq.req : (sched[hhmm] != null ? sched[hhmm] : '');
+     return `<tr class="${rowClass}" data-hhmm="${hhmm}">
+       <td style="font-size:12px;color:${isCurrent?'var(--accent)':'var(--text)'};">
+         ${hhmm}${isCurrent?' ◀':''}</td>
+       <td><input class="req-sched-input" type="number" min="0"
+         data-hhmm="${hhmm}" value="${esc(String(val))}"
+         placeholder="—"></td>
+     </tr>`;
+   }).join('');
+   wrap.innerHTML = `<table><thead><tr><th>Interval</th><th>REQ</th></tr></thead><tbody>${rows}</tbody></table>`;
+
+   const curRow = wrap.querySelector('tr.row-current');
+   if(curRow) curRow.scrollIntoView({block:'center', behavior:'instant'});
+
+   wrap.querySelectorAll('.req-sched-input').forEach(inp=>{
+     inp.addEventListener('paste', e=>{
+       const lines = (e.clipboardData.getData('text')||'').trim().split(/\r?\n/);
+       if(lines.length <= 1) return;
+       e.preventDefault();
+       const all = _intervalList();
+       let i = all.indexOf(inp.dataset.hhmm);
+       for(const line of lines){
+         if(i >= all.length) break;
+         const t = wrap.querySelector(`.req-sched-input[data-hhmm="${all[i]}"]`);
+         if(t && !t.disabled) t.value = isNaN(Number(line.trim())) ? '' : line.trim();
+         i++;
+       }
+     });
+   });
+ }
+
+ function openREQScheduleModal(lobName){
+   _schedLobName = lobName;
+   document.getElementById('reqSchedLobName').textContent = lobName;
+   _renderSchedTable(lobName);
+   document.getElementById('reqSchedOverlay').classList.add('open');
+ }
+
+ document.getElementById('reqSchedClose').addEventListener('click', ()=>{
+   document.getElementById('reqSchedOverlay').classList.remove('open');
+ });
+ document.getElementById('reqSchedOverlay').addEventListener('click', e=>{
+   if(e.target === e.currentTarget) e.currentTarget.classList.remove('open');
+ });
+
+ document.getElementById('reqSchedSave').addEventListener('click', ()=>{
+   if(!_schedLobName) return;
+   const wrap = document.getElementById('reqSchedTableWrap');
+   const now = new Date();
+   const curStart = LATEngine.intervalStartFor(now);
+   const curHHMM = _hhmmOf(curStart);
+   const curIntervalMs = curStart.getTime();
+   const newSched = {};
+   let overrideValue = null;
+   wrap.querySelectorAll('.req-sched-input').forEach(inp=>{
+     const v = inp.value.trim();
+     if(inp.dataset.hhmm === curHHMM){
+       if(v !== '' && Number(v) > 0) overrideValue = Number(v);
+       return;
+     }
+     if(v !== '' && Number(v) > 0) newSched[inp.dataset.hhmm] = Number(v);
+   });
+   REQScheduleStore.setSchedule(_schedLobName, newSched);
+   if(overrideValue != null) REQOverrideStore.set(_schedLobName, curIntervalMs, overrideValue);
+   else REQOverrideStore.clear(_schedLobName);
+   const lobIdx = lastSnapshot.findIndex(l=>l.name===_schedLobName);
+   if(lobIdx >= 0){ recomputeOne(lobIdx); renderGrid(); }
+   NotificationCenter.notify({kind:'good', title:'REQ schedule saved', body:_schedLobName, ttl:6000});
+   document.getElementById('reqSchedOverlay').classList.remove('open');
+ });
+
+ document.getElementById('reqSchedClear').addEventListener('click', ()=>{
+   if(!_schedLobName) return;
+   REQScheduleStore.setSchedule(_schedLobName, {});
+   REQOverrideStore.clear(_schedLobName);
+   _renderSchedTable(_schedLobName);
+   const lobIdx = lastSnapshot.findIndex(l=>l.name===_schedLobName);
+   if(lobIdx >= 0){ recomputeOne(lobIdx); renderGrid(); }
+   NotificationCenter.notify({kind:'warn', title:'REQ schedule cleared', body:_schedLobName, ttl:6000});
+ });
+
+ /* ── Noon reset — clears operational session data only ───── */
+ (function(){
+   const NOON_RESET_KEY = 'intx_noon_reset_v1';
+   let _lastResetDate = '';
+   try{ _lastResetDate = localStorage.getItem(NOON_RESET_KEY) || ''; }catch(e){}
+
+   function performNoonReset(now){
+     const priorLobs = lastSnapshot.map(l=>l.name);
+     LATVelocityStore.clearAll();
+     LATOverrideStore.clearAll();
+     priorLobs.forEach(name=>LATEngine.clear(name));
+     lastSnapshot = [];
+     lastProcessedTimestamp = null;
+     _lastSnapshotWall = null;
+     _lastSnapshotTimestamp = null;
+     _lastSnapshotSource = null;
+     _lastProcessedSig = null;
+     _diag.lastResult = null;
+     _diag.lastResultTime = null;
+     _diag.totalProcessed = 0;
+     _diag.duplicatesCaught = 0;
+     _diag.ignoredOOO = 0;
+     _diag.lastLOBCount = 0;
+     _diag.lastEntryCount = 0;
+     _diag.lastUnknownCount = 0;
+     _diag.lastWarnings = [];
+     _diag.events = [];
+     lastListenerSignature = null;
+     lastWatchedRaw = null;
+     lastListenerRaw = null;
+     REQScheduleStore.clearAll();
+     REQOverrideStore.clearAll();
+     const banner = document.getElementById('alertBanner');
+     if(banner){ banner.classList.remove('active'); banner.textContent = ''; }
+     const fb = document.getElementById('freshnessBar');
+     const fe = document.getElementById('freshElapsed');
+     if(fb) fb.style.display = 'none';
+     if(fe) fe.textContent = '';
+     const grid = document.getElementById('lobGrid');
+     if(grid) grid.innerHTML = '<div class="small" style="opacity:.6;">No snapshot processed yet.</div>';
+     renderDiag();
+   }
+
+   function checkReset(){
+     const now = new Date();
+     if(now.getHours() < 12) return;
+     const today = now.toDateString();
+     if(_lastResetDate === today) return;
+     _lastResetDate = today;
+     try{ localStorage.setItem(NOON_RESET_KEY, _lastResetDate); }catch(e){}
+     performNoonReset(now);
+   }
+
+   setInterval(checkReset, 30000);
+   checkReset();
+ })();
+
+ document.getElementById('btnAddExpectedLob').addEventListener('click', ()=>{
+   const input = document.getElementById('expectedLobInput');
+   const status = document.getElementById('expectedLobStatus');
+   const name = (input.value || '').trim();
+   if(!name){
+     if(status) status.textContent = 'Enter a LOB name.';
+     return;
+   }
+   const added = ExpectedLobStore.add(name);
+   if(!added){
+     if(status) status.textContent = 'Already exists.';
+     return;
+   }
+   if(status) status.textContent = `Added: ${name}`;
+   input.value = '';
+   renderExpectedLobsPanel();
+ });
+
+ document.getElementById('expectedLobInput').addEventListener('keydown', e=>{
+   if(e.key === 'Enter'){
+     e.preventDefault();
+     document.getElementById('btnAddExpectedLob').click();
+   }
+ });
+
+ renderExpectedLobsPanel();
+
+ /* ---------------- Tabs ---------------- */
+ document.querySelectorAll('.tab').forEach(tab=>{
+   tab.addEventListener('click', ()=>{
+     document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+     document.querySelectorAll('.tabpane').forEach(p=>p.classList.remove('active'));
+     tab.classList.add('active');
+     document.getElementById('pane-'+tab.dataset.tab).classList.add('active');
+   });
+ });
+
+/* ================================================================
+   Phase 1A — Collapsible Input Panel
+================================================================ */
+(function initCollapsePanel(){
+  const body = document.getElementById('inputPanelBody');
+  const btn  = document.getElementById('btnToggleInput');
+  if(!body || !btn) return;
+  let collapsed = false;
+  try{ collapsed = localStorage.getItem('intx_input_collapsed_v1') === '1'; }catch(e){}
+  function applyCollapse(c, save){
+    collapsed = c;
+    body.classList.toggle('collapsed', c);
+    btn.textContent = c ? '▸ Expand' : '▾ Collapse';
+    btn.setAttribute('aria-expanded', String(!c));
+    if(save){ try{ localStorage.setItem('intx_input_collapsed_v1', c ? '1' : '0'); }catch(e){} }
+  }
+  applyCollapse(collapsed, false);
+  btn.addEventListener('click', ()=>applyCollapse(!collapsed, true));
+})();
+
+/* ================================================================
+   Phase 1B — Font Scaling
+================================================================ */
+const _FS_LEVELS = { compact: 0.857, default: 1, readable: 1.143 };
+(function initFontScale(){
+  let level = 'default';
+  try{ const v = localStorage.getItem('intx_font_scale_v1'); if(v && _FS_LEVELS[v]) level = v; }catch(e){}
+  _applyFontScale(level, false);
+})();
+function _applyFontScale(level, save){
+  const v = _FS_LEVELS[level] || 1;
+  document.documentElement.style.setProperty('--fs-scale', String(v));
+  if(save !== false){ try{ localStorage.setItem('intx_font_scale_v1', level); }catch(e){} }
+  document.querySelectorAll('.fs-btn').forEach(b=>b.classList.toggle('active', b.dataset.scale === level));
+}
+document.querySelectorAll('.fs-btn').forEach(btn=>{
+  btn.addEventListener('click', ()=>_applyFontScale(btn.dataset.scale, true));
+});
+
+/* ================================================================
+   Phase 1C — Storage Usage Warning
+================================================================ */
+function _estimateStorageKB(){
+  let bytes = 0;
+  try{
+    for(let i = 0; i < localStorage.length; i++){
+      const k = localStorage.key(i);
+      if(k && k.startsWith('intx_'))
+        bytes += (k.length + (localStorage.getItem(k)||'').length) * 2;
+    }
+  }catch(e){}
+  return Math.round(bytes / 1024);
+}
+function _checkStorageWarning(){
+  const el = document.getElementById('storageWarn');
+  if(!el) return;
+  const kb = _estimateStorageKB();
+  const show = kb > 200;
+  el.classList.toggle('visible', show);
+  if(show) el.textContent = '\u26a0 Storage ~' + kb + 'KB';
+}
+_checkStorageWarning();
+setInterval(_checkStorageWarning, 30000);
+
+/* ================================================================
+   Phase 2 — Unknown State Mapping Editor
+================================================================ */
+const _SM_BUILT_IN = new Set([
+  'ready','available','avail','in','in-call','on-call','incall','on call',
+  'lunch','break','aux','not ready','aux-break','auxbreak','training','meeting','offline'
+]);
+
+function _smFeedback(msg, cls){
+  const el = document.getElementById('smFeedback');
+  if(!el) return;
+  el.textContent = msg;
+  el.className = 'sm-feedback ' + (cls||'');
+  clearTimeout(el._t);
+  el._t = setTimeout(()=>{ el.textContent=''; el.className='sm-feedback'; }, 3500);
+}
+
+function renderStateMapEditor(){
+  const wrap    = document.getElementById('smTableWrap');
+  const countEl = document.getElementById('smCount');
+  if(!wrap) return;
+  let map = {};
+  try{ map = JSON.parse(localStorage.getItem('intx_state_map_v1')||'{}'); }catch(e){}
+  const keys = Object.keys(map);
+  if(countEl) countEl.textContent = keys.length === 0
+    ? 'No custom mappings defined.'
+    : keys.length + ' custom mapping' + (keys.length===1?'.':'s.');
+  if(keys.length === 0){
+    wrap.innerHTML = '<div class="small" style="opacity:.6;padding:6px 0;">No mappings yet — add one below.</div>';
+    return;
+  }
+  const rows = keys.map(k=>`
+    <tr>
+      <td style="max-width:180px;word-break:break-all;">${esc(k)}</td>
+      <td><select class="sm-input sm-val-sel" data-smkey="${esc(k)}" style="width:80px;">
+        <option value="IN" ${map[k]==='IN'?'selected':''}>IN</option>
+        <option value="OUT" ${map[k]==='OUT'?'selected':''}>OUT</option>
+      </select></td>
+      <td><button class="secondary sm-del-btn" data-smkey="${esc(k)}" style="font-size:10px;padding:2px 8px;">Delete</button></td>
+    </tr>`).join('');
+  wrap.innerHTML = `<table class="sm-table"><thead><tr>
+    <th>Aux State (lowercased key)</th><th>Classify As</th><th></th>
+  </tr></thead><tbody>${rows}</tbody></table>`;
+  wrap.querySelectorAll('.sm-val-sel').forEach(sel=>{
+    sel.addEventListener('change', ()=>{
+      const key = sel.dataset.smkey;
+      let m = {}; try{ m = JSON.parse(localStorage.getItem('intx_state_map_v1')||'{}'); }catch(e){}
+      m[key] = sel.value;
+      try{ localStorage.setItem('intx_state_map_v1', JSON.stringify(m)); }catch(e){}
+      _smFeedback('Updated "' + key + '" \u2192 ' + sel.value, 'ok');
+    });
+  });
+  wrap.querySelectorAll('.sm-del-btn').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      const key = btn.dataset.smkey;
+      let m = {}; try{ m = JSON.parse(localStorage.getItem('intx_state_map_v1')||'{}'); }catch(e){}
+      delete m[key];
+      try{ localStorage.setItem('intx_state_map_v1', JSON.stringify(m)); }catch(e){}
+      _smFeedback('Deleted mapping for "' + key + '"', 'ok');
+      renderStateMapEditor();
+    });
+  });
+}
+
+(function wireSmEditor(){
+  const addBtn = document.getElementById('smAddBtn');
+  if(!addBtn) return;
+  addBtn.addEventListener('click', ()=>{
+    const keyIn = document.getElementById('smKeyInput');
+    const valIn = document.getElementById('smValInput');
+    if(!keyIn || !valIn) return;
+    const key = keyIn.value.trim().toLowerCase();
+    const val = valIn.value;
+    if(!key) return _smFeedback('State key cannot be empty.', 'err');
+    if(!['IN','OUT'].includes(val)) return _smFeedback('Value must be IN or OUT.', 'err');
+    if(_SM_BUILT_IN.has(key))
+      return _smFeedback('"' + key + '" is a built-in state and cannot be remapped.', 'err');
+    let m = {}; try{ m = JSON.parse(localStorage.getItem('intx_state_map_v1')||'{}'); }catch(e){}
+    const existed = Object.prototype.hasOwnProperty.call(m, key);
+    m[key] = val;
+    try{ localStorage.setItem('intx_state_map_v1', JSON.stringify(m)); }catch(e){}
+    keyIn.value = '';
+    _smFeedback((existed?'Updated':'Added') + ' "' + key + '" \u2192 ' + val, 'ok');
+    renderStateMapEditor();
+  });
+  // Render when diag drawer opens (capture phase so it fires before the overlay shows)
+  const diagBtn = document.getElementById('btnOpenDiagDrawer');
+  if(diagBtn) diagBtn.addEventListener('click', ()=>setTimeout(renderStateMapEditor, 0));
+})();
+
+ /* ---------------- Clock ---------------- */
+ setInterval(()=>{ document.getElementById('clock').textContent = new Date().toLocaleTimeString(); }, 1000);
+
+/* ================================================================
+   NEW renderGrid — replaces original. Builds .lobstrip rows.
+   All business logic (MetricsModule, AlertEngine, etc.) unchanged.
+================================================================ */
+
+function _gaugeClass(pct, threshold){
+  if(!isFinite(pct) || pct <= 0) return 'g-fail';
+  if(pct >= threshold) return 'g-pass';
+  if(pct >= threshold * 0.90) return 'g-warn';
+  return 'g-fail';
+}
+
+function _stripStatus(m){
+  if(m.req <= 0) return 'st-neutral';
+  if(!m.pass)    return 'st-fail-lat';
+  if(!m.reqPass) return 'st-fail-req';
+  return 'st-pass';
+}
+
+function _headLabel(head){
+  if(!isFinite(head)) return '—';
+  return (head >= 0 ? '+' : '') + head;
+}
+
+function renderGrid(){
+  const grid       = document.getElementById('lobGrid');
+  const emptyState = document.getElementById('emptyState');
+
+  const activeEl = document.activeElement;
+  const preserveFocus = activeEl && grid.contains(activeEl) ? {
+    className: activeEl.className || '',
+    idx: activeEl.dataset ? activeEl.dataset.idx || '' : '',
+    name: activeEl.dataset ? activeEl.dataset.name || '' : '',
+    lob: activeEl.dataset ? activeEl.dataset.lob || '' : '',
+    value: 'value' in activeEl ? activeEl.value : '',
+    start: typeof activeEl.selectionStart === 'number' ? activeEl.selectionStart : null,
+    end:   typeof activeEl.selectionEnd   === 'number' ? activeEl.selectionEnd   : null
+  } : null;
+
+  if(lastSnapshot.length === 0){
+    grid.style.display  = 'none';
+    emptyState.style.display = 'flex';
+    if(lastParseWarnings.length){
+      emptyState.querySelector('.empty-sub').textContent = lastParseWarnings[0];
+    }
+    return;
+  }
+
+  grid.style.display  = 'flex';
+  emptyState.style.display = 'none';
+
+  const expandedSet = new Set();
+  grid.querySelectorAll('.lobstrip.expanded').forEach(el => {
+    if(el.dataset.lob) expandedSet.add(el.dataset.lob);
+  });
+
+  grid.innerHTML = lastSnapshot.map((lob, idx) => {
+    const m         = lob.metrics;
+    const baseCfg   = lob._baseCfg || lob.cfg || {};
+    const isMuted   = AlertEngine.isLobMuted(lob.name);
+    const isExpanded = expandedSet.has(lob.name);
+
+    const reqBadge = m.req <= 0
+      ? '<span class="badge na req-badge">REQ —</span>'
+      : (m.reqPass
+          ? '<span class="badge pass req-badge">REQ ✓</span>'
+          : '<span class="badge fail req-badge">REQ ✗</span>');
+    const latBadge = m.req <= 0
+      ? '<span class="badge na lat-badge">LAT —</span>'
+      : (m.pass
+          ? '<span class="badge pass lat-badge">LAT ✓</span>'
+          : '<span class="badge fail lat-badge">LAT ✗</span>');
+
+    const deltaNum  = _headLabel(m.head);
+    const deltaClass = (m.head >= 0) ? 'h-pos' : 'h-neg';
+
+    const reqPctNum  = isFinite(m.reqPct) ? m.reqPct : 0;
+    const latPctNum  = isFinite(m.currentLAT) ? m.currentLAT : 0;
+    const expPctNum  = isFinite(m.expectedLAT) ? m.expectedLAT : 0;
+    const reqGClass  = _gaugeClass(reqPctNum, 100);
+    const latGClass  = _gaugeClass(latPctNum, m.threshold || 92.5);
+    const expGClass  = _gaugeClass(expPctNum, m.threshold || 92.5);
+    const reqFill    = Math.min(100, Math.max(0, reqPctNum));
+    const latFill    = Math.min(100, Math.max(0, latPctNum));
+    const expFill    = Math.min(100, Math.max(0, expPctNum));
+
+    const unknownCount = lob.agg.UNKNOWN || 0;
+    const expectedLATFmt = isFinite(m.expectedLAT) ? fmtPct(m.expectedLAT) : '—';
+    const velFmt = fmtVelocity(m.latVelocity);
+
+    const inRows = lob.agg.detail.IN.map(e =>
+      `<div class="agent-row">
+        <span class="agent-name">${esc(e.name)}</span>
+        <span class="agent-state">${esc(e.state)}</span>
+        <span class="agent-timer">${esc(e.timer)}</span>
+      </div>`).join('') || '<div class="roster-empty">None</div>';
+
+    const outRows = lob.agg.detail.OUT.map(e =>
+      `<div class="agent-row">
+        <span class="agent-name">${esc(e.name)}</span>
+        <span class="agent-state">${esc(e.state)}</span>
+        <span class="agent-timer">${esc(e.timer)}</span>
+      </div>`).join('') || '<div class="roster-empty">None</div>';
+
+    const unknownRows = lob.agg.detail.UNKNOWN.map(e =>
+      `<div class="agent-row">
+        <span class="agent-name">${esc(e.name)}</span>
+        <span class="agent-state">${esc(e.state)}</span>
+        <span class="agent-timer">${esc(e.timer)}</span>
+      </div>`).join('') || '<div class="roster-empty">None</div>';
+
+    const statusClass = _stripStatus(m);
+    const expandedClass = isExpanded ? ' expanded' : '';
+
+    return `
+<div class="lobstrip ${statusClass}${expandedClass}" data-lob="${esc(lob.name)}">
+
+  <!-- ── Summary strip (always visible) ── -->
+  <div class="strip-summary">
+
+    <!-- ID column: name + badges -->
+    <div class="strip-id">
+      <div class="lob-name">${esc(lob.name)}${lob._canonicalName
+        ? `<span class="lob-alias-tag" title="Alias to '${esc(lob._canonicalName)}'">≡ ${esc(lob._canonicalName)}</span>`
+        : ''}</div>
+      <div class="strip-badges">
+        ${reqBadge}
+        ${latBadge}
+      </div>
+    </div>
+
+    <!-- Center: heroes + gauges -->
+    <div class="strip-metrics">
+
+      <!-- Hero trio -->
+      <div class="hero-cluster">
+        <div class="hero-item">
+          <span class="hero-num h-in" data-metric-hero="in-${idx}">${lob.agg.IN}</span>
+          <span class="hero-label">In</span>
+        </div>
+        <div class="hero-divider"></div>
+        <div class="hero-item" title="${m.head >= 0 ? 'Head Over' : 'Head Needed'}">
+          <span class="hero-num ${deltaClass}" data-metric-hero="delta-${idx}">${deltaNum}</span>
+          <span class="hero-label">Δ Staff</span>
+        </div>
+        <div class="hero-divider"></div>
+        <div class="hero-item">
+          <span class="hero-num h-out">${lob.agg.OUT}</span>
+          <span class="hero-label">Out</span>
+        </div>
+      </div>
+
+      <!-- Gauge block -->
+      <div class="gauge-block">
+        <!-- REQ% gauge -->
+        <div class="gauge-row">
+          <span class="gauge-lbl">REQ</span>
+          <div class="gauge-track">
+            <div class="gauge-fill ${reqGClass}" data-gauge="req-${idx}" style="width:${reqFill}%;"></div>
+          </div>
+          <span class="gauge-val ${reqGClass}" data-metric="reqPct" data-idx="${idx}">${fmtPct(reqPctNum)}</span>
+        </div>
+        <!-- LAT% gauge -->
+        <div class="gauge-row">
+          <span class="gauge-lbl">LAT</span>
+          <div class="gauge-track">
+            <div class="gauge-fill ${latGClass}" data-gauge="lat-${idx}" style="width:${latFill}%;"></div>
+          </div>
+          <span class="gauge-val ${latGClass}" data-metric="currentLAT" data-idx="${idx}">${fmtPct(latPctNum)}</span>
+        </div>
+        <!-- EXP LAT% gauge -->
+        <div class="gauge-row">
+          <span class="gauge-lbl">EXP</span>
+          <div class="gauge-track">
+            <div class="gauge-fill ${expGClass}" data-gauge="exp-${idx}" style="width:${expFill}%;"></div>
+          </div>
+          <span class="gauge-val ${expGClass}" data-metric="expectedLAT" data-idx="${idx}">${expectedLATFmt}</span>
+        </div>
+        <!-- Sub-counts -->
+        <div class="count-strip">
+          ${unknownCount > 0 ? `<div class="count-item"><span class="count-num" style="color:var(--warn)">${unknownCount}</span><span class="count-lbl"> Unk</span></div>` : ''}
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Right: expand toggle + mute -->
+    <div class="strip-toggle" data-expand-lob="${esc(lob.name)}">
+      <button class="mute-mini${isMuted ? ' muted' : ''}" data-lob="${esc(lob.name)}" title="${isMuted ? 'Unmute' : 'Mute'} alerts" onclick="event.stopPropagation();">${isMuted ? '🔕' : '🔔'}</button>
+      <span class="toggle-chevron">▾</span>
+    </div>
+
+  </div>
+
+  <!-- ── Expandable detail ── -->
+  <div class="strip-detail">
+
+    <!-- Config band -->
+    <div class="cfg-band">
+      <div class="cfg-field">
+        <span class="cfg-label">Requirement (REQ)</span>
+        <input type="number" class="cfg-req" data-idx="${idx}" value="${m.req}" style="width:80px;">
+        <span class="req-source">Source: ${esc(lob._reqSource || 'Default')}</span>
+      </div>
+      <div class="cfg-field">
+        <span class="cfg-label">LAT% Threshold</span>
+        <select class="cfg-th" data-idx="${idx}">
+          <option value="92.5" ${baseCfg.threshold == 92.5 ? 'selected' : ''}>92.5%</option>
+          <option value="100.5" ${baseCfg.threshold == 100.5 ? 'selected' : ''}>100.5%</option>
+        </select>
+      </div>
+      <div class="cfg-field">
+        <span class="cfg-label">REQ Schedule</span>
+        <button class="btn-sec req-sched-btn" data-lob="${esc(lob.name)}" style="font-size:11px;padding:4px 9px;">Set Schedule</button>
+      </div>
+      <div class="cfg-field" style="flex-direction:row;gap:14px;align-items:flex-end;">
+        <label class="check-group">
+          <input type="checkbox" class="cfg-alert-req" data-idx="${idx}" ${baseCfg.alertREQ !== false ? 'checked' : ''}>
+          <span class="check-label">REQ Alert</span>
+        </label>
+        <label class="check-group">
+          <input type="checkbox" class="cfg-alert-lat" data-idx="${idx}" ${baseCfg.alertLAT !== false ? 'checked' : ''}>
+          <span class="check-label">LAT Alert</span>
+        </label>
+      </div>
+    </div>
+
+    <!-- Secondary metrics -->
+    <div class="detail-metrics">
+      <div class="detail-kv">
+        <span class="dkv-label">Expected LAT%</span>
+        <span class="dkv-val" data-metric="expectedLAT-detail" data-idx="${idx}">${expectedLATFmt}</span>
+      </div>
+      <div class="detail-kv">
+        <span class="dkv-label">LAT Velocity</span>
+        <span class="dkv-val" style="font-size:13px;" data-metric="latVelocity" data-idx="${idx}">${velFmt}</span>
+      </div>
+      <div class="detail-kv">
+        <span class="dkv-label">Δ Staff Detail</span>
+        <span class="dkv-val ${m.head >= 0 ? 'good' : 'bad'}">${m.head >= 0 ? 'Head Over: +' + m.head : 'Head Needed: ' + Math.abs(m.head)}</span>
+      </div>
+      <div class="detail-kv">
+        <span class="dkv-label">REQ Value</span>
+        <span class="dkv-val" style="font-size:13px;">${m.req}</span>
+      </div>
+      
+    </div>
+
+    <!-- LAT Override band -->
+    <div class="lat-override-band">
+      <div class="cfg-field">
+        <span class="cfg-label">LAT Override %</span>
+        <input type="number" class="lat-override-input" data-idx="${idx}" min="0" step="0.1" value="" style="width:90px;" placeholder="Optional">
+      </div>
+      <div style="display:flex;gap:6px;align-items:flex-end;">
+        <button class="btn-sec lat-override-save" data-idx="${idx}" style="font-size:11px;padding:4px 9px;">Apply</button>
+        <button class="btn-sec lat-override-clear" data-idx="${idx}" style="font-size:11px;padding:4px 9px;">Clear</button>
+      </div>
+      <span class="hint-text" style="margin-top:0;">Per-LOB, per-interval. Clears automatically when the interval changes.</span>
+    </div>
+
+    <!-- Agent roster -->
+    <div class="roster-grid">
+      <div class="roster-col">
+        <div class="roster-head">
+          <span class="roster-head-label">In</span>
+          <span class="roster-head-count">${lob.agg.IN}</span>
+        </div>
+        <div class="roster-scroll">${inRows}</div>
+      </div>
+      <div class="roster-col">
+        <div class="roster-head">
+          <span class="roster-head-label">Out</span>
+          <span class="roster-head-count">${lob.agg.OUT}</span>
+        </div>
+        <div class="roster-scroll">${outRows}</div>
+      </div>
+      <div class="roster-col">
+        <div class="roster-head">
+          <span class="roster-head-label" style="color:${unknownCount > 0 ? 'var(--warn)' : 'var(--text-ghost)'}">Unknown</span>
+          <span class="roster-head-count" style="color:${unknownCount > 0 ? 'var(--warn)' : 'var(--text)'}">${unknownCount}</span>
+        </div>
+        <div class="roster-scroll">${unknownRows}</div>
+      </div>
+    </div>
+
+  </div>
+</div>`;
+  }).join('');
+
+  /* ── Wire event listeners ── */
+
+  grid.querySelectorAll('[data-expand-lob]').forEach(toggle => {
+    toggle.addEventListener('click', () => {
+      const lobName = toggle.dataset.expandLob;
+      const strip = grid.querySelector(`.lobstrip[data-lob="${lobName}"]`);
+      if(strip) strip.classList.toggle('expanded');
+    });
+  });
+
+  grid.querySelectorAll('.cfg-req').forEach(el => {
+    el.addEventListener('change', e => {
+      const idx = +e.target.dataset.idx;
+      const newReq = Number(e.target.value) || 0;
+      const lob = lastSnapshot[idx];
+      const base = lob._baseCfg || lob.cfg || {};
+      base.req = newReq;
+      lob._baseCfg = base;
+      lob.cfg = {...base};
+      ConfigStore.set(lob.name, base);
+      recomputeOne(idx);
+      renderGrid();
+    });
+  });
+
+  grid.querySelectorAll('.cfg-th').forEach(el => {
+    el.addEventListener('change', e => {
+      const idx = +e.target.dataset.idx;
+      const lob = lastSnapshot[idx];
+      const base = lob._baseCfg || lob.cfg || {};
+      base.threshold = Number(e.target.value);
+      lob._baseCfg = base;
+      lob.cfg = {...base};
+      ConfigStore.set(lob.name, base);
+      recomputeOne(idx);
+      renderGrid();
+    });
+  });
+
+  grid.querySelectorAll('.cfg-alert-req').forEach(el => {
+    el.addEventListener('change', e => {
+      const idx = +e.target.dataset.idx;
+      const lob = lastSnapshot[idx];
+      const base = lob._baseCfg || lob.cfg || {};
+      base.alertREQ = e.target.checked;
+      lob._baseCfg = base;
+      lob.cfg = {...base};
+      ConfigStore.set(lob.name, base);
+    });
+  });
+
+  grid.querySelectorAll('.cfg-alert-lat').forEach(el => {
+    el.addEventListener('change', e => {
+      const idx = +e.target.dataset.idx;
+      const lob = lastSnapshot[idx];
+      const base = lob._baseCfg || lob.cfg || {};
+      base.alertLAT = e.target.checked;
+      lob._baseCfg = base;
+      lob.cfg = {...base};
+      ConfigStore.set(lob.name, base);
+    });
+  });
+
+  grid.querySelectorAll('.req-sched-btn').forEach(btn => {
+    btn.addEventListener('click', e => {
+      openREQScheduleModal(e.currentTarget.dataset.lob);
+    });
+  });
+
+  grid.querySelectorAll('.mute-mini[data-lob]').forEach(btn => {
+    btn.addEventListener('click', e => {
+      AlertEngine.unlock();
+      const name  = e.currentTarget.dataset.lob;
+      const muted = AlertEngine.toggleLobMute(name);
+      e.currentTarget.textContent = muted ? '🔕' : '🔔';
+      e.currentTarget.title = muted ? 'Unmute alerts' : 'Mute alerts';
+      e.currentTarget.classList.toggle('muted', muted);
+    });
+  });
+
+  grid.querySelectorAll('.lat-override-save').forEach(btn => {
+    btn.addEventListener('click', e => {
+      const idx = +e.currentTarget.dataset.idx;
+      const lob = lastSnapshot[idx];
+      if(!lob) return;
+      const input = document.querySelector(`.lat-override-input[data-idx="${idx}"]`);
+      const now = new Date();
+      const intervalKey = LATEngine.intervalStartFor(now).getTime();
+      const v = input ? input.value.trim() : '';
+      if(v === ''){
+        LATOverrideStore.clear(lob.name);
+      } else {
+        LATOverrideStore.set(lob.name, intervalKey, Number(v));
+      }
+      recomputeOne(idx);
+      renderGrid();
+    });
+  });
+
+  grid.querySelectorAll('.lat-override-clear').forEach(btn => {
+    btn.addEventListener('click', e => {
+      const idx = +e.currentTarget.dataset.idx;
+      const lob = lastSnapshot[idx];
+      if(!lob) return;
+      LATOverrideStore.clear(lob.name);
+      recomputeOne(idx);
+      renderGrid();
+    });
+  });
+
+  renderExpectedLobsPanel();
+
+  if(preserveFocus){
+    let target = null;
+    if(preserveFocus.className.includes('cfg-req') && preserveFocus.idx !== ''){
+      target = grid.querySelector(`.cfg-req[data-idx="${preserveFocus.idx}"]`);
+    } else if(preserveFocus.className.includes('cfg-th') && preserveFocus.idx !== ''){
+      target = grid.querySelector(`.cfg-th[data-idx="${preserveFocus.idx}"]`);
+    } else if(preserveFocus.className.includes('lat-override-input') && preserveFocus.idx !== ''){
+      target = grid.querySelector(`.lat-override-input[data-idx="${preserveFocus.idx}"]`);
+    }
+    if(target){
+      try{
+        if('value' in target) target.value = preserveFocus.value;
+        target.focus({preventScroll: true});
+        if(typeof preserveFocus.start === 'number' && typeof preserveFocus.end === 'number' &&
+           typeof target.setSelectionRange === 'function'){
+          target.setSelectionRange(preserveFocus.start, preserveFocus.end);
+        }
+      }catch(e){}
+    }
+  }
+}
+
+function _updateStripDOM(lob){
+  const lobName = lob.name;
+  const m = lob.metrics;
+  const strip = document.querySelector(`.lobstrip[data-lob="${CSS.escape(lobName)}"]`);
+  if(!strip) return;
+
+  const idx = lastSnapshot.indexOf(lob);
+
+  const sc = _stripStatus(m);
+  strip.className = strip.className.replace(/st-\w+/g, '').trim() + ' ' + sc;
+
+  const reqPctNum = isFinite(m.reqPct) ? m.reqPct : 0;
+  const latPctNum = isFinite(m.currentLAT) ? m.currentLAT : 0;
+  const reqGClass  = _gaugeClass(reqPctNum, 100);
+  const latGClass  = _gaugeClass(latPctNum, m.threshold || 92.5);
+
+  const reqFill = strip.querySelector(`[data-gauge="req-${idx}"]`);
+  const latFill = strip.querySelector(`[data-gauge="lat-${idx}"]`);
+  if(reqFill){ reqFill.style.width = Math.min(100, Math.max(0, reqPctNum)) + '%'; reqFill.className = 'gauge-fill ' + reqGClass; }
+  if(latFill){ latFill.style.width = Math.min(100, Math.max(0, latPctNum)) + '%'; latFill.className = 'gauge-fill ' + latGClass; }
+
+  function updGaugeVal(selector, value, cls){
+    const el = strip.querySelector(selector);
+    if(!el) return;
+    const txt = String(value);
+    if(el.textContent !== txt){
+      el.textContent = txt;
+      el.className = 'gauge-val ' + cls;
+    }
+  }
+  updGaugeVal(`[data-metric="reqPct"][data-idx="${idx}"]`, fmtPct(reqPctNum), reqGClass);
+  updGaugeVal(`[data-metric="currentLAT"][data-idx="${idx}"]`, fmtPct(latPctNum), latGClass);
+
+  const expPctFmt = isFinite(m.expectedLAT) ? fmtPct(m.expectedLAT) : '—';
+  strip.querySelectorAll(`[data-metric="expectedLAT"][data-idx="${idx}"], [data-metric="expectedLAT-detail"][data-idx="${idx}"]`).forEach(el => {
+    el.textContent = expPctFmt;
+  });
+
+  const heroD = strip.querySelector(`[data-metric-hero="delta-${idx}"]`);
+  if(heroD){
+    const dn = _headLabel(m.head);
+    if(heroD.textContent !== dn) heroD.textContent = dn;
+    heroD.className = 'hero-num ' + (m.head >= 0 ? 'h-pos' : 'h-neg');
+  }
+
+  const heroI = strip.querySelector(`[data-metric-hero="in-${idx}"]`);
+  if(heroI && heroI.textContent !== String(lob.agg.IN)) heroI.textContent = String(lob.agg.IN);
+
+  const reqBadge = strip.querySelector('.req-badge');
+  const latBadge = strip.querySelector('.lat-badge');
+  if(reqBadge){
+    if(m.req <= 0){ reqBadge.className='badge na req-badge'; reqBadge.textContent='REQ —'; }
+    else if(m.reqPass){ reqBadge.className='badge pass req-badge'; reqBadge.textContent='REQ ✓'; }
+    else { reqBadge.className='badge fail req-badge'; reqBadge.textContent='REQ ✗'; }
+  }
+  if(latBadge){
+    if(m.req <= 0){ latBadge.className='badge na lat-badge'; latBadge.textContent='LAT —'; }
+    else if(m.pass){ latBadge.className='badge pass lat-badge'; latBadge.textContent='LAT ✓'; }
+    else { latBadge.className='badge fail lat-badge'; latBadge.textContent='LAT ✗'; }
+  }
+
+  const reqInput = strip.querySelector(`.cfg-req[data-idx="${idx}"]`);
+  if(reqInput && document.activeElement !== reqInput && reqInput.value !== String(m.req ?? 0)){
+    reqInput.value = String(m.req ?? 0);
+  }
+
+  const reqSrc = strip.querySelector('.req-source');
+  if(reqSrc) reqSrc.textContent = 'Source: ' + (lob._reqSource || 'Default');
+
+  const latOvInput = strip.querySelector(`.lat-override-input[data-idx="${idx}"]`);
+  if(latOvInput && document.activeElement !== latOvInput){
+    const ov = LATOverrideStore.get(lob.name, lob._intervalKey || LATEngine.intervalStartFor(new Date()).getTime());
+    latOvInput.value = ov == null ? '' : String(ov);
+  }
+
+  const velEl = strip.querySelector(`[data-metric="latVelocity"][data-idx="${idx}"]`);
+  if(velEl) velEl.textContent = fmtVelocity(m.latVelocity);
+}
+
+/* ================================================================
+   SIDEBAR TOGGLE
+================================================================ */
+(function initSidebarToggle(){
+  const btn     = document.getElementById('btnToggleSidebar');
+  const sidebar = document.getElementById('sidebar');
+  if(!btn || !sidebar) return;
+  let collapsed = false;
+  try{ collapsed = localStorage.getItem('intx_sidebar_collapsed_v1') === '1'; }catch(e){}
+  function apply(c, save){
+    collapsed = c;
+    sidebar.classList.toggle('collapsed', c);
+    btn.textContent = c ? '☰ Input' : '☰ Input';
+    btn.title = c ? 'Show input panel' : 'Hide input panel';
+    btn.classList.toggle('active', !c);
+    if(save){ try{ localStorage.setItem('intx_sidebar_collapsed_v1', c ? '1' : '0'); }catch(e){} }
+  }
+  apply(collapsed, false);
+  btn.addEventListener('click', () => apply(!collapsed, true));
+})();
+
+/* ================================================================
+   SIDEBAR INPUT TABS
+================================================================ */
+document.querySelectorAll('.itab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.itab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.itabpane').forEach(p => p.classList.remove('active'));
+    tab.classList.add('active');
+    document.getElementById('pane-' + tab.dataset.tab).classList.add('active');
+  });
+});
+
+})(); // end IIFE
+</script>
+</body>
+</html>
