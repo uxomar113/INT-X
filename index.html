@@ -1607,13 +1607,12 @@ body{
   align-items:stretch;
   min-width:0;
 }
-.main-line{ grid-template-columns:48px minmax(58px, 72px) minmax(58px, 1fr) minmax(54px, 0.95fr) minmax(86px, 1.5fr); }
-.sub-line{ grid-template-columns:minmax(48px, 0.85fr) minmax(48px, 0.85fr) 58px 50px minmax(70px, 1.45fr); }
+.main-line{ grid-template-columns:44px minmax(58px, 70px) minmax(58px, 0.9fr) minmax(58px, 0.9fr) minmax(54px, 0.85fr) minmax(82px, 1.35fr); }
+.sub-line{ grid-template-columns:minmax(48px, 1fr) minmax(48px, 1fr) 58px 50px; }
 .latbe-shell .pr-lob,
 .latbe-shell .req-target,
 .latbe-shell .auto-req-btn,
-.latbe-shell .pr-mini,
-.pr-mode{
+.latbe-shell .pr-mini{
   min-height:38px;
 }
 .latbe-shell .pr-lob{
@@ -1632,27 +1631,11 @@ body{
 .latbe-shell .pr-mini small{ font-size:0.44rem; }
 .latbe-shell .pr-mini strong{ font-size:1.18rem; }
 .latbe-shell .pr-mini.avail strong{ font-size:1.02rem; }
+.latbe-shell .pr-mini.lat{ border-color:rgba(107,184,255,0.28); background:var(--total-bg); }
+.latbe-shell .pr-mini.lat strong{ color:var(--total); font-size:1.02rem; }
 .shell-btn{
   padding:0 6px;
   font-size:0.54rem;
-}
-.pr-mode{
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  min-width:0;
-  border:1px solid var(--border-soft);
-  border-radius:9px;
-  background:rgba(0,0,0,0.14);
-  color:var(--muted);
-  font-family:Consolas,'Roboto Mono','Courier New',monospace;
-  font-size:0.52rem;
-  font-weight:900;
-  text-transform:uppercase;
-  letter-spacing:0.04em;
-  white-space:nowrap;
-  overflow:hidden;
-  text-overflow:ellipsis;
 }
 .shell-panel{
   display:none;
@@ -1716,17 +1699,15 @@ body{
 @media (max-width:430px){
   .latbe-shell{ padding:6px; }
   .latbe-shell .priority-row{ padding:7px; gap:6px; }
-  .main-line{ grid-template-columns:42px minmax(52px, 62px) minmax(54px, 1fr) minmax(48px, 0.9fr) minmax(74px, 1.25fr); }
-  .sub-line{ grid-template-columns:1fr 1fr 54px 46px minmax(58px, 1.2fr); }
+  .main-line{ grid-template-columns:38px minmax(50px, 58px) minmax(50px, 0.85fr) minmax(50px, 0.85fr) minmax(46px, 0.8fr) minmax(68px, 1.1fr); }
+  .sub-line{ grid-template-columns:1fr 1fr 54px 46px; }
   .latbe-shell .pr-lob,
   .latbe-shell .req-target,
   .latbe-shell .auto-req-btn,
-  .latbe-shell .pr-mini,
-  .pr-mode{ min-height:36px; }
+  .latbe-shell .pr-mini{ min-height:36px; }
   .latbe-shell .pr-mini strong{ font-size:1.04rem; }
   .latbe-shell .pr-mini small{ font-size:0.39rem; }
   .shell-btn{ font-size:0.47rem; }
-  .pr-mode{ font-size:0.46rem; }
   .shell-grid{ grid-template-columns:repeat(2, minmax(0, 1fr)); }
 }
 </style>
@@ -1821,6 +1802,7 @@ function buildPriorityRows(){
         <button class="pr-lob" onclick="setActiveSimLOB(${l.id})">${l.short}</button>
         <div class="req-wrap"><input class="req-target" id="topReq${l.id}" type="number" min="0" step="0.01" placeholder="00.00" oninput="onReqManualInput(${l.id})" onblur="formatReqInput(${l.id})" onkeydown="handleReqTab(event, ${l.id})"><span class="req-suffix">%</span></div>
         <div class="pr-mini pct" id="topPctTile${l.id}"><small>REQ92%</small><strong id="topPct${l.id}">—</strong></div>
+        <div class="pr-mini lat" id="topLatTile${l.id}"><small>LAT%</small><strong id="topLat${l.id}">LAT —</strong></div>
         <div class="pr-mini heads" id="topHeadsTile${l.id}"><small id="topHeadsLabel${l.id}">HEAD</small><strong id="topHeads${l.id}">—</strong></div>
         <div class="pr-mini avail"><small>AVAIL</small><strong id="topAvail${l.id}">—</strong><span class="live-name-mini" id="topAvailName${l.id}"></span></div>
       </div>
@@ -1829,7 +1811,6 @@ function buildPriorityRows(){
         <div class="pr-mini out"><small>OUT</small><strong id="topOut${l.id}">0</strong></div>
         <button class="auto-req-btn shell-btn" id="latBeBtn${l.id}" onclick="toggleLatBePanel(${l.id})">LAT/BE</button>
         <button class="auto-req-btn shell-btn" id="autoBtn${l.id}" onclick="toggleAutoPanel(${l.id})">AUTO</button>
-        <div class="pr-mode" id="topMode${l.id}">shell ready</div>
       </div>
       <div class="latbe-panel shell-panel" id="latBePanel${l.id}">
         <div class="shell-panel-title">LAT/BE shell · ${l.short}</div>
@@ -1945,8 +1926,8 @@ function scheduleAutoClear(health){
     cancelAutoClear();
     document.getElementById('masterInput').value = '';
     masterCache = '';
-    note.innerHTML = `<span class="blue">snapshot kept</span> · ${formatParseHealth(lastParseHealth)} · selected LOB sim only`;
-    setHeaderStatus('sim');
+    note.innerHTML = `<span class="blue">snapshot kept</span> · ${formatParseHealth(lastParseHealth)} · live roster timer`;
+    setHeaderStatus('live');
   }, CLEAR_DELAY_MS);
 }
 
@@ -1958,9 +1939,12 @@ function setHeaderStatus(mode){
   if (mode === 'parsed') {
     wrap.classList.add('live');
     txt.textContent = 'parsed';
+  } else if (mode === 'live') {
+    wrap.classList.add('live');
+    txt.textContent = 'live';
   } else if (mode === 'sim') {
-    wrap.classList.add('sim');
-    txt.textContent = 'sim';
+    wrap.classList.add('live');
+    txt.textContent = 'live';
   } else if (mode === 'warn') {
     wrap.classList.add('warn');
     txt.textContent = 'check';
@@ -2356,12 +2340,12 @@ function renderSimChip(id){
 
   if (id === activeSimLobId && s.simActive) {
     chip.classList.add('active');
-    chip.textContent = `SIM ${formatClock(simRemainingSec(s))}`;
+    chip.textContent = `LIVE ${formatClock(simRemainingSec(s))}`;
   } else if (s.snapshotAt) {
     chip.classList.add('frozen');
     chip.textContent = id === activeSimLobId ? 'BASE' : 'PAUSED';
   } else {
-    chip.textContent = id === activeSimLobId ? 'SIM --' : 'BASE';
+    chip.textContent = id === activeSimLobId ? 'LIVE --' : 'BASE';
   }
 }
 
@@ -2440,7 +2424,7 @@ function renderRosterList(id){
     const m = s.meta;
     const metaText = m && m.employees !== null ? `Emp ${m.employees}/${m.employeesTotal}` : `${s.records.length} records`;
     const unknownText = s.unknownStatuses && s.unknownStatuses.length ? ` · UNK ${s.unknownStatuses.length}` : '';
-    const mode = id === activeSimLobId ? (s.simActive ? `SIM +${formatClock(liveElapsedSec(id))}` : 'BASE') : 'PAUSED';
+    const mode = id === activeSimLobId ? (s.simActive ? `LIVE +${formatClock(liveElapsedSec(id))}` : 'BASE') : 'PAUSED';
     summary.textContent = `${metaText}${unknownText} · ${s.listSide.toUpperCase()} ${currentRecords.length} · ${mode}`;
   }
 }
@@ -2661,7 +2645,7 @@ function updateHeaderAfterTick(){
   if (document.getElementById('masterInput').value.trim()) return;
   const active = state[activeSimLobId - 1];
   const hasSnapshot = state.some(s => s.snapshotAt);
-  setHeaderStatus(active && active.simActive ? 'sim' : (hasSnapshot ? 'sim' : 'idle'));
+  setHeaderStatus(active && active.simActive ? 'live' : (hasSnapshot ? 'live' : 'idle'));
 }
 
 
