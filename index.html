@@ -4,7 +4,6 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>INT 4.8 · AUX Live Final UI</title>
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600;700&family=Bebas+Neue&family=Manrope:wght@500;700;800&display=swap" rel="stylesheet">
 <style>
 *, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
 
@@ -38,7 +37,7 @@ body{
     radial-gradient(circle at 92% 12%, rgba(32,224,144,0.08), transparent 30%),
     var(--bg);
   color:var(--text);
-  font-family:'Manrope',system-ui,-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+  font-family:system-ui,-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
   display:flex;
   align-items:flex-start;
   justify-content:center;
@@ -72,7 +71,7 @@ body{
 }
 .title-wrap{ display:flex; flex-direction:column; gap:1px; }
 .app-title{
-  font-family:'Bebas Neue',Impact,sans-serif;
+  font-family:Impact,'Arial Narrow',sans-serif;
   font-size:1.65rem;
   line-height:0.9;
   letter-spacing:0.11em;
@@ -80,7 +79,7 @@ body{
   text-shadow:0 0 12px rgba(255,209,102,0.12);
 }
 .app-sub{
-  font-family:'IBM Plex Mono',Consolas,monospace;
+  font-family:Consolas,'SFMono-Regular',monospace;
   font-size:0.52rem;
   letter-spacing:0.08em;
   color:var(--muted);
@@ -99,7 +98,7 @@ body{
   background:rgba(255,255,255,0.045);
   border:1px solid var(--border);
   color:var(--muted);
-  font-family:'IBM Plex Mono',Consolas,monospace;
+  font-family:Consolas,'SFMono-Regular',monospace;
   font-size:0.55rem;
   font-weight:900;
   text-transform:uppercase;
@@ -123,7 +122,7 @@ body{
   color:var(--text);
   outline:none;
   padding:6px 7px;
-  font-family:'IBM Plex Mono',Consolas,monospace;
+  font-family:Consolas,'SFMono-Regular',monospace;
   font-size:0.61rem;
   line-height:1.28;
   font-weight:800;
@@ -139,7 +138,7 @@ body{
   overflow:hidden;
   text-overflow:ellipsis;
   color:var(--muted);
-  font-family:'IBM Plex Mono',Consolas,monospace;
+  font-family:Consolas,'SFMono-Regular',monospace;
   font-size:0.55rem;
   font-weight:800;
 }
@@ -153,7 +152,7 @@ body{
   border:1px solid var(--border);
   background:var(--card);
   color:var(--soft);
-  font-family:'IBM Plex Mono',Consolas,monospace;
+  font-family:Consolas,'SFMono-Regular',monospace;
   font-size:0.54rem;
   font-weight:900;
   cursor:pointer;
@@ -174,7 +173,7 @@ body{
   margin-bottom:6px;
 }
 .focus-title{
-  font-family:'IBM Plex Mono',Consolas,monospace;
+  font-family:Consolas,'SFMono-Regular',monospace;
   color:var(--soft);
   font-size:0.56rem;
   font-weight:900;
@@ -194,7 +193,7 @@ body{
   background:rgba(255,255,255,0.035);
   color:var(--muted);
   cursor:pointer;
-  font-family:'IBM Plex Mono',Consolas,monospace;
+  font-family:Consolas,'SFMono-Regular',monospace;
   font-size:0.56rem;
   font-weight:900;
   transition:all 0.12s;
@@ -223,7 +222,7 @@ body{
   border:1px solid var(--border);
   background:var(--card-2);
   color:var(--text);
-  font-family:'IBM Plex Mono',Consolas,monospace;
+  font-family:Consolas,'SFMono-Regular',monospace;
   font-size:0.57rem;
   font-weight:900;
   white-space:nowrap;
@@ -237,7 +236,7 @@ body{
   color:var(--accent);
   outline:none;
   text-align:center;
-  font-family:'IBM Plex Mono',Consolas,monospace;
+  font-family:Consolas,'SFMono-Regular',monospace;
   font-size:0.78rem;
   font-weight:900;
   -moz-appearance:textfield;
@@ -251,7 +250,7 @@ body{
   border:1px solid var(--border);
   background:var(--card);
   color:var(--soft);
-  font-family:'IBM Plex Mono',Consolas,monospace;
+  font-family:Consolas,'SFMono-Regular',monospace;
   font-size:0.51rem;
   font-weight:900;
   cursor:pointer;
@@ -274,7 +273,7 @@ body{
 .pr-mini small{
   display:block;
   color:var(--muted);
-  font-family:'IBM Plex Mono',Consolas,monospace;
+  font-family:Consolas,'SFMono-Regular',monospace;
   font-size:0.42rem;
   font-weight:900;
   letter-spacing:0.06em;
@@ -283,7 +282,7 @@ body{
 }
 .pr-mini strong{
   display:block;
-  font-family:'Bebas Neue',Impact,sans-serif;
+  font-family:Impact,'Arial Narrow',sans-serif;
   font-weight:400;
   font-size:1.06rem;
   letter-spacing:0.03em;
@@ -327,7 +326,7 @@ body{
 }
 .lob-id{ display:flex; align-items:center; gap:7px; min-width:0; }
 .lob-name{
-  font-family:'IBM Plex Mono',Consolas,monospace;
+  font-family:Consolas,'SFMono-Regular',monospace;
   font-size:0.74rem;
   font-weight:900;
   color:var(--text);
@@ -341,7 +340,7 @@ body{
 .lob-meta{
   min-width:0;
   color:var(--muted);
-  font-family:'IBM Plex Mono',Consolas,monospace;
+  font-family:Consolas,'SFMono-Regular',monospace;
   font-size:0.54rem;
   line-height:1.4;
   font-weight:800;
@@ -360,7 +359,7 @@ body{
   background:rgba(255,255,255,0.035);
   border:1px solid var(--border);
   color:var(--muted);
-  font-family:'IBM Plex Mono',Consolas,monospace;
+  font-family:Consolas,'SFMono-Regular',monospace;
   font-size:0.55rem;
   font-weight:900;
   text-transform:uppercase;
@@ -374,7 +373,7 @@ body{
   border:1px solid var(--border);
   background:var(--card);
   color:var(--muted);
-  font-family:'IBM Plex Mono',Consolas,monospace;
+  font-family:Consolas,'SFMono-Regular',monospace;
   font-size:0.58rem;
   font-weight:900;
   cursor:pointer;
@@ -394,7 +393,7 @@ body{
 .auto-panel-hint{
   margin-bottom:5px;
   color:var(--muted);
-  font-family:'IBM Plex Mono',Consolas,monospace;
+  font-family:Consolas,'SFMono-Regular',monospace;
   font-size:0.55rem;
   line-height:1.42;
   font-weight:800;
@@ -412,7 +411,7 @@ body{
   color:var(--text);
   padding:6px 7px;
   outline:none;
-  font-family:'IBM Plex Mono',Consolas,monospace;
+  font-family:Consolas,'SFMono-Regular',monospace;
   font-size:0.61rem;
   line-height:1.35;
   font-weight:800;
@@ -425,7 +424,7 @@ body{
   gap:6px;
   margin-top:5px;
   color:var(--muted);
-  font-family:'IBM Plex Mono',Consolas,monospace;
+  font-family:Consolas,'SFMono-Regular',monospace;
   font-size:0.54rem;
   line-height:1.35;
   font-weight:900;
@@ -439,7 +438,7 @@ body{
   border:1px solid var(--border);
   background:#0b0e15;
   color:var(--soft);
-  font-family:'IBM Plex Mono',Consolas,monospace;
+  font-family:Consolas,'SFMono-Regular',monospace;
   font-size:0.52rem;
   font-weight:900;
   cursor:pointer;
@@ -464,7 +463,7 @@ body{
   display:flex;
   justify-content:center;
   gap:4px;
-  font-family:'IBM Plex Mono',Consolas,monospace;
+  font-family:Consolas,'SFMono-Regular',monospace;
   font-size:0.48rem;
   font-weight:900;
   letter-spacing:0.08em;
@@ -485,7 +484,7 @@ body{
 .val-pct,
 .val-heads,
 .val-num{
-  font-family:'Bebas Neue',Impact,sans-serif;
+  font-family:Impact,'Arial Narrow',sans-serif;
   font-weight:400;
   font-size:1.38rem;
   line-height:0.95;
@@ -494,7 +493,7 @@ body{
 }
 .val-sub{
   margin-top:3px;
-  font-family:'IBM Plex Mono',Consolas,monospace;
+  font-family:Consolas,'SFMono-Regular',monospace;
   color:var(--muted);
   font-size:0.49rem;
   font-weight:900;
@@ -509,7 +508,7 @@ body{
   border:1px solid var(--border);
   background:#0b0e15;
   color:var(--soft);
-  font-family:'IBM Plex Mono',Consolas,monospace;
+  font-family:Consolas,'SFMono-Regular',monospace;
   font-size:0.78rem;
   font-weight:900;
   cursor:pointer;
@@ -526,7 +525,7 @@ body{
 .live-name-mini{
   margin-top:3px;
   color:var(--muted);
-  font-family:'IBM Plex Mono',Consolas,monospace;
+  font-family:Consolas,'SFMono-Regular',monospace;
   font-size:0.47rem;
   font-weight:800;
   line-height:1.2;
@@ -553,7 +552,7 @@ body{
   justify-content:space-between;
   gap:5px;
   color:var(--muted);
-  font-family:'IBM Plex Mono',Consolas,monospace;
+  font-family:Consolas,'SFMono-Regular',monospace;
   font-size:0.48rem;
   font-weight:900;
   letter-spacing:0.07em;
@@ -566,7 +565,7 @@ body{
 .live-time{
   display:block;
   margin-top:2px;
-  font-family:'Bebas Neue',Impact,sans-serif;
+  font-family:Impact,'Arial Narrow',sans-serif;
   font-size:1.28rem;
   line-height:1;
   letter-spacing:0.04em;
@@ -579,7 +578,7 @@ body{
 .live-name{
   margin-top:3px;
   color:var(--muted);
-  font-family:'IBM Plex Mono',Consolas,monospace;
+  font-family:Consolas,'SFMono-Regular',monospace;
   font-size:0.49rem;
   font-weight:800;
   line-height:1.25;
@@ -604,7 +603,7 @@ body{
   background:rgba(255,255,255,0.035);
   color:var(--soft);
   padding:4px 7px;
-  font-family:'IBM Plex Mono',Consolas,monospace;
+  font-family:Consolas,'SFMono-Regular',monospace;
   font-size:0.5rem;
   font-weight:800;
   white-space:nowrap;
@@ -729,7 +728,7 @@ body{
   background:rgba(255,255,255,0.035);
 }
 .roster-title{
-  font-family:'IBM Plex Mono',Consolas,monospace;
+  font-family:Consolas,'SFMono-Regular',monospace;
   font-size:0.6rem;
   color:var(--soft);
   font-weight:900;
@@ -740,7 +739,7 @@ body{
   min-width:0;
   text-align:right;
   color:var(--muted);
-  font-family:'IBM Plex Mono',Consolas,monospace;
+  font-family:Consolas,'SFMono-Regular',monospace;
   font-size:0.56rem;
   font-weight:900;
   white-space:nowrap;
@@ -759,7 +758,7 @@ body{
   align-items:center;
   justify-content:space-between;
   padding:0 8px;
-  font-family:'IBM Plex Mono',Consolas,monospace;
+  font-family:Consolas,'SFMono-Regular',monospace;
   font-size:0.56rem;
   font-weight:900;
   letter-spacing:0.08em;
@@ -785,7 +784,7 @@ body{
   min-height:27px;
   padding:4px 7px;
   border-bottom:1px solid rgba(255,255,255,0.045);
-  font-family:'IBM Plex Mono',Consolas,monospace;
+  font-family:Consolas,'SFMono-Regular',monospace;
 }
 .agent-row:last-child{ border-bottom:none; }
 .agent-row.in{ background:rgba(32,224,144,0.025); }
@@ -823,7 +822,7 @@ body{
 .empty-row{
   padding:12px 8px;
   color:var(--muted);
-  font-family:'IBM Plex Mono',Consolas,monospace;
+  font-family:Consolas,'SFMono-Regular',monospace;
   font-size:0.58rem;
   font-weight:900;
   text-align:center;
@@ -884,7 +883,7 @@ body{
   border:1px solid var(--border);
   background:rgba(255,255,255,0.04);
   color:var(--muted);
-  font-family:'IBM Plex Mono',Consolas,monospace;
+  font-family:Consolas,'SFMono-Regular',monospace;
   font-size:0.62rem;
   font-weight:900;
   cursor:pointer;
@@ -898,7 +897,7 @@ body{
   border-bottom:1px solid var(--border-soft);
   background:rgba(0,0,0,0.11);
   color:var(--muted);
-  font-family:'IBM Plex Mono',Consolas,monospace;
+  font-family:Consolas,'SFMono-Regular',monospace;
   font-size:0.58rem;
   font-weight:900;
   white-space:nowrap;
@@ -923,7 +922,7 @@ body{
   border-bottom:1px solid var(--border-soft);
   border-top:1px solid rgba(255,255,255,0.035);
   background:#121723;
-  font-family:'IBM Plex Mono',Consolas,monospace;
+  font-family:Consolas,'SFMono-Regular',monospace;
   font-size:0.55rem;
   font-weight:900;
   letter-spacing:0.07em;
@@ -1384,7 +1383,7 @@ body{
   align-items:center;
   gap:5px;
   padding:7px 8px;
-  font-family:'IBM Plex Mono',Consolas,monospace;
+  font-family:Consolas,'SFMono-Regular',monospace;
 }
 .agent-name{
   flex:1 1 auto;
@@ -1506,887 +1505,123 @@ body{
 const IN_KW  = new Set(['auxin','auxout','available','followup/outboundout','hold','busyin','acw','acwout']);
 const OUT_KW = new Set(['personal','system problems','break','lunch','coaching','nps','project','followup/outbound','auxwk','meeting']);
 const IGNORE_NAME_LINES = new Set(['actions','action menu','load complete','loading complete','save','menu']);
-const SNAPSHOT_SIM_MS = 120000;
 const CLEAR_DELAY_MS = 10000;
+const STORAGE_KEY = 'INT48_LAT_BE_REQ_SCHEDULE_V4';
+const INTERVAL_SECONDS = 1800;
+const STALE_MS = 60 * 60 * 1000;
+const WHATIF_IDLE_MS = 10000;
+const WHATIF_HARD_MS = 30000;
+const MODES = ['AUTO','ASSUMED','MANUAL','STALE','FROZEN','LOCKED','RESET','OUTSIDE_WINDOW'];
 
 const LOBS = [
-  { id: 1, label: 'CSA T2', short: 'T2', aliases: ['csa tier2','csa t2','t2','tier2'] },
-  { id: 2, label: 'CSA SP', short: 'SP', aliases: ['csa sp','sp','spanish','spa'] },
-  { id: 3, label: 'CSA T1', short: 'T1', aliases: ['csa tier1','csa t1','t1','tier1'] }
+  { id: 1, key:'T2', label: 'CSA T2', short: 'T2', aliases: ['csa tier2','csa t2','t2','tier2'] },
+  { id: 2, key:'SP', label: 'CSA SP', short: 'SP', aliases: ['csa sp','sp','spanish','spa'] },
+  { id: 3, key:'T1', label: 'CSA T1', short: 'T1', aliases: ['csa tier1','csa t1','t1','tier1'] }
 ];
 
-const state = LOBS.map(l => ({
-  id: l.id,
-  baseIn: 0,
-  baseOut: 0,
-  adjIn:  0,
-  adjOut: 0,
-  lockCleared: false,
-  maxAvailSec: null,
-  records: [],
-  metaLine: '',
-  meta: null,
-  snapshotAt: null,
-  simStartedAt: null,
-  simActive: false,
-  autoSchedule: [],
-  autoPanelOpen: false,
-  autoLastAppliedKey: null
-}));
+const state = LOBS.map(l => newLobState(l));
+let masterCache = '', clearTimerHandle = null, clearCountdownHandle = null, activeSimLobId = 1, activeListSide = 'in';
+let storageStatus = { state:'missing', message:'Auto Req schedule not restored; enter or confirm schedule.' };
+let locked = false, lastGlobalSignature = null;
 
-let masterCache = '';
-let clearTimerHandle = null;
-let clearCountdownHandle = null;
-let activeSimLobId = 1;
-let activeListSide = 'in';
+function newLobState(l){ return {
+  id:l.id, key:l.key, baseIn:0, baseOut:0, officialIn:0, officialOut:0, lockCleared:false, maxAvailSec:null,
+  records:[], metaLine:'', meta:null, snapshotAt:null, autoPanelOpen:false,
+  latReq:0, beReq:0, currentInterval:null, finalizedIntervals:[], samples:[],
+  req92PctRaw:null, bePctRaw:null, latPctRaw:null, expectedLatPctRaw:null, beLatPctRaw:null, expectedBePctRaw:null,
+  manualLatSegment:null, manualBeSegment:null, temporaryManualInDelta:0, temporaryManualInStartedAt:null, temporaryManualInLastChangedAt:null,
+  lastValidSnapshotAt:null, freezeStartedAt:null, isStale:false, isFrozen:false, isLocked:false, mode:'RESET', lastParsedSnapshotSignature:null,
+  autoReqSchedule:{ latReqSchedule:[], beReqSchedule:[] }, autoConfirmed:false, parseHealth:[]
+}; }
 
 const IN_STATUS_ORDER = ['available','auxin','auxout','busyin','acw','acwout','hold','followup/outboundout'];
 const OUT_STATUS_ORDER = ['break','lunch','meeting','personal','system problems','followup/outbound','coaching','nps','project','auxwk'];
 
-
-function buildSimSwitch(){
-  const wrap = document.getElementById('simSwitch');
-  wrap.innerHTML = LOBS.map(l => `<button class="sim-switch-btn" id="simSwitch${l.id}" onclick="setActiveSimLOB(${l.id})">${l.short}</button>`).join('');
-}
-
-function buildPriorityRows(){
-  const wrap = document.getElementById('priorityRows');
-  wrap.innerHTML = LOBS.map(l => `
-    <div class="priority-row" id="priorityRow${l.id}">
-      <button class="pr-lob" onclick="setActiveSimLOB(${l.id})">${l.short}</button>
-      <input class="req-target" id="topReq${l.id}" type="number" min="0" step="0.01" placeholder="00.00" oninput="onReqManualInput(${l.id})" onkeydown="handleReqTab(event, ${l.id})">
-      <button class="auto-req-btn" id="autoBtn${l.id}" onclick="toggleAutoPanel(${l.id})">AUTO</button>
-      <div class="pr-mini pct" id="topPctTile${l.id}"><small>REQ%</small><strong id="topPct${l.id}">—</strong></div>
-      <div class="pr-mini heads" id="topHeadsTile${l.id}"><small>HEAD</small><strong id="topHeads${l.id}">—</strong></div>
-      <div class="pr-mini avail"><small>AVAIL</small><strong id="topAvail${l.id}">—</strong></div>
-      <div class="pr-mini in"><small>IN</small><strong id="topIn${l.id}">0</strong></div>
-      <div class="pr-mini out"><small>OUT</small><strong id="topOut${l.id}">0</strong></div>
-    </div>
-  `).join('');
-}
-
-function buildRows(){
-  const container = document.getElementById('lobs');
-  LOBS.forEach(l => {
-    const s = state[l.id-1];
-    const block = document.createElement('div');
-    block.className = 'lob-card';
-    block.id = `lobBlock${s.id}`;
-    block.innerHTML = `
-      <div class="lob-head">
-        <div class="lob-id">
-          <span class="lob-name">${l.label}</span>
-          <span class="lob-meta" id="lobMeta${s.id}">no snapshot</span>
-        </div>
-        <div class="lob-actions">
-          <span class="sim-chip" id="simChip${s.id}">BASE</span>
-          <button class="clear-btn" onclick="clearSlot(${s.id})">×</button>
-        </div>
-      </div>
-
-      <div class="auto-panel" id="autoPanel${s.id}">
-        <div class="auto-panel-hint">Format <b>HH:MM value</b>, one per line. REQ auto-updates at the scheduled time.</div>
-        <textarea class="auto-textarea" id="autoText${s.id}" placeholder="10:00 6.3&#10;10:30 8.0&#10;13:30 11.2" spellcheck="false" autocomplete="off" oninput="onAutoScheduleInput(${s.id})"></textarea>
-        <div class="auto-status">
-          <span id="autoStatus${s.id}">no schedule set</span>
-          <button class="auto-clear-btn" onclick="clearAutoSchedule(${s.id})">CLEAR</button>
-        </div>
-      </div>
-
-      <div class="roster-panel">
-        <div class="roster-toolbar">
-          <div class="roster-title">AGENT LIST</div>
-          <div class="list-toggle">
-            <button class="list-toggle-btn in" id="listBtnIn${s.id}" onclick="setListSide('in')">IN <span id="inListCount${s.id}">0</span></button>
-            <button class="list-toggle-btn out" id="listBtnOut${s.id}" onclick="setListSide('out')">OUT <span id="outListCount${s.id}">0</span></button>
-          </div>
-        </div>
-        <div class="roster-summary" id="rosterSummary${s.id}">paste snapshot to load</div>
-        <div class="roster-table single" id="agentList${s.id}">
-          <div class="empty-row">No records</div>
-        </div>
-      </div>
-    `;
-    container.appendChild(block);
-  });
-}
-
-function masterChanged(){
-  const raw = document.getElementById('masterInput').value;
-  if (raw !== masterCache) {
-    state.forEach(s => s.lockCleared = false);
-    masterCache = raw;
-  }
-
-  if (raw.trim()) {
-    reparse(true);
-    scheduleAutoClear();
-    setHeaderStatus('parsed');
-  } else {
-    setHeaderStatus('idle');
-    document.getElementById('autoNote').textContent = 'waiting for snapshot';
-  }
-}
-
-function scheduleAutoClear(){
-  if (clearTimerHandle) clearTimeout(clearTimerHandle);
-  if (clearCountdownHandle) clearInterval(clearCountdownHandle);
-
-  const note = document.getElementById('autoNote');
-  const raw = document.getElementById('masterInput').value;
-  if (!raw.trim()) {
-    note.textContent = 'waiting for snapshot';
-    return;
-  }
-
-  let remaining = 10;
-  note.innerHTML = `<span class="good">parsed</span> · input clears in <span class="cnt">${remaining}s</span>`;
-  clearCountdownHandle = setInterval(() => {
-    remaining -= 1;
-    if (remaining <= 0) return;
-    note.innerHTML = `<span class="good">parsed</span> · input clears in <span class="cnt">${remaining}s</span>`;
-  }, 1000);
-
-  clearTimerHandle = setTimeout(() => {
-    if (clearCountdownHandle) clearInterval(clearCountdownHandle);
-    clearCountdownHandle = null;
-    clearTimerHandle = null;
-    document.getElementById('masterInput').value = '';
-    masterCache = '';
-    note.innerHTML = `<span class="blue">snapshot kept</span> · sim runs for selected LOB only`;
-    setHeaderStatus('sim');
-  }, CLEAR_DELAY_MS);
-}
-
-function setHeaderStatus(mode){
-  const wrap = document.getElementById('hdrStatus');
-  const txt = document.getElementById('hdrStatusTxt');
-  wrap.classList.remove('live','sim');
-
-  if (mode === 'parsed') {
-    wrap.classList.add('live');
-    txt.textContent = 'parsed';
-  } else if (mode === 'sim') {
-    wrap.classList.add('sim');
-    txt.textContent = 'sim';
-  } else {
-    txt.textContent = 'idle';
-  }
-}
-
-
-function setListSide(side){
-  activeListSide = side === 'out' ? 'out' : 'in';
-  LOBS.forEach(l => renderRosterList(l.id));
-}
-
-function handleReqTab(event, id){
-  if (event.key !== 'Tab') return;
-  const orderedIds = LOBS.map(l => l.id);
-  const idx = orderedIds.indexOf(id);
-  if (idx < 0) return;
-  event.preventDefault();
-  const nextIdx = event.shiftKey
-    ? (idx - 1 + orderedIds.length) % orderedIds.length
-    : (idx + 1) % orderedIds.length;
-  const next = document.getElementById(`topReq${orderedIds[nextIdx]}`);
-  if (next) {
-    next.focus();
-    next.select();
-  }
-}
-
-function setActiveSimLOB(id){
-  activeSimLobId = id;
-  refreshActiveUI();
-  LOBS.forEach(l => {
-    renderSimChip(l.id);
-    renderTopRow(l.id);
-    renderRosterList(l.id);
-  });
-  updateHeaderAfterTick();
-}
-
-function refreshActiveUI(){
-  LOBS.forEach(l => {
-    const isActive = l.id === activeSimLobId;
-    document.getElementById(`simSwitch${l.id}`)?.classList.toggle('active', isActive);
-    document.getElementById(`priorityRow${l.id}`)?.classList.toggle('active', isActive);
-    document.getElementById(`lobBlock${l.id}`)?.classList.toggle('active', isActive);
-  });
-}
-
-function reparse(resetSim){
-  const raw = document.getElementById('masterInput').value;
-  const cleaned = decodeEntities(raw);
-  const lines = cleaned.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
-
-  LOBS.forEach(l => {
-    const s = state[l.id-1];
-    const data = extractLOBData(lines, l.aliases);
-    if (!data || s.lockCleared) ingestSegment(l.id, [], '', resetSim);
-    else ingestSegment(l.id, data.block, data.metaLine, resetSim);
-  });
-  refreshTopRows();
-}
-
-function extractLOBData(lines, aliases){
-  const aliasSet = new Set(aliases.map(a => a.toLowerCase()));
-  for (let i = 0; i < lines.length; i++){
-    if (aliasSet.has(normalizeLobLabel(lines[i]))) {
-      let j = i + 1;
-      while (j < lines.length && !/^employees\s*:/i.test(lines[j])) j++;
-      return {
-        block: lines.slice(i + 1, j),
-        metaLine: j < lines.length ? lines[j] : ''
-      };
-    }
-  }
-  return null;
-}
-
-function normalizeLobLabel(line){
-  return String(line)
-    .toLowerCase()
-    .replace(/\s+/g, ' ')
-    .trim()
-    .replace(/\s*actions\s*$/i, '');
-}
-
-function normalizeStatus(line){
-  return String(line).toLowerCase().replace(/\s+/g, ' ').trim();
-}
-
-function classifyStatus(line){
-  const lower = normalizeStatus(line);
-  if (IN_KW.has(lower)) return 'in';
-  if (OUT_KW.has(lower)) return 'out';
-  return null;
-}
-
-function parseDurationToSec(value){
-  const m = String(value || '').trim().match(/^(\d{1,3}):(\d{2})(?::(\d{2}))?$/);
-  if (!m) return null;
-  if (m[3] !== undefined) {
-    return (parseInt(m[1], 10) || 0) * 3600 + (parseInt(m[2], 10) || 0) * 60 + (parseInt(m[3], 10) || 0);
-  }
-  return (parseInt(m[1], 10) || 0) * 60 + (parseInt(m[2], 10) || 0);
-}
-
-function parseMetaLine(line){
-  const meta = { employees: null, employeesTotal: null, activity: null, activityTotal: null, schedule: null, scheduleTotal: null };
-  const text = String(line || '');
-  const emp = text.match(/Employees\s*:\s*(\d+)\s*of\s*(\d+)/i);
-  const act = text.match(/Activity\s+Alarms\s*:\s*(\d+)\s*of\s*(\d+)/i);
-  const sch = text.match(/Schedule\s+Alarms\s*:\s*(\d+)\s*of\s*(\d+)/i);
-  if (emp) { meta.employees = parseInt(emp[1], 10); meta.employeesTotal = parseInt(emp[2], 10); }
-  if (act) { meta.activity = parseInt(act[1], 10); meta.activityTotal = parseInt(act[2], 10); }
-  if (sch) { meta.schedule = parseInt(sch[1], 10); meta.scheduleTotal = parseInt(sch[2], 10); }
-  return meta;
-}
-
-function ingestSegment(id, segLines, metaLine, resetSim){
-  const s = state[id-1];
-  s.baseIn = 0;
-  s.baseOut = 0;
-  s.maxAvailSec = null;
-  s.records = [];
-  s.metaLine = metaLine || '';
-  s.meta = parseMetaLine(metaLine);
-
-  let lastName = '';
-
-  segLines.forEach((line, i) => {
-    const trimmed = String(line || '').trim();
-    const lower = normalizeStatus(trimmed);
-    const side = classifyStatus(trimmed);
-    const dur = parseDurationToSec(trimmed);
-
-    if (side) {
-      const nextDur = parseDurationToSec(segLines[i + 1]);
-      const rec = {
-        name: lastName || 'Unknown',
-        status: trimmed,
-        side,
-        seconds: nextDur === null ? 0 : nextDur
-      };
-      s.records.push(rec);
-      if (side === 'in') s.baseIn += 1;
-      if (side === 'out') s.baseOut += 1;
-      if (lower === 'available') {
-        if (s.maxAvailSec === null || rec.seconds > s.maxAvailSec) s.maxAvailSec = rec.seconds;
-      }
-      return;
-    }
-
-    if (dur !== null) return;
-    if (IGNORE_NAME_LINES.has(lower)) return;
-    if (/^employees\s*:/i.test(trimmed)) return;
-    if (/^workspace\s*:/i.test(trimmed)) return;
-    if (/real-time adherence/i.test(trimmed)) return;
-
-    lastName = trimmed;
-  });
-
-  if (resetSim && (s.baseIn + s.baseOut > 0 || s.records.length > 0)) {
-    s.snapshotAt = new Date();
-    s.simStartedAt = Date.now();
-    s.simActive = true;
-  }
-
-  refreshRow(id);
-}
-
-function adj(id, side, delta){
-  const s = state[id-1];
-  if (side === 'in') {
-    const newVal = Math.max(0, s.baseIn + s.adjIn + delta);
-    s.adjIn = newVal - s.baseIn;
-  } else {
-    const newVal = Math.max(0, s.baseOut + s.adjOut + delta);
-    s.adjOut = newVal - s.baseOut;
-  }
-  refreshRow(id);
-  refreshTopRows();
-}
-
-function refreshRow(id){
-  renderMeta(id);
-  renderTopRow(id);
-  renderSimChip(id);
-  renderRosterList(id);
-}
-
-function renderDelta(elId, base, adj){
-  const el = document.getElementById(elId);
-  if (!el) return;
-  if (!adj) { el.textContent = `${base}`; return; }
-  const sign = adj > 0 ? '+' : '−';
-  const cls  = adj > 0 ? 'pos' : 'neg';
-  el.innerHTML = `${base} <span class="${cls}">${sign}${Math.abs(adj)}</span>`;
-}
-
-function renderMeta(id){
-  const s = state[id-1];
-  const el = document.getElementById(`lobMeta${id}`);
-  const m = s.meta;
-  if (!m || m.employees === null) {
-    el.textContent = s.records.length ? `${s.records.length} records` : 'no snapshot';
-    return;
-  }
-  const parts = [`Emp ${m.employees}/${m.employeesTotal}`];
-  if (m.activity !== null) parts.push(`Act ${m.activity}/${m.activityTotal}`);
-  if (m.schedule !== null) parts.push(`Sch ${m.schedule}/${m.scheduleTotal}`);
-  el.textContent = parts.join(' · ');
-}
-
-function getReqValue(id){
-  return parseFloat(document.getElementById(`topReq${id}`).value);
-}
-
-function updatePct(id){
-  renderTopRow(id);
-}
-
-function updateHeads(id, curIn, req){
-  const headsEl = document.getElementById(`heads${id}`);
-  const minIn = Math.ceil(0.92 * req);
-  const heads = Math.max(0, curIn - minIn);
-  headsEl.textContent = heads;
-  headsEl.className = 'val-heads ' + (heads > 0 ? 'avail' : 'zero');
-}
-
-function getHeadCount(id){
-  const s = state[id-1];
-  const req = getReqValue(id);
-  if (!req || req <= 0) return null;
-  const curIn = Math.max(0, s.baseIn + s.adjIn);
-  return Math.max(0, curIn - Math.ceil(0.92 * req));
-}
-
-function refreshTopRows(){
-  LOBS.forEach(l => renderTopRow(l.id));
-}
-
-function renderTopRow(id){
-  const s = state[id-1];
-  const curIn  = Math.max(0, s.baseIn + s.adjIn);
-  const curOut = Math.max(0, s.baseOut + s.adjOut);
-  const req = getReqValue(id);
-  const total = curIn + curOut;
-  const pctTile = document.getElementById(`topPctTile${id}`);
-  const headsTile = document.getElementById(`topHeadsTile${id}`);
-  const pctEl = document.getElementById(`topPct${id}`);
-  const headsEl = document.getElementById(`topHeads${id}`);
-
-  document.getElementById(`topIn${id}`).textContent = curIn;
-  document.getElementById(`topOut${id}`).textContent = curOut;
-
-  pctTile.classList.remove('good','bad');
-  headsTile.classList.remove('zero');
-
-  if (!req || req <= 0 || total === 0) {
-    pctEl.textContent = '00.00%';
-    headsEl.textContent = '—';
-    headsTile.classList.add('zero');
-  } else {
-    const pct = (curIn / req) * 100;
-    const heads = getHeadCount(id);
-    pctEl.textContent = pct.toFixed(2) + '%';
-    pctTile.classList.add(pct >= 92 ? 'good' : 'bad');
-    headsEl.textContent = heads;
-    if (!heads) headsTile.classList.add('zero');
-  }
-
-  const topAvail = getTopRecord(s, 'in', 'available');
-  const elapsed = liveElapsedSec(id);
-  document.getElementById(`topAvail${id}`).textContent = topAvail ? formatDuration(topAvail.seconds + elapsed) : '—';
-}
-
-function liveElapsedSec(id){
-  const s = state[id-1];
-  if (id !== activeSimLobId) return 0;
-  if (!s.simStartedAt || !s.simActive) return 0;
-  const elapsed = Date.now() - s.simStartedAt;
-  if (elapsed >= SNAPSHOT_SIM_MS) {
-    s.simActive = false;
-    return 0;
-  }
-  return Math.floor(elapsed / 1000);
-}
-
-function simRemainingSec(s){
-  if (!s.simStartedAt || !s.simActive) return 0;
-  return Math.max(0, Math.ceil((SNAPSHOT_SIM_MS - (Date.now() - s.simStartedAt)) / 1000));
-}
-
-function getTopRecord(s, side, statusFilter){
-  let records = s.records.filter(r => r.side === side);
-  if (statusFilter) records = records.filter(r => normalizeStatus(r.status) === statusFilter);
-  if (!records.length) return null;
-  return records.reduce((best, r) => r.seconds > best.seconds ? r : best, records[0]);
-}
-
-function renderLiveCards(id){
-  renderSimChip(id);
-}
-
-function renderSimChip(id){
-  const s = state[id-1];
-  const chip = document.getElementById(`simChip${id}`);
-  if (!chip) return;
-
-  chip.classList.remove('active','frozen');
-
-  if (id === activeSimLobId && s.simActive) {
-    chip.classList.add('active');
-    chip.textContent = `SIM ${formatClock(simRemainingSec(s))}`;
-  } else if (s.snapshotAt) {
-    chip.classList.add('frozen');
-    chip.textContent = id === activeSimLobId ? 'BASE' : 'PAUSED';
-  } else {
-    chip.textContent = id === activeSimLobId ? 'SIM --' : 'BASE';
-  }
-}
-
-function renderLiveRecord(id, kind, rec, elapsed){
-  const statusEl = document.getElementById(`live${kind}Status${id}`);
-  const timeEl = document.getElementById(`live${kind}Time${id}`);
-  const nameEl = document.getElementById(`live${kind}Name${id}`);
-
-  if (!rec) {
-    statusEl.textContent = '—';
-    timeEl.textContent = '—';
-    nameEl.textContent = kind === 'In' ? 'no IN records' : 'no OUT records';
-    return;
-  }
-
-  statusEl.textContent = cleanStatusLabel(rec.status);
-  timeEl.textContent = formatDuration(rec.seconds + elapsed);
-  nameEl.textContent = compactName(rec.name);
-}
-
-function renderAvailRecord(id, rec, elapsed){
-  const statusEl = document.getElementById(`liveAvailStatus${id}`);
-  const timeEl = document.getElementById(`liveAvailTimeDetail${id}`);
-  const nameEl = document.getElementById(`liveAvailNameDetail${id}`);
-  const miniTimeEl = document.getElementById(`liveAvailTime${id}`);
-  const miniNameEl = document.getElementById(`liveAvailName${id}`);
-
-  if (!rec) {
-    statusEl.textContent = 'max';
-    timeEl.textContent = '—';
-    nameEl.textContent = 'no available';
-    miniTimeEl.textContent = '—';
-    miniNameEl.textContent = 'no available';
-    return;
-  }
-
-  const duration = formatDuration(rec.seconds + elapsed);
-  const name = compactName(rec.name);
-  statusEl.textContent = 'max';
-  timeEl.textContent = duration;
-  nameEl.textContent = name;
-  miniTimeEl.textContent = duration;
-  miniNameEl.textContent = name;
-}
-
-function renderStrip(id){
-  renderRosterList(id);
-}
-
-function renderRosterList(id){
-  const s = state[id-1];
-  const listEl = document.getElementById(`agentList${id}`);
-  if (!listEl) return;
-
-  const elapsed = liveElapsedSec(id);
-  const isLive = id === activeSimLobId && s.simActive;
-  const inRecords = s.records.filter(r => r.side === 'in');
-  const outRecords = s.records.filter(r => r.side === 'out');
-
-  document.getElementById(`inListCount${id}`).textContent = inRecords.length;
-  document.getElementById(`outListCount${id}`).textContent = outRecords.length;
-  document.getElementById(`listBtnIn${id}`).classList.toggle('active', activeListSide === 'in');
-  document.getElementById(`listBtnOut${id}`).classList.toggle('active', activeListSide === 'out');
-
-  const currentRecords = activeListSide === 'in' ? inRecords : outRecords;
-  listEl.innerHTML = currentRecords.length
-    ? renderGroupedAgentRows(currentRecords, activeListSide, elapsed, isLive)
-    : `<div class="empty-row">No ${activeListSide.toUpperCase()} records</div>`;
-
-  const summary = document.getElementById(`rosterSummary${id}`);
-  if (summary) {
-    const m = s.meta;
-    const metaText = m && m.employees !== null ? `Emp ${m.employees}/${m.employeesTotal}` : `${s.records.length} records`;
-    const mode = id === activeSimLobId ? (s.simActive ? `SIM +${formatClock(Math.floor((Date.now() - s.simStartedAt) / 1000))}` : 'BASE') : 'PAUSED';
-    summary.textContent = `${metaText} · ${activeListSide.toUpperCase()} ${currentRecords.length} · ${mode}`;
-  }
-}
-
-function renderGroupedAgentRows(records, side, elapsed, isLive){
-  const groups = groupRecordsByStatus(records, side);
-  return groups.map(group => {
-    const cls = statusClass(group.status);
-    const head = `<div class="status-group-head ${side} ${cls}"><span>${escapeHtml(cleanStatusLabel(group.status))}</span><span class="group-count">${group.items.length}</span></div>`;
-    const rows = group.items.map(r => renderAgentRow(r, elapsed, side, isLive)).join('');
-    return head + rows;
-  }).join('');
-}
-
-function groupRecordsByStatus(records, side){
-  const order = side === 'in' ? IN_STATUS_ORDER : OUT_STATUS_ORDER;
-  const buckets = new Map();
-  records.forEach((rec, idx) => {
-    const key = normalizeStatus(rec.status);
-    if (!buckets.has(key)) buckets.set(key, { status: rec.status, firstIndex: idx, items: [] });
-    buckets.get(key).items.push(rec);
-  });
-
-  return Array.from(buckets.values()).sort((a,b) => {
-    const ak = normalizeStatus(a.status);
-    const bk = normalizeStatus(b.status);
-    const ai = order.indexOf(ak);
-    const bi = order.indexOf(bk);
-    if (ai !== -1 || bi !== -1) return (ai === -1 ? 999 : ai) - (bi === -1 ? 999 : bi);
-    return a.firstIndex - b.firstIndex;
-  });
-}
-
-function renderAgentRow(rec, elapsed, side, isLive){
-  const status = cleanStatusLabel(rec.status);
-  const time = formatDuration(rec.seconds + elapsed);
-  const liveClass = isLive ? ' live' : '';
-  const stClass = statusClass(rec.status);
-  const displayName = compactName(rec.name);
-  return `<div class="agent-row ${side} ${stClass}${liveClass}" title="${escapeHtml(displayName)} | ${escapeHtml(rec.status)} | ${time}">
-    <div class="agent-line">
-      <span class="agent-name">${escapeHtml(displayName)}</span>
-      <span class="agent-sep">|</span>
-      <span class="agent-status">${escapeHtml(status)}</span>
-      <span class="agent-sep">|</span>
-      <span class="agent-time">${time}</span>
-    </div>
-  </div>`;
-}
-
-function statusClass(status){
-  const s = normalizeStatus(status);
-  if (s === 'available') return 'st-available';
-  if (s === 'auxin') return 'st-auxin';
-  if (s === 'auxout') return 'st-auxout';
-  if (s === 'busyin') return 'st-busyin';
-  if (s === 'hold') return 'st-hold';
-  if (s === 'acw' || s === 'acwout') return 'st-acw';
-  if (s === 'break') return 'st-break';
-  if (s === 'lunch') return 'st-lunch';
-  if (s === 'meeting') return 'st-meeting';
-  if (s === 'personal') return 'st-personal';
-  if (s === 'system problems') return 'st-sysprob';
-  if (s === 'followup/outbound' || s === 'followup/outboundout') return 'st-followup';
-  return 'st-other';
-}
-
-function cleanStatusLabel(status){
-  return String(status || '')
-    .replace(/Followup\/OutboundOUT/i, 'F/O OUT')
-    .replace(/Followup\/Outbound/i, 'F/O')
-    .replace(/System Problems/i, 'SysProb')
-    .replace(/Available/i, 'Avail')
-    .replace(/BusyIN/i, 'BusyIN')
-    .replace(/AUXOUT/i, 'AUXOUT')
-    .replace(/AUXIN/i, 'AUXIN');
-}
-
-function compactName(name){
-  const raw = String(name || 'Unknown').replace(/\s+/g, ' ').trim();
-  const full = parseAgentDisplayName(raw);
-  return full || raw;
-}
-
-function parseAgentDisplayName(raw){
-  const text = String(raw || '').replace(/\s+/g, ' ').trim();
-  // Snapshot format: Lastname - HRID, Agent Name
-  const direct = text.match(/^(.+?)\s*-\s*([0-9]+)\s*,\s*(.+)$/);
-  if (direct) {
-    const lastName = direct[1].trim();
-    const agentName = direct[3].trim();
-    if (agentName && lastName) return `${agentName} ${lastName}`.replace(/\s+/g, ' ').trim();
-    return agentName || lastName;
-  }
-
-  const commaOnly = text.match(/^(.+?)\s*,\s*(.+)$/);
-  if (commaOnly) {
-    const lastName = commaOnly[1].trim();
-    const agentName = commaOnly[2].trim();
-    if (agentName && lastName) return `${agentName} ${lastName}`.replace(/\s+/g, ' ').trim();
-    return agentName || lastName;
-  }
-
-  return text.replace(/\s*-\s*[0-9]+.*$/, '').trim() || text;
-}
-
-function shortName(name){
-  const compact = compactName(name);
-  if (compact.length <= 16) return compact;
-  return compact.slice(0, 15) + '…';
-}
-
-function onReqManualInput(id){
-  updatePct(id);
-  renderTopRow(id);
-}
-
-function clearSlot(id){
-  const s = state[id-1];
-  s.baseIn = 0;
-  s.baseOut = 0;
-  s.adjIn = 0;
-  s.adjOut = 0;
-  s.lockCleared = true;
-  s.maxAvailSec = null;
-  s.records = [];
-  s.metaLine = '';
-  s.meta = null;
-  s.snapshotAt = null;
-  s.simStartedAt = null;
-  s.simActive = false;
-
-  document.getElementById(`topReq${id}`).value = '';
-  refreshRow(id);
-  refreshTopRows();
-}
-
-function clearMaster(){
-  if (clearTimerHandle) clearTimeout(clearTimerHandle);
-  if (clearCountdownHandle) clearInterval(clearCountdownHandle);
-  clearTimerHandle = null;
-  clearCountdownHandle = null;
-
-  document.getElementById('masterInput').value = '';
-  masterCache = '';
-  document.getElementById('autoNote').textContent = 'waiting for snapshot';
-  setHeaderStatus('idle');
-
-  state.forEach(s => {
-    s.baseIn = 0;
-    s.baseOut = 0;
-    s.adjIn = 0;
-    s.adjOut = 0;
-    s.lockCleared = false;
-    s.maxAvailSec = null;
-    s.records = [];
-    s.metaLine = '';
-    s.meta = null;
-    s.snapshotAt = null;
-    s.simStartedAt = null;
-    s.simActive = false;
-  });
-
-  LOBS.forEach(l => refreshRow(l.id));
-  refreshTopRows();
-}
-
-function toggleAutoPanel(id){
-  const s = state[id-1];
-  s.autoPanelOpen = !s.autoPanelOpen;
-  document.getElementById(`autoPanel${id}`).classList.toggle('open', s.autoPanelOpen);
-  document.getElementById(`autoBtn${id}`).classList.toggle('active', s.autoSchedule.length > 0 || s.autoPanelOpen);
-  setActiveSimLOB(id);
-}
-
-function onAutoScheduleInput(id){
-  const s = state[id-1];
-  const text = document.getElementById(`autoText${id}`).value;
-  const statusEl = document.getElementById(`autoStatus${id}`);
-  const btn = document.getElementById(`autoBtn${id}`);
-
-  const lines = text.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
-  const parsed = [];
-  let badLines = 0;
-
-  lines.forEach(line => {
-    const m = line.match(/^(\d{1,2}):(\d{2})\s+([0-9]+(?:\.[0-9]+)?)$/);
-    if (!m) { badLines++; return; }
-    const h = parseInt(m[1], 10);
-    const mi = parseInt(m[2], 10);
-    const val = parseFloat(m[3]);
-    if (h < 0 || h > 23 || mi < 0 || mi > 59) { badLines++; return; }
-    parsed.push({ h, m: mi, val, key: `${pad2(h)}:${pad2(mi)}` });
-  });
-
-  parsed.sort((a,b) => (a.h*60+a.m) - (b.h*60+b.m));
-  s.autoSchedule = parsed;
-  s.autoLastAppliedKey = null;
-  btn.classList.toggle('active', parsed.length > 0 || s.autoPanelOpen);
-
-  if (parsed.length === 0) {
-    statusEl.innerHTML = badLines > 0 ? `<span class="err">no valid lines yet</span>` : 'no schedule set';
-    return;
-  }
-
-  const nextPoint = findNextSchedulePoint(parsed);
-  const suffix = badLines > 0 ? ` · <span class="err">${badLines} ignored</span>` : '';
-  if (nextPoint) statusEl.innerHTML = `${parsed.length} pts · next <span class="next-time">${nextPoint.key} → ${nextPoint.val}</span>${suffix}`;
-  else statusEl.innerHTML = `${parsed.length} pts · all times passed today${suffix}`;
-
-  checkAutoScheduleForLOB(id);
-}
-
-function clearAutoSchedule(id){
-  const s = state[id-1];
-  s.autoSchedule = [];
-  s.autoLastAppliedKey = null;
-  document.getElementById(`autoText${id}`).value = '';
-  document.getElementById(`autoStatus${id}`).textContent = 'no schedule set';
-  document.getElementById(`autoBtn${id}`).classList.toggle('active', s.autoPanelOpen);
-}
-
-function findNextSchedulePoint(schedule, excludeKey){
-  const now = new Date();
-  const nowMin = now.getHours() * 60 + now.getMinutes();
-  for (const pt of schedule) {
-    if (pt.key === excludeKey) continue;
-    if (pt.h * 60 + pt.m >= nowMin) return pt;
-  }
-  return null;
-}
-
-function checkAutoScheduleForLOB(id){
-  const s = state[id-1];
-  if (!s.autoSchedule.length) return;
-
-  const now = new Date();
-  const nowMin = now.getHours() * 60 + now.getMinutes();
-  let due = null;
-
-  for (const pt of s.autoSchedule) {
-    if (pt.h * 60 + pt.m <= nowMin) due = pt;
-    else break;
-  }
-  if (!due || s.autoLastAppliedKey === due.key) return;
-
-  s.autoLastAppliedKey = due.key;
-  document.getElementById(`topReq${id}`).value = due.val;
-  updatePct(id);
-  renderTopRow(id);
-
-  const statusEl = document.getElementById(`autoStatus${id}`);
-  const nextPoint = findNextSchedulePoint(s.autoSchedule, due.key);
-  if (nextPoint) statusEl.innerHTML = `applied <span class="next-time">${due.key} → ${due.val}</span> · next ${nextPoint.key} → ${nextPoint.val}`;
-  else statusEl.innerHTML = `applied <span class="next-time">${due.key} → ${due.val}</span> · all times passed today`;
-}
-
-function checkAllAutoSchedules(){
-  LOBS.forEach(l => checkAutoScheduleForLOB(l.id));
-}
-
-function tickLive(){
-  state.forEach(s => {
-    if (s.simStartedAt && s.simActive && Date.now() - s.simStartedAt >= SNAPSHOT_SIM_MS) {
-      s.simActive = false;
-    }
-    renderSimChip(s.id);
-    renderTopRow(s.id);
-    renderRosterList(s.id);
-  });
-  updateHeaderAfterTick();
-}
-
-function updateHeaderAfterTick(){
-  if (document.getElementById('masterInput').value.trim()) return;
-  const active = state[activeSimLobId - 1];
-  const hasSnapshot = state.some(s => s.snapshotAt);
-  setHeaderStatus(active && active.simActive ? 'sim' : (hasSnapshot ? 'sim' : 'idle'));
-}
-
-function formatDuration(totalSec){
-  if (totalSec === null || totalSec === undefined || isNaN(totalSec)) return '—';
-  totalSec = Math.max(0, Math.floor(totalSec));
-  const h = Math.floor(totalSec / 3600);
-  const m = Math.floor((totalSec % 3600) / 60);
-  const sec = totalSec % 60;
-  if (h > 0) return `${pad2(h)}:${pad2(m)}:${pad2(sec)}`;
-  return `${pad2(m)}:${pad2(sec)}`;
-}
-
-function formatClock(totalSec){
-  totalSec = Math.max(0, Math.floor(totalSec));
-  const m = Math.floor(totalSec / 60);
-  const s = totalSec % 60;
-  return `${pad2(m)}:${pad2(s)}`;
-}
-
-function pad2(n){ return String(n).padStart(2,'0'); }
-
-function decodeEntities(s){
-  return String(s)
-    .replace(/&amp;/gi, '&')
-    .replace(/&lt;/gi, '<')
-    .replace(/&gt;/gi, '>')
-    .replace(/&nbsp;/gi, ' ')
-    .replace(/&#39;/gi, "'")
-    .replace(/&quot;/gi, '"');
-}
-
-function escapeHtml(value){
-  return String(value ?? '')
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#39;');
-}
-
-buildSimSwitch();
-buildPriorityRows();
-buildRows();
-refreshActiveUI();
-setListSide('in');
-refreshTopRows();
-setHeaderStatus('idle');
-setInterval(checkAllAutoSchedules, 15000);
-setInterval(tickLive, 1000);
+function injectLatBeStyles(){ const st=document.createElement('style'); st.textContent=`
+.latbe-panel{border:1px solid var(--border-soft);border-radius:12px;background:rgba(0,0,0,.16);padding:8px;margin-bottom:9px;font-family:Consolas,'SFMono-Regular',monospace}.latbe-status{padding:7px 10px;border-bottom:1px solid var(--border-soft);font:900 .58rem Consolas,'SFMono-Regular',monospace;color:var(--warn);background:rgba(255,179,71,.08)}.latbe-global-actions{display:flex;gap:6px;padding:7px 10px;border-bottom:1px solid var(--border-soft)}.latbe-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}.latbe-metric{border:1px solid var(--border-soft);border-radius:8px;padding:5px;text-align:center;background:rgba(255,255,255,.035);min-width:0}.latbe-metric small{display:block;color:var(--muted);font-size:.45rem;font-weight:900;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.latbe-metric strong{display:block;color:var(--soft);font:900 1rem Consolas,'SFMono-Regular',monospace;white-space:nowrap}.latbe-metric.good strong{color:var(--in)}.latbe-metric.bad strong{color:var(--out)}.latbe-controls{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin:7px 0}.latbe-controls input{width:100%;height:26px;border-radius:7px;border:1px solid var(--border);background:#0b0e15;color:var(--accent);text-align:center;font:900 .72rem Consolas,'SFMono-Regular',monospace}.latbe-controls button,.latbe-global-actions button,.auto-save-btn{height:26px;border-radius:7px;border:1px solid var(--border);background:var(--card);color:var(--soft);font:900 .52rem Consolas,'SFMono-Regular',monospace;cursor:pointer}.be-section{margin-top:7px}.be-section.hidden{display:none}.whatif{margin-top:6px;color:var(--total);font-size:.52rem;font-weight:900}.health{margin-top:6px;color:var(--warn);font-size:.52rem;line-height:1.35;font-weight:900}.locked-screen{padding:14px;margin:10px;border:1px solid rgba(255,100,127,.45);border-radius:12px;background:var(--out-bg);color:var(--out);font-weight:900;text-align:center}.auto-table{width:100%;border-collapse:collapse;margin-top:6px}.auto-table th,.auto-table td{border:1px solid var(--border-soft);padding:3px;text-align:center;font-size:.48rem}.auto-table input{width:100%;background:#0b0e15;border:1px solid var(--border);border-radius:4px;color:var(--text);font-size:.52rem;text-align:center}.auto-tools{display:flex;gap:5px;margin-top:6px;align-items:center;flex-wrap:wrap}.auto-tools span{color:var(--muted);font-size:.52rem;font-weight:900}@media(max-width:480px){.latbe-grid{grid-template-columns:repeat(2,1fr)}.latbe-controls{grid-template-columns:1fr}.auto-table th,.auto-table td{font-size:.42rem;padding:2px}}`; document.head.appendChild(st); }
+
+function buildSimSwitch(){ document.getElementById('simSwitch').innerHTML = LOBS.map(l => `<button class="sim-switch-btn" id="simSwitch${l.id}" onclick="setActiveSimLOB(${l.id})">${l.short}</button>`).join(''); }
+function buildPriorityRows(){ document.getElementById('priorityRows').innerHTML = LOBS.map(l => `<div class="priority-row" id="priorityRow${l.id}"><button class="pr-lob" onclick="setActiveSimLOB(${l.id})">${l.short}</button><input class="req-target" id="topReq${l.id}" type="number" min="0" step="0.01" placeholder="LAT" oninput="onReqManualInput(${l.id})" onkeydown="handleReqTab(event, ${l.id})"><input class="req-target" id="topBeReq${l.id}" type="number" min="0" max="6" step="1" placeholder="BE" oninput="onBeReqManualInput(${l.id})"><button class="auto-req-btn" id="autoBtn${l.id}" onclick="toggleAutoPanel(${l.id})">AUTO</button><div class="pr-mini pct" id="topPctTile${l.id}"><small>REQ92</small><strong id="topPct${l.id}">—</strong></div><div class="pr-mini heads" id="topHeadsTile${l.id}"><small>HEAD</small><strong id="topHeads${l.id}">—</strong></div><div class="pr-mini in"><small>IN</small><strong id="topIn${l.id}">0</strong></div><div class="pr-mini out"><small>OUT</small><strong id="topOut${l.id}">0</strong></div></div>`).join(''); }
+function intervalRows(){ let rows=''; for(let i=1;i<=32;i++){ const t=intervalStartLabel(i); rows+=`<tr><td>${i}</td><td>${t}</td><td><input data-interval="${i}" data-kind="lat" placeholder="LAT"></td><td><input data-interval="${i}" data-kind="be" placeholder="0-6"></td></tr>`; } return rows; }
+function buildRows(){ const c=document.getElementById('lobs'); LOBS.forEach(l=>{ const s=state[l.id-1], b=document.createElement('div'); b.className='lob-card'; b.id=`lobBlock${s.id}`; b.innerHTML=`<div class="lob-head"><div class="lob-id"><span class="lob-name">${l.label}</span><span class="lob-meta" id="lobMeta${s.id}">no snapshot</span></div><div class="lob-actions"><span class="sim-chip" id="simChip${s.id}">RESET</span><button class="clear-btn" onclick="clearSlot(${s.id})">×</button></div></div><div class="auto-panel" id="autoPanel${s.id}"><div class="auto-panel-hint"><b>Auto Req Schedule</b>: per 30-minute interval. LAT decimal, BE integer 0–6. Saved locally.</div><div class="auto-tools"><button class="auto-save-btn" onclick="saveScheduleFromPanel(${s.id})">SAVE SCHEDULE</button><button class="auto-clear-btn" onclick="clearAutoSchedule(${s.id})">CLEAR</button><button class="auto-save-btn" onclick="confirmStoredScheduleReuse()">CONFIRM REUSE</button><span id="autoStatus${s.id}">not loaded</span></div><table class="auto-table"><thead><tr><th>#</th><th>Start</th><th>LAT</th><th>BE</th></tr></thead><tbody id="autoTbody${s.id}">${intervalRows()}</tbody></table></div><div class="latbe-panel"><div class="latbe-grid"><div class="latbe-metric"><small>INTERVAL</small><strong id="lbInterval${s.id}">—</strong></div><div class="latbe-metric"><small>MODE</small><strong id="lbMode${s.id}">RESET</strong></div><div class="latbe-metric"><small>REQ92%</small><strong id="lbReq92${s.id}">—</strong></div><div class="latbe-metric"><small>LAT%</small><strong id="lbLat${s.id}">—</strong></div><div class="latbe-metric"><small>EXP LAT%</small><strong id="lbExpLat${s.id}">—</strong></div><div class="latbe-metric"><small>92% HEAD</small><strong id="lbHead${s.id}">—</strong></div></div><div class="latbe-controls"><input id="manualLat${s.id}" placeholder="Manual LAT%"><button onclick="applyManualPct(${s.id}, 'LAT')">APPLY LAT</button><input id="whatIf${s.id}" type="number" min="-20" max="20" step="1" value="0" oninput="setWhatIf(${s.id})"><button onclick="resetWhatIf(${s.id})">RESET TEMP IN</button></div><div class="be-section hidden" id="beSection${s.id}"><div class="latbe-grid"><div class="latbe-metric"><small>BE%</small><strong id="lbBePct${s.id}">—</strong></div><div class="latbe-metric"><small>BE LAT%</small><strong id="lbBeLat${s.id}">—</strong></div><div class="latbe-metric"><small>EXP BE%</small><strong id="lbExpBe${s.id}">—</strong></div><div class="latbe-metric"><small>BE HEAD</small><strong id="lbBeHead${s.id}">—</strong></div></div><div class="latbe-controls"><input id="manualBe${s.id}" placeholder="Manual BE%"><button onclick="applyManualPct(${s.id}, 'BE')">APPLY BE</button></div></div><div class="whatif" id="whatIfDisplay${s.id}"></div><div class="health" id="health${s.id}"></div></div><div class="roster-panel"><div class="roster-toolbar"><div class="roster-title">AGENT LIST</div><div class="list-toggle"><button class="list-toggle-btn in" id="listBtnIn${s.id}" onclick="setListSide('in')">IN <span id="inListCount${s.id}">0</span></button><button class="list-toggle-btn out" id="listBtnOut${s.id}" onclick="setListSide('out')">OUT <span id="outListCount${s.id}">0</span></button></div></div><div class="roster-summary" id="rosterSummary${s.id}">paste snapshot to load</div><div class="roster-table single" id="agentList${s.id}"><div class="empty-row">No records</div></div></div>`; c.appendChild(b); }); }
+function addGlobalPanels(){ document.querySelector('.focus-panel').insertAdjacentHTML('beforebegin', `<div class="latbe-status" id="storageStatus"></div><div class="latbe-global-actions"><button onclick="refreshStartOver()">REFRESH / START OVER</button><button onclick="confirmStoredScheduleReuse()">CONFIRM SAVED SCHEDULE</button></div><div id="lockScreen" class="locked-screen" style="display:none">Session ended. Please refresh the page to start a new day.</div>`); }
+
+function masterChanged(){ const raw=document.getElementById('masterInput').value; if(raw!==masterCache){ state.forEach(s=>s.lockCleared=false); masterCache=raw; } if(raw.trim()){ reparse(true); scheduleAutoClear(); setHeaderStatus('parsed'); } else { setHeaderStatus('idle'); document.getElementById('autoNote').textContent='waiting for snapshot'; } }
+function scheduleAutoClear(){ if(clearTimerHandle)clearTimeout(clearTimerHandle); if(clearCountdownHandle)clearInterval(clearCountdownHandle); const note=document.getElementById('autoNote'), raw=document.getElementById('masterInput').value; if(!raw.trim()){note.textContent='waiting for snapshot';return;} let r=10; note.innerHTML=`<span class="good">parsed</span> · input clears in <span class="cnt">${r}s</span>`; clearCountdownHandle=setInterval(()=>{r--; if(r>0)note.innerHTML=`<span class="good">parsed</span> · input clears in <span class="cnt">${r}s</span>`;},1000); clearTimerHandle=setTimeout(()=>{clearInterval(clearCountdownHandle); clearCountdownHandle=null; clearTimerHandle=null; document.getElementById('masterInput').value=''; masterCache=''; note.innerHTML=`<span class="blue">snapshot kept</span> · LAT/BE tracking live`; setHeaderStatus('sim');}, CLEAR_DELAY_MS); }
+function setHeaderStatus(mode){ const w=document.getElementById('hdrStatus'), t=document.getElementById('hdrStatusTxt'); w.classList.remove('live','sim'); if(mode==='parsed'){w.classList.add('live');t.textContent='parsed';} else if(mode==='sim'){w.classList.add('sim');t.textContent='live';} else t.textContent='idle'; }
+function setListSide(side){ activeListSide=side==='out'?'out':'in'; LOBS.forEach(l=>renderRosterList(l.id)); }
+function handleReqTab(event,id){ if(event.key!=='Tab')return; const ids=LOBS.map(l=>l.id), idx=ids.indexOf(id); event.preventDefault(); const n=ids[(idx+(event.shiftKey?-1:1)+ids.length)%ids.length]; document.getElementById(`topReq${n}`)?.focus(); }
+function setActiveSimLOB(id){ activeSimLobId=id; refreshActiveUI(); LOBS.forEach(l=>{renderSimChip(l.id);renderTopRow(l.id);renderRosterList(l.id);}); }
+function refreshActiveUI(){ LOBS.forEach(l=>{ const a=l.id===activeSimLobId; document.getElementById(`simSwitch${l.id}`)?.classList.toggle('active',a); document.getElementById(`priorityRow${l.id}`)?.classList.toggle('active',a); document.getElementById(`lobBlock${l.id}`)?.classList.toggle('active',a); }); }
+
+function reparse(resetSim){ const now=Date.now(), raw=document.getElementById('masterInput').value, lines=decodeEntities(raw).split(/\r?\n/).map(l=>l.trim()).filter(Boolean); let anyValid=false, globalRecords=[]; LOBS.forEach(l=>{ const s=state[l.id-1], data=extractLOBData(lines,l.aliases); const parsed=(!data||s.lockCleared)?parseSegment([], ''):parseSegment(data.block, data.metaLine); ingestParsed(l.id, parsed, data?data.metaLine:'', resetSim, now); if(parsed.records.length){anyValid=true; parsed.records.forEach(r=>globalRecords.push({...r,lob:l.key}));} }); const sig=signatureFor(globalRecords); const duplicate=anyValid && sig && sig===lastGlobalSignature; state.forEach(s=>{ if(anyValid){ if(s.records.length) addSnapshotSample(s, now, duplicate?'duplicate':'paste'); if(!duplicate && s.records.length) s.lastValidSnapshotAt=now; if(s.temporaryManualInDelta) resetWhatIf(s.id); if(duplicate) s.parseHealth.push('Duplicate snapshot'); } }); if(anyValid && !duplicate) lastGlobalSignature=sig; if(!anyValid) state.forEach(s=>s.parseHealth.push('Fully invalid paste rejected')); refreshTopRows(); renderAll(); }
+function extractLOBData(lines, aliases){ const set=new Set(aliases.map(a=>a.toLowerCase())); for(let i=0;i<lines.length;i++){ if(set.has(normalizeLobLabel(lines[i]))){ let j=i+1; while(j<lines.length&&!/^employees\s*:/i.test(lines[j])&&!LOBS.some(l=>l.aliases.includes(normalizeLobLabel(lines[j]))))j++; return {block:lines.slice(i+1,j),metaLine:j<lines.length&&/^employees\s*:/i.test(lines[j])?lines[j]:''}; } } return null; }
+function normalizeLobLabel(line){ return String(line).toLowerCase().replace(/\s+/g,' ').trim().replace(/\s*actions\s*$/i,''); }
+function normalizeStatus(line){ return String(line).toLowerCase().replace(/\s+/g,' ').trim(); }
+function classifyStatus(line){ const lower=normalizeStatus(line); if(IN_KW.has(lower))return 'in'; if(OUT_KW.has(lower))return 'out'; if(/[a-z]in$/i.test(lower)||/[a-z]out$/i.test(lower))return 'in'; return null; }
+function parseDurationToSec(value){ const m=String(value||'').trim().match(/^(\d{1,2}):(\d{2}):(\d{2})$/); if(!m)return null; return (+m[1])*3600+(+m[2])*60+(+m[3]); }
+function parseMetaLine(line){ const meta={employees:null,employeesTotal:null,activity:null,activityTotal:null,schedule:null,scheduleTotal:null}; const text=String(line||''); const emp=text.match(/Employees\s*:\s*(\d+)\s*of\s*(\d+)/i), act=text.match(/Activity\s+Alarms\s*:\s*(\d+)\s*of\s*(\d+)/i), sch=text.match(/Schedule\s+Alarms\s*:\s*(\d+)\s*of\s*(\d+)/i); if(emp){meta.employees=+emp[1];meta.employeesTotal=+emp[2];} if(act){meta.activity=+act[1];meta.activityTotal=+act[2];} if(sch){meta.schedule=+sch[1];meta.scheduleTotal=+sch[2];} return meta; }
+function parseSegment(segLines, metaLine){ const out={records:[], health:[], meta:parseMetaLine(metaLine), unknownIn:0, unknownOut:0, excluded:0, statusCount:0, timerCount:0, agentCount:0}; let lastName=''; segLines.forEach((line,i)=>{ const trimmed=String(line||'').trim(), lower=normalizeStatus(trimmed), dur=parseDurationToSec(trimmed); if(dur!==null){out.timerCount++; return;} let side=classifyStatus(trimmed); if(side){ out.statusCount++; const known=IN_KW.has(lower)||OUT_KW.has(lower); if(!known){ if(side==='in')out.unknownIn++; else out.unknownOut++; } const nextDur=parseDurationToSec(segLines[i+1]); if(nextDur===null){ out.excluded++; out.health.push(`Excluded invalid records: missing HH:MM:SS timer after ${trimmed}`); return; } const rec={name:lastName||'Unknown',status:trimmed,side,seconds:nextDur}; out.records.push(rec); out.agentCount++; return; } if(IGNORE_NAME_LINES.has(lower)||/^employees\s*:/i.test(trimmed)||/^workspace\s*:/i.test(trimmed)||/real-time adherence/i.test(trimmed))return; if(trimmed) lastName=trimmed; }); if(out.agentCount!==out.statusCount||out.statusCount!==out.timerCount) out.health.push(`Agent/status/timer count mismatch (${out.agentCount}/${out.statusCount}/${out.timerCount})`); if(out.unknownIn)out.health.push(`Unknown counted as IN: ${out.unknownIn}`); if(out.unknownOut)out.health.push(`Unknown counted as OUT: ${out.unknownOut}`); if(out.excluded)out.health.push(`Excluded invalid records: ${out.excluded}`); return out; }
+function ingestParsed(id, parsed, metaLine, resetSim, now){ const s=state[id-1]; s.baseIn=parsed.records.filter(r=>r.side==='in').length; s.baseOut=parsed.records.filter(r=>r.side==='out').length; s.officialIn=s.baseIn; s.officialOut=s.baseOut; s.records=parsed.records; s.metaLine=metaLine||''; s.meta=parsed.meta; s.maxAvailSec=null; parsed.records.forEach(r=>{ if(normalizeStatus(r.status)==='available'&&(s.maxAvailSec===null||r.seconds>s.maxAvailSec))s.maxAvailSec=r.seconds; }); s.snapshotAt=parsed.records.length?new Date(now):s.snapshotAt; s.parseHealth=parsed.health.slice(); if(parsed.records.length&&parsed.excluded) s.parseHealth.push('Partial invalid paste processed valid records'); refreshRow(id); }
+function signatureFor(records){ if(!records.length)return ''; return records.map(r=>[r.lob,compactName(r.name).toLowerCase(),normalizeStatus(r.status),r.seconds,r.side].join('|')).sort().join('||'); }
+
+function getWindowInfo(nowMs=Date.now()){ const d=new Date(nowMs), h=d.getHours(), m=d.getMinutes(), min=h*60+m; if(min>=15*60){ const start=new Date(d); start.setHours(15,0,0,0); const end=new Date(start); end.setDate(end.getDate()+1); end.setHours(7,0,0,0); const lock=new Date(start); lock.setDate(lock.getDate()+1); lock.setHours(7,15,0,0); return buildWindow(nowMs,start,end,lock); } const start=new Date(d); start.setDate(start.getDate()-1); start.setHours(15,0,0,0); const end=new Date(d); end.setHours(7,0,0,0); const lock=new Date(d); lock.setHours(7,15,0,0); return buildWindow(nowMs,start,end,lock); }
+function buildWindow(nowMs,start,end,lock){ const upcoming=new Date(start); if(nowMs>=lock.getTime()){ upcoming.setDate(upcoming.getDate()+1); } const inWin=nowMs>=start.getTime()&&nowMs<end.getTime(); const hold=nowMs>=end.getTime()&&nowMs<lock.getTime(); const isLock=nowMs>=lock.getTime()&&nowMs<new Date(lock).setHours(15,0,0,0); let interval=null; if(inWin){ const elapsed=Math.floor((nowMs-start.getTime())/1000), id=Math.floor(elapsed/INTERVAL_SECONDS)+1; const is=new Date(start.getTime()+(id-1)*INTERVAL_SECONDS*1000), ie=new Date(is.getTime()+INTERVAL_SECONDS*1000); interval={id,start:is,end:ie}; } else if(hold){ const is=new Date(end.getTime()-INTERVAL_SECONDS*1000); interval={id:32,start:is,end:new Date(end)}; } return {start,end,lock,inWindow:inWin,holdGap:hold,isLock,interval,operatingWindowDate:ymd(upcoming)}; }
+function ensureInterval(s, now=Date.now()){ const w=getWindowInfo(now); if(w.isLock){ lockSession(); return; } if(!w.inWindow&&!w.holdGap){ s.mode='OUTSIDE_WINDOW'; s.currentInterval=null; return; } if(w.holdGap){ s.mode=s.isFrozen?'FROZEN':'AUTO'; if(!s.currentInterval) s.currentInterval=w.interval; return; } if(s.isFrozen||s.isLocked)return; if(!s.currentInterval||s.currentInterval.id!==w.interval.id||s.currentInterval.start.getTime()!==w.interval.start.getTime()){ if(s.currentInterval) finalizeInterval(s, now); s.currentInterval=w.interval; s.samples=[]; s.manualLatSegment=null; s.manualBeSegment=null; resetWhatIf(s.id); applyAutoReqForInterval(s, w.interval.id, now); if(s.officialIn||s.officialOut) addSnapshotSample(s, w.interval.start.getTime(), 'rollover'); s.mode=s.samples.length?'AUTO':'AUTO'; } }
+function addSnapshotSample(s, at, source){ ensureInterval(s, at); if(!s.currentInterval||s.mode==='OUTSIDE_WINDOW'||s.isFrozen||s.isLocked)return; s.samples.push({timestamp:at, officialIn:s.officialIn, officialOut:s.officialOut, latReq:s.latReq, beReq:s.beReq, source}); if(s.samples.length===1 && at>s.currentInterval.start.getTime()+1000) s.mode='ASSUMED'; recalcLob(s, at); }
+function finalizeInterval(s, now){ recalcLob(s, Math.min(now, s.currentInterval.end.getTime())); s.finalizedIntervals.push({intervalId:s.currentInterval.id,lobId:s.key,intervalStart:s.currentInterval.start.toISOString(),intervalEnd:s.currentInterval.end.toISOString(),finalReq92PctRaw:s.req92PctRaw,finalLatPctRaw:s.latPctRaw,finalExpectedLatPctRaw:s.expectedLatPctRaw,finalBePctRaw:s.bePctRaw,finalBeLatPctRaw:s.beLatPctRaw,finalExpectedBePctRaw:s.expectedBePctRaw,latReq:s.latReq,beReq:s.beReq,officialIn:s.officialIn,officialOut:s.officialOut,sampleCount:s.samples.length,hadManualLatCorrection:!!s.manualLatSegment,manualLatPctRaw:s.manualLatSegment?.valueRaw??null,hadManualBeCorrection:!!s.manualBeSegment,manualBePctRaw:s.manualBeSegment?.valueRaw??null,wasAssumed:s.mode==='ASSUMED',wasFrozen:s.isFrozen,wasOutsideWindow:s.mode==='OUTSIDE_WINDOW'}); }
+function recalcLob(s, now=Date.now()){ ensureInterval(s, now); if(!s.currentInterval||s.isFrozen||s.isLocked||s.mode==='OUTSIDE_WINDOW')return; const elapsed=Math.max(0, Math.min((now-s.currentInterval.start.getTime())/1000, INTERVAL_SECONDS)); const rem=Math.max(0, (s.currentInterval.end.getTime()-now)/1000); s.req92PctRaw=validLat(s.latReq)?(s.officialIn/s.latReq*100):null; s.bePctRaw=validBe(s.latReq,s.beReq)?(s.officialIn/(s.latReq+s.beReq)*100):null; s.latPctRaw=weighted(s,'LAT',elapsed,now,false); s.expectedLatPctRaw=weighted(s,'LAT',INTERVAL_SECONDS,now,true,rem); s.beLatPctRaw=weighted(s,'BE',elapsed,now,false); s.expectedBePctRaw=weighted(s,'BE',INTERVAL_SECONDS,now,true,rem); }
+function weighted(s, metric, denom, now, expected, rem=0){ const valid=metric==='LAT'?validLat(s.latReq):validBe(s.latReq,s.beReq); if(!valid||denom<=0)return null; const start=s.currentInterval.start.getTime(), endLimit=now; const manual=metric==='LAT'?s.manualLatSegment:s.manualBeSegment; let sum=0, coveredTo=start; if(manual){ const mt=Math.min(manual.appliedAt,endLimit); if(mt>start){ sum+=manual.valueRaw*((mt-start)/1000); coveredTo=mt; } }
+  const samples=s.samples.length?s.samples:[{timestamp:start,officialIn:s.officialIn,latReq:s.latReq,beReq:s.beReq}]; const sorted=samples.slice().sort((a,b)=>a.timestamp-b.timestamp); let cur=sorted[0]; if(cur.timestamp>start) cur={...cur,timestamp:start}; for(let i=0;i<sorted.length;i++){ const a=Math.max(sorted[i].timestamp, coveredTo, start); const b=Math.min((sorted[i+1]?.timestamp??endLimit), endLimit); if(b>a){ const raw=metric==='LAT'?(validLat(s.latReq)?sorted[i].officialIn/s.latReq*100:null):(validBe(s.latReq,s.beReq)?sorted[i].officialIn/(s.latReq+s.beReq)*100:null); if(raw!==null) sum+=raw*((b-a)/1000); } } if(expected&&rem>0){ const raw=metric==='LAT'?s.req92PctRaw:s.bePctRaw; if(raw!==null) sum+=raw*rem; } return sum/denom; }
+function validLat(v){ return Number.isFinite(+v)&&+v>0; } function validBe(lat,be){ return Number.isFinite(+lat)&&Number.isFinite(+be)&&(+lat + +be)>0; }
+function applyManualPct(id, metric){ const s=state[id-1], input=document.getElementById(metric==='LAT'?`manualLat${id}`:`manualBe${id}`); const v=parseFloat(input.value); if(!Number.isFinite(v)||v<0){ alert('Enter a valid manual percentage.'); return; } ensureInterval(s); if(!s.currentInterval){ alert('Manual corrections require an active interval.'); return; } const seg={metric,lobId:s.key,valueRaw:v,intervalStart:s.currentInterval.start.toISOString(),appliedAt:Date.now(),source:'manual'}; if(metric==='LAT')s.manualLatSegment=seg; else s.manualBeSegment=seg; s.mode='MANUAL'; recalcLob(s); renderAll(); }
+function onReqManualInput(id){ const s=state[id-1], v=parseFloat(document.getElementById(`topReq${id}`).value); s.latReq=Number.isFinite(v)&&v>=0?v:0; addSnapshotSample(s, Date.now(), 'req-change'); saveSchedules(); renderAll(); }
+function onBeReqManualInput(id){ const s=state[id-1], v=parseInt(document.getElementById(`topBeReq${id}`).value,10); s.beReq=Number.isInteger(v)&&v>=0&&v<=6?v:0; addSnapshotSample(s, Date.now(), 'req-change'); saveSchedules(); renderAll(); }
+function setWhatIf(id){ const s=state[id-1], el=document.getElementById(`whatIf${id}`); let v=Math.max(-20,Math.min(20,parseInt(el.value||'0',10)||0)); el.value=v; const now=Date.now(); if(s.temporaryManualInDelta===0&&v!==0)s.temporaryManualInStartedAt=now; s.temporaryManualInDelta=v; s.temporaryManualInLastChangedAt=now; if(v===0)resetWhatIf(id); renderAll(); }
+function resetWhatIf(id){ const s=state[id-1]; s.temporaryManualInDelta=0; s.temporaryManualInStartedAt=null; s.temporaryManualInLastChangedAt=null; const el=document.getElementById(`whatIf${id}`); if(el)el.value=0; const d=document.getElementById(`whatIfDisplay${id}`); if(d)d.textContent=''; }
+function checkWhatIf(s, now){ if(!s.temporaryManualInDelta)return; if(now-s.temporaryManualInLastChangedAt>=WHATIF_IDLE_MS||now-s.temporaryManualInStartedAt>=WHATIF_HARD_MS)resetWhatIf(s.id); }
+function checkStale(s, now){ if(s.lastValidSnapshotAt && !s.isFrozen && now-s.lastValidSnapshotAt>=STALE_MS){ s.isStale=true; s.isFrozen=true; s.freezeStartedAt=now; s.mode='FROZEN'; resetWhatIf(s.id); } }
+function lockSession(){ if(locked)return; locked=true; document.getElementById('lockScreen').style.display='block'; state.forEach(s=>{ s.isLocked=true; s.mode='LOCKED'; s.records=[]; s.baseIn=s.baseOut=s.officialIn=s.officialOut=0; s.samples=[]; s.manualLatSegment=s.manualBeSegment=null; resetWhatIf(s.id); }); saveSchedules(); renderAll(); }
+function refreshStartOver(){ locked=false; document.getElementById('lockScreen').style.display='none'; state.forEach((s,i)=>{ const keep=s.autoReqSchedule, lat=s.latReq, be=s.beReq; Object.assign(s,newLobState(LOBS[i])); s.autoReqSchedule=keep; s.latReq=lat; s.beReq=be; document.getElementById(`topReq${s.id}`).value=lat||''; document.getElementById(`topBeReq${s.id}`).value=be||''; }); lastGlobalSignature=null; clearMaster(false); renderAll(); }
+
+function formatPct(v){ return v===null||v===undefined||!Number.isFinite(v)?'—':`${v.toFixed(2)}%`; } function head92(s){ if(!validLat(s.latReq))return '—'; const req=Math.ceil(.92*s.latReq), diff=s.officialIn-req; return diff>=0?`OVER ${diff}`:`NEED ${Math.abs(diff)}`; } function headBE(s){ if(!validBe(s.latReq,s.beReq))return '—'; const req=Math.ceil(s.latReq+s.beReq), diff=s.officialIn-req; return diff>=0?`OVER ${diff}`:`NEED ${Math.abs(diff)}`; }
+function renderTopRow(id){ const s=state[id-1]; document.getElementById(`topIn${id}`).textContent=s.officialIn; document.getElementById(`topOut${id}`).textContent=s.officialOut; document.getElementById(`topPct${id}`).textContent=formatPct(s.req92PctRaw); document.getElementById(`topHeads${id}`).textContent=head92(s); document.getElementById(`topPctTile${id}`).classList.toggle('good',(s.req92PctRaw??0)>=92); document.getElementById(`topPctTile${id}`).classList.toggle('bad',s.req92PctRaw!==null&&s.req92PctRaw<92); document.getElementById(`topHeadsTile${id}`).classList.toggle('zero',head92(s)==='—'); }
+function renderLatBe(id){ const s=state[id-1]; recalcLob(s); const int=s.currentInterval?`${s.currentInterval.id} ${hhmm(s.currentInterval.start)}-${hhmm(s.currentInterval.end)}`:(getWindowInfo().holdGap?'32 HOLD':'—'); setText(`lbInterval${id}`, int); setText(`lbMode${id}`, s.mode); setText(`lbReq92${id}`, formatPct(s.req92PctRaw)); setText(`lbLat${id}`, formatPct(s.latPctRaw)); setText(`lbExpLat${id}`, formatPct(s.expectedLatPctRaw)); setText(`lbHead${id}`, head92(s)); const beActive=s.beReq>=1; document.getElementById(`beSection${id}`)?.classList.toggle('hidden', !beActive); setText(`lbBePct${id}`, formatPct(s.bePctRaw)); setText(`lbBeLat${id}`, formatPct(s.beLatPctRaw)); setText(`lbExpBe${id}`, formatPct(s.expectedBePctRaw)); setText(`lbBeHead${id}`, headBE(s)); setText(`health${id}`, s.parseHealth.join(' · ')); if(s.temporaryManualInDelta){ const adj=s.officialIn+s.temporaryManualInDelta, req92=validLat(s.latReq)?adj/s.latReq*100:null, be=validBe(s.latReq,s.beReq)?adj/(s.latReq+s.beReq)*100:null; setText(`whatIfDisplay${id}`, `TEMP IN ${s.temporaryManualInDelta>0?'+':''}${s.temporaryManualInDelta}: REQ92 ${formatPct(req92)} · HEAD ${validLat(s.latReq)?(adj-Math.ceil(.92*s.latReq)>=0?'OVER ':'NEED ')+Math.abs(adj-Math.ceil(.92*s.latReq)):'—'}${beActive?' · BE '+formatPct(be)+' · BE HEAD '+(validBe(s.latReq,s.beReq)?(adj-Math.ceil(s.latReq+s.beReq)>=0?'OVER ':'NEED ')+Math.abs(adj-Math.ceil(s.latReq+s.beReq)):'—'):''}`); } }
+function setText(id,t){ const e=document.getElementById(id); if(e)e.textContent=t; }
+function renderAll(){ renderStorageStatus(); LOBS.forEach(l=>refreshRow(l.id)); }
+function refreshRow(id){ renderMeta(id); renderTopRow(id); renderSimChip(id); renderLatBe(id); renderRosterList(id); }
+function renderMeta(id){ const s=state[id-1], el=document.getElementById(`lobMeta${id}`), m=s.meta; if(!m||m.employees===null){el.textContent=s.records.length?`${s.records.length} records`:'no snapshot';return;} const p=[`Emp ${m.employees}/${m.employeesTotal}`]; if(m.activity!==null)p.push(`Act ${m.activity}/${m.activityTotal}`); if(m.schedule!==null)p.push(`Sch ${m.schedule}/${m.scheduleTotal}`); el.textContent=p.join(' · '); }
+function renderSimChip(id){ const s=state[id-1], chip=document.getElementById(`simChip${id}`); chip.classList.remove('active','frozen'); chip.textContent=s.mode; if(s.isFrozen||s.isStale)chip.classList.add('frozen'); else if(s.mode==='AUTO'||s.mode==='ASSUMED'||s.mode==='MANUAL')chip.classList.add('active'); }
+function renderRosterList(id){ const s=state[id-1], listEl=document.getElementById(`agentList${id}`); if(!listEl)return; const inR=s.records.filter(r=>r.side==='in'), outR=s.records.filter(r=>r.side==='out'); setText(`inListCount${id}`,inR.length); setText(`outListCount${id}`,outR.length); document.getElementById(`listBtnIn${id}`).classList.toggle('active',activeListSide==='in'); document.getElementById(`listBtnOut${id}`).classList.toggle('active',activeListSide==='out'); const cur=activeListSide==='in'?inR:outR; listEl.innerHTML=cur.length?renderGroupedAgentRows(cur,activeListSide,0,false):`<div class="empty-row">No ${activeListSide.toUpperCase()} records</div>`; setText(`rosterSummary${id}`,`${s.records.length} records · IN ${inR.length} · OUT ${outR.length} · ${s.mode}`); }
+function renderGroupedAgentRows(records, side, elapsed, isLive){ const groups=groupRecordsByStatus(records,side); return groups.map(g=>`<div class="status-group-head ${side} ${statusClass(g.status)}"><span>${escapeHtml(cleanStatusLabel(g.status))}</span><span class="group-count">${g.items.length}</span></div>`+g.items.map(r=>renderAgentRow(r,0,side,false)).join('')).join(''); }
+function groupRecordsByStatus(records, side){ const order=side==='in'?IN_STATUS_ORDER:OUT_STATUS_ORDER, buckets=new Map(); records.forEach((r,i)=>{const k=normalizeStatus(r.status); if(!buckets.has(k))buckets.set(k,{status:r.status,firstIndex:i,items:[]}); buckets.get(k).items.push(r);}); return Array.from(buckets.values()).sort((a,b)=>{const ai=order.indexOf(normalizeStatus(a.status)),bi=order.indexOf(normalizeStatus(b.status)); if(ai!==-1||bi!==-1)return (ai===-1?999:ai)-(bi===-1?999:bi); return a.firstIndex-b.firstIndex;}); }
+function renderAgentRow(rec, elapsed, side, isLive){ const time=formatDuration(rec.seconds), name=compactName(rec.name); return `<div class="agent-row ${side} ${statusClass(rec.status)}" title="${escapeHtml(name)} | ${escapeHtml(rec.status)} | ${time}"><div class="agent-line"><span class="agent-name">${escapeHtml(name)}</span><span class="agent-sep">|</span><span class="agent-status">${escapeHtml(cleanStatusLabel(rec.status))}</span><span class="agent-sep">|</span><span class="agent-time">${time}</span></div></div>`; }
+function statusClass(status){ const s=normalizeStatus(status); if(s==='available')return'st-available'; if(s==='auxin')return'st-auxin'; if(s==='auxout')return'st-auxout'; if(s==='busyin')return'st-busyin'; if(s==='hold')return'st-hold'; if(s==='acw'||s==='acwout')return'st-acw'; if(s==='break')return'st-break'; if(s==='lunch')return'st-lunch'; if(s==='meeting')return'st-meeting'; if(s==='personal')return'st-personal'; if(s==='system problems')return'st-sysprob'; if(s==='followup/outbound'||s==='followup/outboundout')return'st-followup'; return'st-other'; }
+function cleanStatusLabel(status){ return String(status||'').replace(/Followup\/OutboundOUT/i,'F/O OUT').replace(/Followup\/Outbound/i,'F/O').replace(/System Problems/i,'SysProb').replace(/Available/i,'Avail'); }
+function compactName(name){ const raw=String(name||'Unknown').replace(/\s+/g,' ').trim(), direct=raw.match(/^(.+?)\s*-\s*([0-9]+)\s*,\s*(.+)$/); if(direct)return `${direct[3].trim()} ${direct[1].trim()}`.trim(); const comma=raw.match(/^(.+?)\s*,\s*(.+)$/); if(comma)return `${comma[2].trim()} ${comma[1].trim()}`.trim(); return raw.replace(/\s*-\s*[0-9]+.*$/,'').trim()||raw; }
+
+function toggleAutoPanel(id){ const s=state[id-1]; s.autoPanelOpen=!s.autoPanelOpen; document.getElementById(`autoPanel${id}`).classList.toggle('open',s.autoPanelOpen); document.getElementById(`autoBtn${id}`).classList.toggle('active',s.autoReqSchedule.latReqSchedule.length||s.autoReqSchedule.beReqSchedule.length||s.autoPanelOpen); fillSchedulePanel(id); setActiveSimLOB(id); }
+function intervalStartLabel(i){ const min=15*60+(i-1)*30, h=Math.floor(min/60)%24, m=min%60; return `${pad2(h)}:${pad2(m)}`; }
+function fillSchedulePanel(id){ const s=state[id-1], tbody=document.getElementById(`autoTbody${id}`); if(!tbody)return; tbody.querySelectorAll('input').forEach(inp=>{ const intervalId=+inp.dataset.interval, kind=inp.dataset.kind; const arr=kind==='lat'?s.autoReqSchedule.latReqSchedule:s.autoReqSchedule.beReqSchedule; const found=arr.find(x=>x.intervalId===intervalId); inp.value=found?(kind==='lat'?found.latReq:found.beReq):''; }); }
+function saveScheduleFromPanel(id){ const s=state[id-1], tbody=document.getElementById(`autoTbody${id}`), lat=[], be=[]; let bad=[]; tbody.querySelectorAll('input').forEach(inp=>{ const val=inp.value.trim(); if(val==='')return; const intervalId=+inp.dataset.interval, startLocal=intervalStartLabel(intervalId); if(inp.dataset.kind==='lat'){ const v=parseFloat(val); if(!Number.isFinite(v)||v<0)bad.push(`LAT interval ${intervalId}`); else lat.push({intervalId,startLocal,latReq:v}); } else { const v=Number(val); if(!Number.isInteger(v)||v<0||v>6)bad.push(`BE interval ${intervalId}`); else be.push({intervalId,startLocal,beReq:v}); } }); if(bad.length){ setText(`autoStatus${id}`,`Invalid: ${bad.join(', ')}`); return; } s.autoReqSchedule={latReqSchedule:lat,beReqSchedule:be}; s.autoConfirmed=true; saveSchedules(); setText(`autoStatus${id}`,`saved ${lat.length} LAT / ${be.length} BE`); }
+function clearAutoSchedule(id){ const s=state[id-1]; s.autoReqSchedule={latReqSchedule:[],beReqSchedule:[]}; fillSchedulePanel(id); saveSchedules(); setText(`autoStatus${id}`,'schedule cleared'); }
+function applyAutoReqForInterval(s, intervalId, now){ if(storageStatus.state==='stale')return; const lat=[...s.autoReqSchedule.latReqSchedule].sort((a,b)=>a.intervalId-b.intervalId).filter(x=>x.intervalId<=intervalId).pop(); const be=[...s.autoReqSchedule.beReqSchedule].sort((a,b)=>a.intervalId-b.intervalId).filter(x=>x.intervalId<=intervalId).pop(); if(lat){s.latReq=lat.latReq; document.getElementById(`topReq${s.id}`).value=s.latReq; addSnapshotSample(s, now, 'auto-req');} if(be){s.beReq=be.beReq; document.getElementById(`topBeReq${s.id}`).value=s.beReq; addSnapshotSample(s, now, 'auto-req');} }
+function saveSchedules(){ try{ const w=getWindowInfo(); const payload={schemaVersion:STORAGE_KEY,savedAt:new Date().toISOString(),operatingWindowDate:w.operatingWindowDate,lobs:{}}; LOBS.forEach(l=>{ const s=state[l.id-1]; payload.lobs[l.key]={latReqSchedule:s.autoReqSchedule.latReqSchedule,beReqSchedule:s.autoReqSchedule.beReqSchedule,configuredLatReq:s.latReq,configuredBeReq:s.beReq}; }); localStorage.setItem(STORAGE_KEY, JSON.stringify(payload)); storageStatus={state:'confirmed',message:`Auto Req saved for ${w.operatingWindowDate}`}; }catch(e){ storageStatus={state:'corrupt',message:'Auto Req schedule could not be saved/restored; localStorage unavailable.'}; } renderStorageStatus(); }
+function loadSchedules(){ try{ const raw=localStorage.getItem(STORAGE_KEY); if(!raw){storageStatus={state:'missing',message:'Auto Req schedule not restored; enter or confirm schedule.'};return;} const p=JSON.parse(raw); if(p.schemaVersion!==STORAGE_KEY||!p.lobs)throw new Error('schema'); LOBS.forEach(l=>{ const src=p.lobs[l.key]||{}, s=state[l.id-1]; s.autoReqSchedule={latReqSchedule:validateLatSchedule(src.latReqSchedule||[]),beReqSchedule:validateBeSchedule(src.beReqSchedule||[])}; s.latReq=Number.isFinite(+src.configuredLatReq)?+src.configuredLatReq:0; s.beReq=Number.isInteger(+src.configuredBeReq)&&+src.configuredBeReq>=0&&+src.configuredBeReq<=6?+src.configuredBeReq:0; document.getElementById(`topReq${s.id}`).value=s.latReq||''; document.getElementById(`topBeReq${s.id}`).value=s.beReq||''; }); const current=getWindowInfo().operatingWindowDate; storageStatus=p.operatingWindowDate===current?{state:'confirmed',message:`Auto Req restored for ${current}`}:{state:'stale',message:`Saved Auto Req is for ${p.operatingWindowDate||'another window'}; confirm reuse before it applies to ${current}.`}; }catch(e){ storageStatus={state:'corrupt',message:'Auto Req schedule could not be restored; storage is missing/corrupt.'}; } }
+function validateLatSchedule(a){ return a.filter(x=>x&&x.intervalId>=1&&x.intervalId<=32&&Number.isFinite(+x.latReq)&&+x.latReq>=0).map(x=>({intervalId:+x.intervalId,startLocal:x.startLocal||intervalStartLabel(+x.intervalId),latReq:+x.latReq})); }
+function validateBeSchedule(a){ return a.filter(x=>x&&x.intervalId>=1&&x.intervalId<=32&&Number.isInteger(+x.beReq)&&+x.beReq>=0&&+x.beReq<=6).map(x=>({intervalId:+x.intervalId,startLocal:x.startLocal||intervalStartLabel(+x.intervalId),beReq:+x.beReq})); }
+function confirmStoredScheduleReuse(){ storageStatus.state='confirmed'; saveSchedules(); renderAll(); }
+function renderStorageStatus(){ setText('storageStatus', storageStatus.message); }
+
+function clearSlot(id){ const s=state[id-1], keep=s.autoReqSchedule, lat=s.latReq, be=s.beReq; Object.assign(s,newLobState(LOBS[id-1])); s.autoReqSchedule=keep; s.latReq=lat; s.beReq=be; s.lockCleared=true; refreshRow(id); }
+function clearMaster(reset=true){ if(clearTimerHandle)clearTimeout(clearTimerHandle); if(clearCountdownHandle)clearInterval(clearCountdownHandle); clearTimerHandle=clearCountdownHandle=null; document.getElementById('masterInput').value=''; masterCache=''; document.getElementById('autoNote').textContent='waiting for snapshot'; setHeaderStatus('idle'); if(reset){state.forEach((s,i)=>{ const keep=s.autoReqSchedule, lat=s.latReq, be=s.beReq; Object.assign(s,newLobState(LOBS[i])); s.autoReqSchedule=keep; s.latReq=lat; s.beReq=be; });} renderAll(); }
+function tickLive(){ const now=Date.now(); state.forEach(s=>{ ensureInterval(s, now); checkStale(s, now); checkWhatIf(s, now); recalcLob(s, now); }); renderAll(); }
+function formatDuration(totalSec){ if(totalSec==null||isNaN(totalSec))return'—'; totalSec=Math.max(0,Math.floor(totalSec)); const h=Math.floor(totalSec/3600), m=Math.floor((totalSec%3600)/60), sec=totalSec%60; return `${pad2(h)}:${pad2(m)}:${pad2(sec)}`; }
+function hhmm(d){ return `${pad2(d.getHours())}:${pad2(d.getMinutes())}`; } function ymd(d){ return `${d.getFullYear()}-${pad2(d.getMonth()+1)}-${pad2(d.getDate())}`; } function pad2(n){return String(n).padStart(2,'0');}
+function decodeEntities(s){return String(s).replace(/&amp;/gi,'&').replace(/&lt;/gi,'<').replace(/&gt;/gi,'>').replace(/&nbsp;/gi,' ').replace(/&#39;/gi,"'").replace(/&quot;/gi,'"');}
+function escapeHtml(v){return String(v??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');}
+
+injectLatBeStyles(); buildSimSwitch(); buildPriorityRows(); addGlobalPanels(); buildRows(); loadSchedules(); refreshActiveUI(); setListSide('in'); renderAll(); setHeaderStatus('idle'); setInterval(tickLive,1000);
 </script>
 </body>
 </html>
