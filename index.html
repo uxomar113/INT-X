@@ -1581,6 +1581,154 @@ body{
   .agent-time{ min-width:54px; font-size:0.75rem; }
 }
 
+/* Phase 1 LAT/BE shell: larger two-line LOB cards, no visible simulation switch. */
+.latbe-shell{
+  padding:8px;
+  min-height:0;
+  background:linear-gradient(180deg, rgba(10,13,20,0.88), rgba(0,0,0,0.13));
+}
+.latbe-shell .priority-rows{ gap:8px; }
+.latbe-shell .priority-row{
+  display:flex;
+  flex-direction:column;
+  gap:7px;
+  min-height:0;
+  padding:8px;
+  border-radius:13px;
+  background:linear-gradient(180deg, rgba(26,32,48,0.98), rgba(16,19,27,0.96));
+}
+.latbe-shell .priority-row.active{
+  border-color:rgba(107,184,255,0.5);
+  background:linear-gradient(135deg, rgba(107,184,255,0.13), rgba(26,32,48,0.96) 48%, rgba(255,255,255,0.035));
+}
+.priority-line{
+  display:grid;
+  gap:6px;
+  align-items:stretch;
+  min-width:0;
+}
+.main-line{ grid-template-columns:48px minmax(58px, 72px) minmax(58px, 1fr) minmax(54px, 0.95fr) minmax(86px, 1.5fr); }
+.sub-line{ grid-template-columns:minmax(48px, 0.85fr) minmax(48px, 0.85fr) 58px 50px minmax(70px, 1.45fr); }
+.latbe-shell .pr-lob,
+.latbe-shell .req-target,
+.latbe-shell .auto-req-btn,
+.latbe-shell .pr-mini,
+.pr-mode{
+  min-height:38px;
+}
+.latbe-shell .pr-lob{
+  font-size:0.78rem;
+  border-color:rgba(107,184,255,0.24);
+}
+.latbe-shell .req-target{
+  font-size:0.92rem;
+  border-radius:9px;
+}
+.latbe-shell .req-wrap{ min-width:0; height:auto; }
+.latbe-shell .pr-mini{
+  padding:4px 5px;
+  border-radius:9px;
+}
+.latbe-shell .pr-mini small{ font-size:0.44rem; }
+.latbe-shell .pr-mini strong{ font-size:1.18rem; }
+.latbe-shell .pr-mini.avail strong{ font-size:1.02rem; }
+.shell-btn{
+  padding:0 6px;
+  font-size:0.54rem;
+}
+.pr-mode{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  min-width:0;
+  border:1px solid var(--border-soft);
+  border-radius:9px;
+  background:rgba(0,0,0,0.14);
+  color:var(--muted);
+  font-family:Consolas,'Roboto Mono','Courier New',monospace;
+  font-size:0.52rem;
+  font-weight:900;
+  text-transform:uppercase;
+  letter-spacing:0.04em;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+.shell-panel{
+  display:none;
+  margin-top:2px;
+  margin-bottom:0;
+  padding:8px;
+  border-radius:10px;
+  border:1px solid rgba(107,184,255,0.22);
+  background:rgba(0,0,0,0.22);
+}
+.shell-panel.open{ display:block; }
+.shell-panel-title{
+  color:var(--total);
+  font-family:Consolas,'Roboto Mono','Courier New',monospace;
+  font-size:0.58rem;
+  font-weight:900;
+  letter-spacing:0.08em;
+  text-transform:uppercase;
+  margin-bottom:7px;
+}
+.shell-grid{
+  display:grid;
+  grid-template-columns:repeat(4, minmax(0, 1fr));
+  gap:6px;
+}
+.shell-grid div,
+.shell-placeholder-row{
+  border:1px solid var(--border-soft);
+  border-radius:8px;
+  background:rgba(255,255,255,0.035);
+  padding:6px;
+  min-width:0;
+}
+.shell-grid small{
+  display:block;
+  color:var(--muted);
+  font-family:Consolas,'Roboto Mono','Courier New',monospace;
+  font-size:0.46rem;
+  font-weight:900;
+  text-transform:uppercase;
+  margin-bottom:3px;
+}
+.shell-grid strong{
+  display:block;
+  color:var(--soft);
+  font-family:Consolas,'Roboto Mono','Courier New',monospace;
+  font-size:0.62rem;
+  font-weight:900;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+.shell-placeholder-row{
+  margin-top:6px;
+  color:var(--muted);
+  font-family:Consolas,'Roboto Mono','Courier New',monospace;
+  font-size:0.54rem;
+  font-weight:800;
+  line-height:1.35;
+}
+@media (max-width:430px){
+  .latbe-shell{ padding:6px; }
+  .latbe-shell .priority-row{ padding:7px; gap:6px; }
+  .main-line{ grid-template-columns:42px minmax(52px, 62px) minmax(54px, 1fr) minmax(48px, 0.9fr) minmax(74px, 1.25fr); }
+  .sub-line{ grid-template-columns:1fr 1fr 54px 46px minmax(58px, 1.2fr); }
+  .latbe-shell .pr-lob,
+  .latbe-shell .req-target,
+  .latbe-shell .auto-req-btn,
+  .latbe-shell .pr-mini,
+  .pr-mode{ min-height:36px; }
+  .latbe-shell .pr-mini strong{ font-size:1.04rem; }
+  .latbe-shell .pr-mini small{ font-size:0.39rem; }
+  .shell-btn{ font-size:0.47rem; }
+  .pr-mode{ font-size:0.46rem; }
+  .shell-grid{ grid-template-columns:repeat(2, minmax(0, 1fr)); }
+}
 </style>
 </head>
 
@@ -1607,12 +1755,8 @@ body{
     </div>
   </div>
 
-  <div class="focus-panel">
-    <div class="focus-head">
-      <div class="focus-title">SIM LOB</div>
-      <div class="sim-switch" id="simSwitch"></div>
-    </div>
-    <div class="priority-rows" id="priorityRows"></div>
+  <div class="focus-panel latbe-shell">
+    <div class="priority-rows" id="priorityRows" aria-label="LOB quick controls"></div>
   </div>
 
   <div id="lobs" class="lob-list"></div>
@@ -1649,6 +1793,7 @@ const state = LOBS.map(l => ({
   simActive: false,
   autoSchedule: [],
   autoPanelOpen: false,
+  latBePanelOpen: false,
   autoLastAppliedKey: null,
   listSide: 'in'
 }));
@@ -1665,9 +1810,6 @@ const OUT_STATUS_ORDER = ['break','lunch','meeting','personal','system problems'
 
 
 function buildSimSwitch(){
-  const wrap = document.getElementById('simSwitch');
-  const lobButtons = LOBS.map(l => `<button class="sim-switch-btn" id="simSwitch${l.id}" onclick="setActiveSimLOB(${l.id})">${l.short}</button>`).join('');
-  wrap.innerHTML = lobButtons + `<button class="sim-switch-btn target-toggle-btn" id="targetToggleBtn" onclick="toggleTargetMode()">REQ 92%</button>`;
   renderTargetMode();
 }
 
@@ -1675,14 +1817,38 @@ function buildPriorityRows(){
   const wrap = document.getElementById('priorityRows');
   wrap.innerHTML = LOBS.map(l => `
     <div class="priority-row" id="priorityRow${l.id}">
-      <button class="pr-lob" onclick="setActiveSimLOB(${l.id})">${l.short}</button>
-      <div class="req-wrap"><input class="req-target" id="topReq${l.id}" type="number" min="0" step="0.01" placeholder="00.00" oninput="onReqManualInput(${l.id})" onblur="formatReqInput(${l.id})" onkeydown="handleReqTab(event, ${l.id})"><span class="req-suffix">%</span></div>
-      <button class="auto-req-btn" id="autoBtn${l.id}" onclick="toggleAutoPanel(${l.id})">AUTO</button>
-      <div class="pr-mini pct" id="topPctTile${l.id}"><small>REQ%</small><strong id="topPct${l.id}">—</strong></div>
-      <div class="pr-mini heads" id="topHeadsTile${l.id}"><small id="topHeadsLabel${l.id}">HEAD</small><strong id="topHeads${l.id}">—</strong></div>
-      <div class="pr-mini avail"><small>AVAIL</small><strong id="topAvail${l.id}">—</strong><span class="live-name-mini" id="topAvailName${l.id}"></span></div>
-      <div class="pr-mini in"><small>IN</small><strong id="topIn${l.id}">0</strong></div>
-      <div class="pr-mini out"><small>OUT</small><strong id="topOut${l.id}">0</strong></div>
+      <div class="priority-line main-line">
+        <button class="pr-lob" onclick="setActiveSimLOB(${l.id})">${l.short}</button>
+        <div class="req-wrap"><input class="req-target" id="topReq${l.id}" type="number" min="0" step="0.01" placeholder="00.00" oninput="onReqManualInput(${l.id})" onblur="formatReqInput(${l.id})" onkeydown="handleReqTab(event, ${l.id})"><span class="req-suffix">%</span></div>
+        <div class="pr-mini pct" id="topPctTile${l.id}"><small>REQ92%</small><strong id="topPct${l.id}">—</strong></div>
+        <div class="pr-mini heads" id="topHeadsTile${l.id}"><small id="topHeadsLabel${l.id}">HEAD</small><strong id="topHeads${l.id}">—</strong></div>
+        <div class="pr-mini avail"><small>AVAIL</small><strong id="topAvail${l.id}">—</strong><span class="live-name-mini" id="topAvailName${l.id}"></span></div>
+      </div>
+      <div class="priority-line sub-line">
+        <div class="pr-mini in"><small>IN</small><strong id="topIn${l.id}">0</strong></div>
+        <div class="pr-mini out"><small>OUT</small><strong id="topOut${l.id}">0</strong></div>
+        <button class="auto-req-btn shell-btn" id="latBeBtn${l.id}" onclick="toggleLatBePanel(${l.id})">LAT/BE</button>
+        <button class="auto-req-btn shell-btn" id="autoBtn${l.id}" onclick="toggleAutoPanel(${l.id})">AUTO</button>
+        <div class="pr-mode" id="topMode${l.id}">shell ready</div>
+      </div>
+      <div class="latbe-panel shell-panel" id="latBePanel${l.id}">
+        <div class="shell-panel-title">LAT/BE shell · ${l.short}</div>
+        <div class="shell-grid">
+          <div><small>LAT Req</small><strong>placeholder</strong></div>
+          <div><small>BE Req</small><strong>placeholder</strong></div>
+          <div><small>LAT%</small><strong>—</strong></div>
+          <div><small>Expected LAT%</small><strong>—</strong></div>
+          <div><small>BE%</small><strong>—</strong></div>
+          <div><small>BE LAT%</small><strong>—</strong></div>
+          <div><small>Expected BE%</small><strong>—</strong></div>
+          <div><small>BE HEAD</small><strong>—</strong></div>
+        </div>
+        <div class="shell-placeholder-row">Manual LAT Apply placeholder · Manual BE Apply placeholder · Temporary Manual IN +/- placeholder</div>
+      </div>
+      <div class="auto-panel shell-panel" id="autoPanel${l.id}">
+        <div class="shell-panel-title">AUTO Req shell · ${l.short}</div>
+        <div class="auto-panel-hint">Schedule UI placeholder only. Persistence and timed updates are intentionally not implemented in this phase.</div>
+      </div>
     </div>
   `).join('');
 }
@@ -1701,17 +1867,7 @@ function buildRows(){
           <span class="lob-meta" id="lobMeta${s.id}">no snapshot</span>
         </div>
         <div class="lob-actions">
-          <span class="sim-chip" id="simChip${s.id}">BASE</span>
           <button class="clear-btn" onclick="clearSlot(${s.id})">×</button>
-        </div>
-      </div>
-
-      <div class="auto-panel" id="autoPanel${s.id}">
-        <div class="auto-panel-hint">Format <b>HH:MM value</b>, one per line. REQ auto-updates at the scheduled time.</div>
-        <textarea class="auto-textarea" id="autoText${s.id}" placeholder="10:00 6.3&#10;10:30 8.0&#10;13:30 11.2" spellcheck="false" autocomplete="off" oninput="onAutoScheduleInput(${s.id})"></textarea>
-        <div class="auto-status">
-          <span id="autoStatus${s.id}">no schedule set</span>
-          <button class="auto-clear-btn" onclick="clearAutoSchedule(${s.id})">CLEAR</button>
         </div>
       </div>
 
@@ -1857,7 +2013,6 @@ function setActiveSimLOB(id){
 function refreshActiveUI(){
   LOBS.forEach(l => {
     const isActive = l.id === activeSimLobId;
-    document.getElementById(`simSwitch${l.id}`)?.classList.toggle('active', isActive);
     document.getElementById(`priorityRow${l.id}`)?.classList.toggle('active', isActive);
     document.getElementById(`lobBlock${l.id}`)?.classList.toggle('active', isActive);
   });
@@ -2468,98 +2623,24 @@ function clearMaster(){
   refreshTopRows();
 }
 
-function toggleAutoPanel(id){
+function toggleLatBePanel(id){
   const s = state[id-1];
-  s.autoPanelOpen = !s.autoPanelOpen;
-  document.getElementById(`autoPanel${id}`).classList.toggle('open', s.autoPanelOpen);
-  document.getElementById(`autoBtn${id}`).classList.toggle('active', s.autoSchedule.length > 0 || s.autoPanelOpen);
+  s.latBePanelOpen = !s.latBePanelOpen;
+  document.getElementById(`latBePanel${id}`)?.classList.toggle('open', s.latBePanelOpen);
+  document.getElementById(`latBeBtn${id}`)?.classList.toggle('active', s.latBePanelOpen);
   setActiveSimLOB(id);
 }
 
-function onAutoScheduleInput(id){
+function toggleAutoPanel(id){
   const s = state[id-1];
-  const text = document.getElementById(`autoText${id}`).value;
-  const statusEl = document.getElementById(`autoStatus${id}`);
-  const btn = document.getElementById(`autoBtn${id}`);
-
-  const lines = text.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
-  const parsed = [];
-  let badLines = 0;
-
-  lines.forEach(line => {
-    const m = line.match(/^(\d{1,2}):(\d{2})\s+([0-9]+(?:\.[0-9]+)?)%?$/);
-    if (!m) { badLines++; return; }
-    const h = parseInt(m[1], 10);
-    const mi = parseInt(m[2], 10);
-    const val = parseFloat(m[3]);
-    if (h < 0 || h > 23 || mi < 0 || mi > 59) { badLines++; return; }
-    parsed.push({ h, m: mi, val, key: `${pad2(h)}:${pad2(mi)}` });
-  });
-
-  parsed.sort((a,b) => (a.h*60+a.m) - (b.h*60+b.m));
-  s.autoSchedule = parsed;
-  s.autoLastAppliedKey = null;
-  btn.classList.toggle('active', parsed.length > 0 || s.autoPanelOpen);
-
-  if (parsed.length === 0) {
-    statusEl.innerHTML = badLines > 0 ? `<span class="err">no valid lines yet</span>` : 'no schedule set';
-    return;
-  }
-
-  const nextPoint = findNextSchedulePoint(parsed);
-  const suffix = badLines > 0 ? ` · <span class="err">${badLines} ignored</span>` : '';
-  if (nextPoint) statusEl.innerHTML = `${parsed.length} pts · next <span class="next-time">${nextPoint.key} → ${nextPoint.val}</span>${suffix}`;
-  else statusEl.innerHTML = `${parsed.length} pts · all times passed today${suffix}`;
-
-  checkAutoScheduleForLOB(id);
-}
-
-function clearAutoSchedule(id){
-  const s = state[id-1];
-  s.autoSchedule = [];
-  s.autoLastAppliedKey = null;
-  document.getElementById(`autoText${id}`).value = '';
-  document.getElementById(`autoStatus${id}`).textContent = 'no schedule set';
-  document.getElementById(`autoBtn${id}`).classList.toggle('active', s.autoPanelOpen);
-}
-
-function findNextSchedulePoint(schedule, excludeKey){
-  const now = new Date();
-  const nowMin = now.getHours() * 60 + now.getMinutes();
-  for (const pt of schedule) {
-    if (pt.key === excludeKey) continue;
-    if (pt.h * 60 + pt.m >= nowMin) return pt;
-  }
-  return null;
-}
-
-function checkAutoScheduleForLOB(id){
-  const s = state[id-1];
-  if (!s.autoSchedule.length) return;
-
-  const now = new Date();
-  const nowMin = now.getHours() * 60 + now.getMinutes();
-  let due = null;
-
-  for (const pt of s.autoSchedule) {
-    if (pt.h * 60 + pt.m <= nowMin) due = pt;
-    else break;
-  }
-  if (!due || s.autoLastAppliedKey === due.key) return;
-
-  s.autoLastAppliedKey = due.key;
-  document.getElementById(`topReq${id}`).value = formatReqValue(due.val);
-  updatePct(id);
-  renderTopRow(id);
-
-  const statusEl = document.getElementById(`autoStatus${id}`);
-  const nextPoint = findNextSchedulePoint(s.autoSchedule, due.key);
-  if (nextPoint) statusEl.innerHTML = `applied <span class="next-time">${due.key} → ${due.val}</span> · next ${nextPoint.key} → ${nextPoint.val}`;
-  else statusEl.innerHTML = `applied <span class="next-time">${due.key} → ${due.val}</span> · all times passed today`;
+  s.autoPanelOpen = !s.autoPanelOpen;
+  document.getElementById(`autoPanel${id}`)?.classList.toggle('open', s.autoPanelOpen);
+  document.getElementById(`autoBtn${id}`)?.classList.toggle('active', s.autoPanelOpen);
+  setActiveSimLOB(id);
 }
 
 function checkAllAutoSchedules(){
-  LOBS.forEach(l => checkAutoScheduleForLOB(l.id));
+  // Phase 1 shell only: no schedule parsing, persistence, or timed Req updates.
 }
 
 function tickLive(){
@@ -2639,7 +2720,6 @@ function escapeHtml(value){
     .replace(/'/g, '&#39;');
 }
 
-buildSimSwitch();
 buildPriorityRows();
 buildRows();
 refreshActiveUI();
