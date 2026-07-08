@@ -106,8 +106,6 @@ body{
 .status-pill .dot{ width:7px; height:7px; border-radius:50%; background:var(--muted); }
 .status-pill.live{ color:var(--in); border-color:rgba(32,224,144,0.38); background:var(--in-bg); }
 .status-pill.live .dot{ background:var(--in); box-shadow:0 0 8px rgba(32,224,144,0.9); }
-.status-pill.sim{ color:var(--total); border-color:rgba(107,184,255,0.38); background:var(--total-bg); }
-.status-pill.sim .dot{ background:var(--total); box-shadow:0 0 8px rgba(107,184,255,0.9); }
 
 .capture-dock{ min-width:0; display:flex; flex-direction:column; gap:4px; }
 .capture-area{
@@ -181,25 +179,6 @@ body{
   text-transform:uppercase;
   white-space:nowrap;
 }
-.sim-switch{
-  display:grid;
-  grid-template-columns:repeat(4, 1fr);
-  gap:5px;
-}
-.sim-switch-btn{
-  height:25px;
-  border-radius:7px;
-  border:1px solid var(--border);
-  background:rgba(255,255,255,0.035);
-  color:var(--muted);
-  cursor:pointer;
-  font-family:Consolas,'Roboto Mono','Courier New',monospace;
-  font-size:0.56rem;
-  font-weight:900;
-  transition:all 0.12s;
-}
-.sim-switch-btn.active{ color:var(--total); border-color:rgba(107,184,255,0.55); background:var(--total-bg); box-shadow:0 0 0 1px rgba(107,184,255,0.06); }
-
 .priority-rows{ display:flex; flex-direction:column; gap:5px; }
 .priority-row{
   display:grid;
@@ -349,23 +328,6 @@ body{
   text-overflow:ellipsis;
 }
 .lob-actions{ display:flex; align-items:center; gap:5px; flex-shrink:0; }
-.sim-chip{
-  min-width:58px;
-  height:25px;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  border-radius:999px;
-  background:rgba(255,255,255,0.035);
-  border:1px solid var(--border);
-  color:var(--muted);
-  font-family:Consolas,'Roboto Mono','Courier New',monospace;
-  font-size:0.55rem;
-  font-weight:900;
-  text-transform:uppercase;
-}
-.sim-chip.active{ color:var(--total); border-color:rgba(107,184,255,0.44); background:var(--total-bg); }
-.sim-chip.frozen{ color:var(--muted); }
 .clear-btn{
   height:25px;
   width:26px;
@@ -651,11 +613,6 @@ body{
   min-height:258px;
 }
 .focus-head{ margin-bottom:8px; }
-.sim-switch-btn{
-  height:31px;
-  font-size:0.68rem;
-  border-radius:9px;
-}
 .priority-rows{ gap:8px; }
 .priority-row{
   grid-template-columns:43px 60px 43px minmax(76px,1.25fr) minmax(58px,0.82fr) minmax(86px,1.08fr) minmax(45px,0.55fr) minmax(45px,0.55fr);
@@ -710,7 +667,6 @@ body{
 .lob-head{ align-items:center; margin-bottom:8px; }
 .lob-name{ font-size:0.78rem; padding:5px 9px; }
 .lob-meta{ font-size:0.58rem; }
-.sim-chip{ min-width:74px; height:28px; font-size:0.58rem; }
 .clear-btn{ height:28px; width:28px; }
 .roster-panel{
   border:1px solid var(--border-soft);
@@ -1061,18 +1017,6 @@ body{
   font-size:0.57rem;
   color:#d3d8ea;
 }
-.sim-switch{ gap:6px; }
-.sim-switch-btn{
-  height:32px;
-  border-radius:10px;
-  font-size:0.68rem;
-  background:rgba(255,255,255,0.045);
-}
-.sim-switch-btn.active{
-  color:#cfe8ff;
-  border-color:rgba(107,184,255,0.72);
-  background:linear-gradient(180deg, rgba(107,184,255,0.22), rgba(107,184,255,0.10));
-}
 .priority-rows{ gap:8px; }
 .priority-row{
   grid-template-columns:40px 62px 42px minmax(88px,1.55fr) minmax(52px,0.72fr) minmax(78px,1.02fr) minmax(38px,0.55fr) minmax(38px,0.55fr);
@@ -1168,11 +1112,6 @@ body{
   font-size:0.56rem;
   max-width:230px;
 }
-.sim-chip{
-  min-width:70px;
-  height:28px;
-  font-size:0.57rem;
-}
 .clear-btn{
   height:28px;
   width:28px;
@@ -1247,8 +1186,6 @@ body{
   .auto-note{ font-size:0.5rem; }
   .focus-panel{ padding:7px; min-height:274px; }
   .focus-head{ grid-template-columns:48px minmax(0,1fr); margin-bottom:7px; }
-  .sim-switch{ gap:4px; }
-  .sim-switch-btn{ height:29px; font-size:0.59rem; }
   .priority-rows{ gap:6px; }
   .priority-row{
     grid-template-columns:32px 50px 35px minmax(68px,1.55fr) minmax(40px,0.68fr) minmax(58px,0.92fr) minmax(29px,0.5fr) minmax(29px,0.5fr);
@@ -1271,7 +1208,6 @@ body{
   .lob-card{ padding:7px; border-radius:12px; }
   .lob-meta{ max-width:160px; font-size:0.49rem; }
   .lob-name{ font-size:0.66rem; padding:4px 7px; }
-  .sim-chip{ min-width:60px; height:26px; font-size:0.5rem; }
   .clear-btn{ width:26px; height:26px; }
   .roster-toolbar{ padding:7px; gap:6px; }
   .roster-title{ font-size:0.52rem; }
@@ -1550,8 +1486,6 @@ body{
   .app-title{ font-size:1.56rem; }
   .focus-panel{ padding:8px; min-height:282px; }
   .focus-head{ grid-template-columns:48px minmax(0,1fr); gap:6px; }
-  .sim-switch{ gap:5px; }
-  .sim-switch-btn{ height:30px; font-size:0.60rem; }
   .priority-row{
     grid-template-columns:36px 54px 37px minmax(76px,1.48fr) minmax(45px,0.68fr) minmax(68px,0.92fr) minmax(32px,0.48fr) minmax(32px,0.48fr);
     min-height:64px;
@@ -1682,6 +1616,9 @@ body{
 }
 .temp-in-mini button{ border-radius:8px; font-size:0.78rem; line-height:1; }
 .temp-in-mini button:hover{ color:var(--in); border-color:rgba(32,224,144,0.45); box-shadow:0 0 10px rgba(32,224,144,0.10); }
+.temp-in-mini.disabled{ opacity:0.58; border-style:dashed; }
+.temp-in-mini.disabled button{ cursor:not-allowed; color:rgba(182,189,211,0.58); }
+.temp-in-mini.disabled button:hover{ color:rgba(182,189,211,0.58); border-color:rgba(255,255,255,0.10); box-shadow:none; }
 .shell-btn{
   padding:0 6px;
   font-size:0.52rem;
@@ -1812,6 +1749,7 @@ body{
   font-weight:800;
   line-height:1.35;
 }
+.latbe-modal,
 .auto-modal{
   position:fixed;
   z-index:50;
@@ -1825,6 +1763,30 @@ body{
   box-shadow:0 22px 48px rgba(0,0,0,0.52), 0 0 28px rgba(107,184,255,0.13);
 }
 .auto-modal .auto-panel-hint{ margin-bottom:0; }
+.latbe-modal{
+  top:auto;
+  bottom:14px;
+  max-height:min(62vh, 420px);
+  overflow:auto;
+  padding:9px;
+}
+.latbe-modal .shell-grid{ grid-template-columns:repeat(2, minmax(0, 1fr)); }
+.modal-close{
+  position:absolute;
+  top:6px;
+  right:7px;
+  width:22px;
+  height:22px;
+  border-radius:999px;
+  border:1px solid rgba(255,255,255,0.13);
+  background:rgba(255,255,255,0.055);
+  color:var(--soft);
+  font-family:Consolas,'Roboto Mono','Courier New',monospace;
+  font-size:0.78rem;
+  font-weight:900;
+  cursor:pointer;
+}
+.modal-close:hover{ color:var(--out); border-color:rgba(255,100,127,0.45); box-shadow:0 0 12px rgba(255,100,127,0.10); }
 @media (max-width:430px){
   .latbe-shell{ padding:6px; }
   .latbe-shell .priority-row{ padding:27px 7px 7px; gap:6px; }
@@ -1880,7 +1842,7 @@ body{
 const IN_KW  = new Set(['auxin','auxout','available','followup/outboundout','hold','busyin','acw','acwout']);
 const OUT_KW = new Set(['personal','system problems','break','lunch','coaching','nps','project','followup/outbound','auxwk','meeting']);
 const IGNORE_NAME_LINES = new Set(['actions','action menu','load complete','loading complete','save','menu']);
-const SNAPSHOT_SIM_MS = 120000;
+const SNAPSHOT_LIVE_TIMER_MS = 120000;
 const CLEAR_DELAY_MS = 10000;
 
 const LOBS = [
@@ -1902,9 +1864,9 @@ const state = LOBS.map(l => ({
   metaLine: '',
   meta: null,
   snapshotAt: null,
-  simStartedAt: null,
-  simElapsedMs: 0,
-  simActive: false,
+  liveTimerStartedAt: null,
+  liveTimerElapsedMs: 0,
+  liveTimerActive: false,
   autoSchedule: [],
   autoPanelOpen: false,
   latBePanelOpen: false,
@@ -1915,7 +1877,7 @@ const state = LOBS.map(l => ({
 let masterCache = '';
 let clearTimerHandle = null;
 let clearCountdownHandle = null;
-let activeSimLobId = 1;
+let activeLiveLobId = 1;
 let targetPct = 92;
 let lastParseHealth = { records: 0, missing: LOBS.map(l => l.short), unknown: 0 };
 
@@ -1923,15 +1885,11 @@ const IN_STATUS_ORDER = ['available','auxin','auxout','busyin','acw','acwout','h
 const OUT_STATUS_ORDER = ['break','lunch','meeting','personal','system problems','followup/outbound','coaching','nps','project','auxwk'];
 
 
-function buildSimSwitch(){
-  renderTargetMode();
-}
-
 function buildPriorityRows(){
   const wrap = document.getElementById('priorityRows');
   wrap.innerHTML = LOBS.map(l => `
     <div class="priority-row" id="priorityRow${l.id}">
-      <button class="lob-badge" onclick="setActiveSimLOB(${l.id})">${l.short}</button>
+      <button class="lob-badge" onclick="setActiveLiveLOB(${l.id})">${l.short}</button>
       <div class="priority-line main-line">
         <div class="req-wrap"><input class="req-target" id="topReq${l.id}" type="number" min="0" step="0.01" placeholder="00.00" oninput="onReqManualInput(${l.id})" onblur="formatReqInput(${l.id})" onkeydown="handleReqTab(event, ${l.id})"><span class="req-suffix">%</span></div>
         <div class="pr-mini pct" id="topPctTile${l.id}"><small>REQ%</small><strong id="topPct${l.id}">—</strong></div>
@@ -1942,12 +1900,13 @@ function buildPriorityRows(){
       <div class="priority-line sub-line">
         <div class="pr-mini in"><small>IN</small><strong id="topIn${l.id}">0</strong></div>
         <div class="pr-mini out"><small>OUT</small><strong id="topOut${l.id}">0</strong></div>
-        <div class="temp-in-mini" title="Temporary IN what-if placeholder only"><button type="button" onclick="event.preventDefault()">+</button><button type="button" onclick="event.preventDefault()">−</button></div>
+        <div class="temp-in-mini disabled" title="Temporary IN placeholder only"><button type="button" disabled>+</button><button type="button" disabled>−</button></div>
         <button class="auto-req-btn shell-btn" id="latBeBtn${l.id}" onclick="toggleLatBePanel(${l.id})">LAT/BE</button>
         <button class="auto-req-btn shell-btn" id="autoBtn${l.id}" onclick="toggleAutoPanel(${l.id})">AUTO</button>
         <div class="mode-pill">LIVE</div>
       </div>
-      <div class="latbe-panel shell-panel" id="latBePanel${l.id}">
+      <div class="latbe-panel shell-panel latbe-modal" id="latBePanel${l.id}" role="dialog" aria-label="LAT BE placeholder for ${l.short}">
+        <button class="modal-close" type="button" onclick="closeLatBePanels()">×</button>
         <div class="shell-panel-title">LAT/BE shell · ${l.short}</div>
         <div class="shell-grid">
           <div><small>LAT Req</small><strong>placeholder</strong></div>
@@ -1962,6 +1921,7 @@ function buildPriorityRows(){
         <div class="shell-placeholder-row">Manual LAT placeholder · Manual BE placeholder · Temporary Manual IN +/- placeholder</div>
       </div>
       <div class="auto-panel shell-panel auto-modal" id="autoPanel${l.id}" role="dialog" aria-label="AUTO Req placeholder for ${l.short}">
+        <button class="modal-close" type="button" onclick="closeAutoPanels()">×</button>
         <div class="shell-panel-title">AUTO Req shell · ${l.short}</div>
         <div class="auto-panel-hint">Placeholder schedule popup only. Persistence and timed updates are intentionally not implemented in this phase.</div>
       </div>
@@ -2069,15 +2029,12 @@ function scheduleAutoClear(health){
 function setHeaderStatus(mode){
   const wrap = document.getElementById('hdrStatus');
   const txt = document.getElementById('hdrStatusTxt');
-  wrap.classList.remove('live','sim','warn');
+  wrap.classList.remove('live','warn');
 
   if (mode === 'parsed') {
     wrap.classList.add('live');
     txt.textContent = 'parsed';
   } else if (mode === 'live') {
-    wrap.classList.add('live');
-    txt.textContent = 'live';
-  } else if (mode === 'sim') {
     wrap.classList.add('live');
     txt.textContent = 'live';
   } else if (mode === 'warn') {
@@ -2112,17 +2069,16 @@ function handleReqTab(event, id){
   }
 }
 
-function setActiveSimLOB(id){
-  if (id !== activeSimLobId) {
-    pauseSimForLOB(activeSimLobId);
-    activeSimLobId = id;
-    resumeSimForLOB(activeSimLobId);
+function setActiveLiveLOB(id){
+  if (id !== activeLiveLobId) {
+    pauseLiveTimerForLOB(activeLiveLobId);
+    activeLiveLobId = id;
+    resumeLiveTimerForLOB(activeLiveLobId);
   } else {
-    resumeSimForLOB(activeSimLobId);
+    resumeLiveTimerForLOB(activeLiveLobId);
   }
   refreshActiveUI();
   LOBS.forEach(l => {
-    renderSimChip(l.id);
     renderTopRow(l.id);
     renderRosterList(l.id);
   });
@@ -2131,7 +2087,7 @@ function setActiveSimLOB(id){
 
 function refreshActiveUI(){
   LOBS.forEach(l => {
-    const isActive = l.id === activeSimLobId;
+    const isActive = l.id === activeLiveLobId;
     document.getElementById(`priorityRow${l.id}`)?.classList.toggle('active', isActive);
     document.getElementById(`lobBlock${l.id}`)?.classList.toggle('active', isActive);
   });
@@ -2271,9 +2227,9 @@ function ingestSegment(id, segLines, metaLine, resetSim){
 
   if (resetSim && (s.baseIn + s.baseOut > 0 || s.records.length > 0)) {
     s.snapshotAt = new Date();
-    s.simElapsedMs = 0;
-    s.simStartedAt = id === activeSimLobId ? Date.now() : null;
-    s.simActive = true;
+    s.liveTimerElapsedMs = 0;
+    s.liveTimerStartedAt = id === activeLiveLobId ? Date.now() : null;
+    s.liveTimerActive = true;
   }
 
   refreshRow(id);
@@ -2295,7 +2251,6 @@ function adj(id, side, delta){
 function refreshRow(id){
   renderMeta(id);
   renderTopRow(id);
-  renderSimChip(id);
   renderRosterList(id);
 }
 
@@ -2410,49 +2365,44 @@ function renderTopRow(id){
   if (availNameEl) availNameEl.textContent = topAvail ? shortName(topAvail.name) : '';
 }
 
-function getSimElapsedMs(s){
-  if (!s || !s.simActive) return 0;
-  const running = s.simStartedAt ? Date.now() - s.simStartedAt : 0;
-  return Math.min(SNAPSHOT_SIM_MS, (s.simElapsedMs || 0) + running);
+function getLiveTimerElapsedMs(s){
+  if (!s || !s.liveTimerActive) return 0;
+  const running = s.liveTimerStartedAt ? Date.now() - s.liveTimerStartedAt : 0;
+  return Math.min(SNAPSHOT_LIVE_TIMER_MS, (s.liveTimerElapsedMs || 0) + running);
 }
 
-function pauseSimForLOB(id){
+function pauseLiveTimerForLOB(id){
   const s = state[id-1];
-  if (!s || !s.simActive || !s.simStartedAt) return;
-  s.simElapsedMs = getSimElapsedMs(s);
-  s.simStartedAt = null;
-  if (s.simElapsedMs >= SNAPSHOT_SIM_MS) s.simActive = false;
+  if (!s || !s.liveTimerActive || !s.liveTimerStartedAt) return;
+  s.liveTimerElapsedMs = getLiveTimerElapsedMs(s);
+  s.liveTimerStartedAt = null;
+  if (s.liveTimerElapsedMs >= SNAPSHOT_LIVE_TIMER_MS) s.liveTimerActive = false;
 }
 
-function resumeSimForLOB(id){
+function resumeLiveTimerForLOB(id){
   const s = state[id-1];
-  if (!s || !s.snapshotAt || !s.simActive) return;
-  if ((s.simElapsedMs || 0) >= SNAPSHOT_SIM_MS) {
-    s.simActive = false;
-    s.simStartedAt = null;
+  if (!s || !s.snapshotAt || !s.liveTimerActive) return;
+  if ((s.liveTimerElapsedMs || 0) >= SNAPSHOT_LIVE_TIMER_MS) {
+    s.liveTimerActive = false;
+    s.liveTimerStartedAt = null;
     return;
   }
-  if (!s.simStartedAt) s.simStartedAt = Date.now();
+  if (!s.liveTimerStartedAt) s.liveTimerStartedAt = Date.now();
 }
 
 function liveElapsedSec(id){
   const s = state[id-1];
-  if (id !== activeSimLobId) return 0;
-  if (!s || !s.simActive) return 0;
-  if (!s.simStartedAt) resumeSimForLOB(id);
-  const elapsed = getSimElapsedMs(s);
-  if (elapsed >= SNAPSHOT_SIM_MS) {
-    s.simElapsedMs = SNAPSHOT_SIM_MS;
-    s.simStartedAt = null;
-    s.simActive = false;
+  if (id !== activeLiveLobId) return 0;
+  if (!s || !s.liveTimerActive) return 0;
+  if (!s.liveTimerStartedAt) resumeLiveTimerForLOB(id);
+  const elapsed = getLiveTimerElapsedMs(s);
+  if (elapsed >= SNAPSHOT_LIVE_TIMER_MS) {
+    s.liveTimerElapsedMs = SNAPSHOT_LIVE_TIMER_MS;
+    s.liveTimerStartedAt = null;
+    s.liveTimerActive = false;
     return 0;
   }
   return Math.floor(elapsed / 1000);
-}
-
-function simRemainingSec(s){
-  if (!s || !s.simActive) return 0;
-  return Math.max(0, Math.ceil((SNAPSHOT_SIM_MS - getSimElapsedMs(s)) / 1000));
 }
 
 function getTopRecord(s, side, statusFilter){
@@ -2460,28 +2410,6 @@ function getTopRecord(s, side, statusFilter){
   if (statusFilter) records = records.filter(r => normalizeStatus(r.status) === statusFilter);
   if (!records.length) return null;
   return records.reduce((best, r) => r.seconds > best.seconds ? r : best, records[0]);
-}
-
-function renderLiveCards(id){
-  renderSimChip(id);
-}
-
-function renderSimChip(id){
-  const s = state[id-1];
-  const chip = document.getElementById(`simChip${id}`);
-  if (!chip) return;
-
-  chip.classList.remove('active','frozen');
-
-  if (id === activeSimLobId && s.simActive) {
-    chip.classList.add('active');
-    chip.textContent = `LIVE ${formatClock(simRemainingSec(s))}`;
-  } else if (s.snapshotAt) {
-    chip.classList.add('frozen');
-    chip.textContent = id === activeSimLobId ? 'BASE' : 'PAUSED';
-  } else {
-    chip.textContent = id === activeSimLobId ? 'LIVE --' : 'BASE';
-  }
 }
 
 function renderLiveRecord(id, kind, rec, elapsed){
@@ -2540,7 +2468,7 @@ function renderRosterList(id){
   if (!listEl) return;
 
   const elapsed = liveElapsedSec(id);
-  const isLive = id === activeSimLobId && s.simActive;
+  const isLive = id === activeLiveLobId && s.liveTimerActive;
   const inRecords = s.records.filter(r => r.side === 'in');
   const outRecords = s.records.filter(r => r.side === 'out');
 
@@ -2559,7 +2487,7 @@ function renderRosterList(id){
     const m = s.meta;
     const metaText = m && m.employees !== null ? `Emp ${m.employees}/${m.employeesTotal}` : `${s.records.length} records`;
     const unknownText = s.unknownStatuses && s.unknownStatuses.length ? ` · UNK ${s.unknownStatuses.length}` : '';
-    const mode = id === activeSimLobId ? (s.simActive ? `LIVE +${formatClock(liveElapsedSec(id))}` : 'BASE') : 'PAUSED';
+    const mode = id === activeLiveLobId ? (s.liveTimerActive ? `LIVE +${formatClock(liveElapsedSec(id))}` : 'BASE') : 'PAUSED';
     summary.textContent = `${metaText}${unknownText} · ${s.listSide.toUpperCase()} ${currentRecords.length} · ${mode}`;
   }
 }
@@ -2703,11 +2631,13 @@ function clearSlot(id){
   s.metaLine = '';
   s.meta = null;
   s.snapshotAt = null;
-  s.simStartedAt = null;
-  s.simElapsedMs = 0;
-  s.simActive = false;
+  s.liveTimerStartedAt = null;
+  s.liveTimerElapsedMs = 0;
+  s.liveTimerActive = false;
 
   document.getElementById(`topReq${id}`).value = '';
+  closeLatBePanels();
+  closeAutoPanels();
   refreshRow(id);
   refreshTopRows();
 }
@@ -2720,6 +2650,8 @@ function clearMaster(){
   lastParseHealth = { records: 0, missing: LOBS.map(l => l.short), unknown: 0 };
   document.getElementById('autoNote').textContent = 'waiting for snapshot';
   setHeaderStatus('idle');
+  closeLatBePanels();
+  closeAutoPanels();
 
   state.forEach(s => {
     s.baseIn = 0;
@@ -2733,9 +2665,9 @@ function clearMaster(){
     s.metaLine = '';
     s.meta = null;
     s.snapshotAt = null;
-    s.simStartedAt = null;
-    s.simElapsedMs = 0;
-    s.simActive = false;
+    s.liveTimerStartedAt = null;
+    s.liveTimerElapsedMs = 0;
+    s.liveTimerActive = false;
   });
 
   LOBS.forEach(l => refreshRow(l.id));
@@ -2753,20 +2685,42 @@ function toggleMiniPopover(event, id){
   pop.classList.toggle('open');
 }
 
+function closeLatBePanels(){
+  state.forEach(s => { s.latBePanelOpen = false; });
+  document.querySelectorAll('[id^="latBePanel"]').forEach(el => el.classList.remove('open'));
+  document.querySelectorAll('[id^="latBeBtn"]').forEach(el => el.classList.remove('active'));
+}
+
+function closeAutoPanels(){
+  state.forEach(s => { s.autoPanelOpen = false; });
+  document.querySelectorAll('[id^="autoPanel"]').forEach(el => el.classList.remove('open'));
+  document.querySelectorAll('[id^="autoBtn"]').forEach(el => el.classList.remove('active'));
+}
+
 function toggleLatBePanel(id){
   const s = state[id-1];
-  s.latBePanelOpen = !s.latBePanelOpen;
-  document.getElementById(`latBePanel${id}`)?.classList.toggle('open', s.latBePanelOpen);
-  document.getElementById(`latBeBtn${id}`)?.classList.toggle('active', s.latBePanelOpen);
-  setActiveSimLOB(id);
+  const willOpen = !s.latBePanelOpen;
+  closeLatBePanels();
+  if (willOpen) {
+    s.latBePanelOpen = true;
+    document.getElementById(`latBePanel${id}`)?.classList.add('open');
+    document.getElementById(`latBeBtn${id}`)?.classList.add('active');
+    closeAutoPanels();
+  }
+  setActiveLiveLOB(id);
 }
 
 function toggleAutoPanel(id){
   const s = state[id-1];
-  s.autoPanelOpen = !s.autoPanelOpen;
-  document.getElementById(`autoPanel${id}`)?.classList.toggle('open', s.autoPanelOpen);
-  document.getElementById(`autoBtn${id}`)?.classList.toggle('active', s.autoPanelOpen);
-  setActiveSimLOB(id);
+  const willOpen = !s.autoPanelOpen;
+  closeAutoPanels();
+  if (willOpen) {
+    s.autoPanelOpen = true;
+    document.getElementById(`autoPanel${id}`)?.classList.add('open');
+    document.getElementById(`autoBtn${id}`)?.classList.add('active');
+    closeLatBePanels();
+  }
+  setActiveLiveLOB(id);
 }
 
 function checkAllAutoSchedules(){
@@ -2775,12 +2729,11 @@ function checkAllAutoSchedules(){
 
 function tickLive(){
   state.forEach(s => {
-    if (s.id === activeSimLobId && s.simActive && getSimElapsedMs(s) >= SNAPSHOT_SIM_MS) {
-      s.simElapsedMs = SNAPSHOT_SIM_MS;
-      s.simStartedAt = null;
-      s.simActive = false;
+    if (s.id === activeLiveLobId && s.liveTimerActive && getLiveTimerElapsedMs(s) >= SNAPSHOT_LIVE_TIMER_MS) {
+      s.liveTimerElapsedMs = SNAPSHOT_LIVE_TIMER_MS;
+      s.liveTimerStartedAt = null;
+      s.liveTimerActive = false;
     }
-    renderSimChip(s.id);
     renderTopRow(s.id);
     renderRosterList(s.id);
   });
@@ -2789,9 +2742,9 @@ function tickLive(){
 
 function updateHeaderAfterTick(){
   if (document.getElementById('masterInput').value.trim()) return;
-  const active = state[activeSimLobId - 1];
+  const active = state[activeLiveLobId - 1];
   const hasSnapshot = state.some(s => s.snapshotAt);
-  setHeaderStatus(active && active.simActive ? 'live' : (hasSnapshot ? 'live' : 'idle'));
+  setHeaderStatus(active && active.liveTimerActive ? 'live' : (hasSnapshot ? 'live' : 'idle'));
 }
 
 
