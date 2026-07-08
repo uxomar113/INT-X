@@ -1411,18 +1411,6 @@ body{
 .req-wrap .req-target{
   width:100%;
   height:100%;
-  padding-right:16px;
-}
-.req-suffix{
-  position:absolute;
-  right:5px;
-  top:50%;
-  transform:translateY(-50%);
-  color:rgba(255,209,102,0.72);
-  font-family:Consolas,'Roboto Mono','Courier New',monospace;
-  font-size:0.62rem;
-  font-weight:900;
-  pointer-events:none;
 }
 .pr-mini.heads.good{
   border-color:rgba(32,224,144,0.36);
@@ -1454,11 +1442,9 @@ body{
 .agent-row.out.st-other .agent-status{ color:var(--out); }
 @media (max-width:480px){
   .req-wrap{ height:44px; }
-  .req-suffix{ right:4px; font-size:0.50rem; }
-}
+  }
 @media (max-width:360px){
-  .req-suffix{ font-size:0.46rem; }
-}
+  }
 
 
 
@@ -1805,6 +1791,49 @@ body{
   .mode-pill{ font-size:0.42rem; }
   .shell-grid{ grid-template-columns:repeat(2, minmax(0, 1fr)); }
 }
+
+.threshold-bar{
+  display:flex;
+  align-items:center;
+  justify-content:flex-end;
+  gap:6px;
+  margin:0 0 7px;
+  color:var(--muted);
+  font-family:Consolas,'Roboto Mono','Courier New',monospace;
+  font-size:0.52rem;
+  font-weight:900;
+  text-transform:uppercase;
+}
+.target-select{
+  height:24px;
+  border-radius:8px;
+  border:1px solid rgba(255,209,102,0.34);
+  background:#0b0e15;
+  color:var(--accent);
+  font-family:Consolas,'Roboto Mono','Courier New',monospace;
+  font-size:0.58rem;
+  font-weight:900;
+  outline:none;
+}
+.modal-backdrop{
+  display:none;
+  position:fixed;
+  inset:0;
+  z-index:45;
+  background:rgba(0,0,0,0.34);
+  backdrop-filter:blur(1px);
+}
+.modal-backdrop.open{ display:block; }
+.temp-in-mini span{
+  grid-column:1 / -1;
+  align-self:center;
+  justify-self:center;
+  color:var(--muted);
+  font-family:Consolas,'Roboto Mono','Courier New',monospace;
+  font-size:0.34rem;
+  font-weight:900;
+  letter-spacing:0.05em;
+}
 </style>
 </head>
 
@@ -1832,15 +1861,23 @@ body{
   </div>
 
   <div class="focus-panel latbe-shell">
+    <div class="threshold-bar">
+      <span>REQ target</span>
+      <select id="targetPctSelect" class="target-select" onchange="setTargetPct(this.value)">
+        <option value="92.5" selected>92.5%</option>
+        <option value="100.5">100.5%</option>
+      </select>
+    </div>
     <div class="priority-rows" id="priorityRows" aria-label="LOB quick controls"></div>
   </div>
+  <div class="modal-backdrop" id="modalBackdrop" onclick="closeAllShellPopups()"></div>
 
   <div id="lobs" class="lob-list"></div>
 </div>
 
 <script>
 const IN_KW  = new Set(['auxin','auxout','available','followup/outboundout','hold','busyin','acw','acwout']);
-const OUT_KW = new Set(['personal','system problems','break','lunch','coaching','nps','project','followup/outbound','auxwk','meeting']);
+const OUT_KW = new Set(['personal','system problems','break','lunch','coaching','nps','project','followup/outbound','auxwk','meeting','prep']);
 const IGNORE_NAME_LINES = new Set(['actions','action menu','load complete','loading complete','save','menu']);
 const SNAPSHOT_LIVE_TIMER_MS = 120000;
 const CLEAR_DELAY_MS = 10000;
@@ -1878,7 +1915,7 @@ let masterCache = '';
 let clearTimerHandle = null;
 let clearCountdownHandle = null;
 let activeLiveLobId = 1;
-let targetPct = 92;
+let targetPct = 92.5;
 let lastParseHealth = { records: 0, missing: LOBS.map(l => l.short), unknown: 0 };
 
 const IN_STATUS_ORDER = ['available','auxin','auxout','busyin','acw','acwout','hold','followup/outboundout'];
@@ -1891,7 +1928,7 @@ function buildPriorityRows(){
     <div class="priority-row" id="priorityRow${l.id}">
       <button class="lob-badge" onclick="setActiveLiveLOB(${l.id})">${l.short}</button>
       <div class="priority-line main-line">
-        <div class="req-wrap"><input class="req-target" id="topReq${l.id}" type="number" min="0" step="0.01" placeholder="00.00" oninput="onReqManualInput(${l.id})" onblur="formatReqInput(${l.id})" onkeydown="handleReqTab(event, ${l.id})"><span class="req-suffix">%</span></div>
+        <div class="req-wrap"><input class="req-target" id="topReq${l.id}" type="number" min="0" step="0.01" placeholder="00.00" oninput="onReqManualInput(${l.id})" onblur="formatReqInput(${l.id})" onkeydown="handleReqTab(event, ${l.id})"></div>
         <div class="pr-mini pct" id="topPctTile${l.id}"><small>REQ%</small><strong id="topPct${l.id}">—</strong></div>
         <div class="pr-mini lat" id="topLatTile${l.id}"><button class="micro-dot" title="Manual LAT placeholder" onclick="toggleMiniPopover(event, 'manualLat${l.id}')">manual LAT</button><small>LAT%</small><strong id="topLat${l.id}">LAT —</strong><div class="mini-popover" id="manualLat${l.id}">Manual LAT% placeholder<input type="text" placeholder="--.--" aria-label="Manual LAT placeholder"></div></div>
         <div class="pr-mini heads" id="topHeadsTile${l.id}"><small id="topHeadsLabel${l.id}">HEAD</small><strong id="topHeads${l.id}">—</strong></div>
@@ -1900,7 +1937,7 @@ function buildPriorityRows(){
       <div class="priority-line sub-line">
         <div class="pr-mini in"><small>IN</small><strong id="topIn${l.id}">0</strong></div>
         <div class="pr-mini out"><small>OUT</small><strong id="topOut${l.id}">0</strong></div>
-        <div class="temp-in-mini disabled" title="Temporary IN placeholder only"><button type="button" disabled>+</button><button type="button" disabled>−</button></div>
+        <div class="temp-in-mini disabled" title="Temporary IN placeholder only"><span>TMP IN</span><button type="button" disabled>+</button><button type="button" disabled>−</button></div>
         <button class="auto-req-btn shell-btn" id="latBeBtn${l.id}" onclick="toggleLatBePanel(${l.id})">LAT/BE</button>
         <button class="auto-req-btn shell-btn" id="autoBtn${l.id}" onclick="toggleAutoPanel(${l.id})">AUTO</button>
         <div class="mode-pill">LIVE</div>
@@ -2292,17 +2329,12 @@ function getTargetRatio(){
   return targetPct / 100;
 }
 
-function toggleTargetMode(){
-  targetPct = targetPct === 92 ? 100 : 92;
-  renderTargetMode();
+function setTargetPct(value){
+  const next = parseFloat(value);
+  targetPct = next === 100.5 ? 100.5 : 92.5;
+  const select = document.getElementById('targetPctSelect');
+  if (select) select.value = String(targetPct);
   refreshTopRows();
-}
-
-function renderTargetMode(){
-  const btn = document.getElementById('targetToggleBtn');
-  if (!btn) return;
-  btn.textContent = `REQ ${targetPct}%`;
-  btn.classList.toggle('active', targetPct === 100);
 }
 
 function getHeadResult(id){
@@ -2685,16 +2717,28 @@ function toggleMiniPopover(event, id){
   pop.classList.toggle('open');
 }
 
+function updateModalBackdrop(){
+  const anyOpen = state.some(s => s.latBePanelOpen || s.autoPanelOpen);
+  document.getElementById('modalBackdrop')?.classList.toggle('open', anyOpen);
+}
+
 function closeLatBePanels(){
   state.forEach(s => { s.latBePanelOpen = false; });
   document.querySelectorAll('[id^="latBePanel"]').forEach(el => el.classList.remove('open'));
   document.querySelectorAll('[id^="latBeBtn"]').forEach(el => el.classList.remove('active'));
+  updateModalBackdrop();
 }
 
 function closeAutoPanels(){
   state.forEach(s => { s.autoPanelOpen = false; });
   document.querySelectorAll('[id^="autoPanel"]').forEach(el => el.classList.remove('open'));
   document.querySelectorAll('[id^="autoBtn"]').forEach(el => el.classList.remove('active'));
+  updateModalBackdrop();
+}
+
+function closeAllShellPopups(){
+  closeLatBePanels();
+  closeAutoPanels();
 }
 
 function toggleLatBePanel(id){
@@ -2706,6 +2750,7 @@ function toggleLatBePanel(id){
     document.getElementById(`latBePanel${id}`)?.classList.add('open');
     document.getElementById(`latBeBtn${id}`)?.classList.add('active');
     closeAutoPanels();
+    updateModalBackdrop();
   }
   setActiveLiveLOB(id);
 }
@@ -2719,6 +2764,7 @@ function toggleAutoPanel(id){
     document.getElementById(`autoPanel${id}`)?.classList.add('open');
     document.getElementById(`autoBtn${id}`)?.classList.add('active');
     closeLatBePanels();
+    updateModalBackdrop();
   }
   setActiveLiveLOB(id);
 }
@@ -2735,7 +2781,7 @@ function tickLive(){
       s.liveTimerActive = false;
     }
     renderTopRow(s.id);
-    renderRosterList(s.id);
+    if (s.id === activeLiveLobId) renderRosterList(s.id);
   });
   updateHeaderAfterTick();
 }
@@ -2806,6 +2852,7 @@ function escapeHtml(value){
 buildPriorityRows();
 buildRows();
 refreshActiveUI();
+setTargetPct(targetPct);
 refreshTopRows();
 setHeaderStatus('idle');
 setInterval(checkAllAutoSchedules, 15000);
