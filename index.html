@@ -1820,8 +1820,7 @@ body{
   position:fixed;
   inset:0;
   z-index:45;
-  background:rgba(0,0,0,0.34);
-  backdrop-filter:blur(1px);
+  background:rgba(0,0,0,0.24);
 }
 .modal-backdrop.open{ display:block; }
 .temp-in-mini span{
@@ -2706,9 +2705,17 @@ function clearMaster(){
   refreshTopRows();
 }
 
+function closeMiniPopovers(){
+  document.querySelectorAll('.mini-popover.open').forEach(el => el.classList.remove('open'));
+}
+
 function toggleMiniPopover(event, id){
   event.stopPropagation();
   event.preventDefault();
+  if (event.currentTarget?.closest('.latbe-modal')) {
+    closeMiniPopovers();
+    return;
+  }
   const pop = document.getElementById(id);
   if (!pop) return;
   document.querySelectorAll('.mini-popover.open').forEach(el => {
@@ -2723,6 +2730,7 @@ function updateModalBackdrop(){
 }
 
 function closeLatBePanels(){
+  closeMiniPopovers();
   state.forEach(s => { s.latBePanelOpen = false; });
   document.querySelectorAll('[id^="latBePanel"]').forEach(el => el.classList.remove('open'));
   document.querySelectorAll('[id^="latBeBtn"]').forEach(el => el.classList.remove('active'));
@@ -2730,6 +2738,7 @@ function closeLatBePanels(){
 }
 
 function closeAutoPanels(){
+  closeMiniPopovers();
   state.forEach(s => { s.autoPanelOpen = false; });
   document.querySelectorAll('[id^="autoPanel"]').forEach(el => el.classList.remove('open'));
   document.querySelectorAll('[id^="autoBtn"]').forEach(el => el.classList.remove('active'));
@@ -2737,11 +2746,13 @@ function closeAutoPanels(){
 }
 
 function closeAllShellPopups(){
+  closeMiniPopovers();
   closeLatBePanels();
   closeAutoPanels();
 }
 
 function toggleLatBePanel(id){
+  closeMiniPopovers();
   const s = state[id-1];
   const willOpen = !s.latBePanelOpen;
   closeLatBePanels();
@@ -2756,6 +2767,7 @@ function toggleLatBePanel(id){
 }
 
 function toggleAutoPanel(id){
+  closeMiniPopovers();
   const s = state[id-1];
   const willOpen = !s.autoPanelOpen;
   closeAutoPanels();
