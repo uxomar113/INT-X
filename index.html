@@ -1644,36 +1644,6 @@ body{
   background:var(--accent);
   box-shadow:0 0 8px rgba(255,209,102,0.55);
 }
-.mini-popover{
-  display:none;
-  position:absolute;
-  z-index:9;
-  right:4px;
-  top:20px;
-  min-width:86px;
-  padding:6px;
-  border:1px solid rgba(255,209,102,0.28);
-  border-radius:8px;
-  background:#0b0e15;
-  box-shadow:0 10px 22px rgba(0,0,0,0.34), 0 0 14px rgba(255,209,102,0.08);
-  color:var(--muted);
-  font-family:Consolas,'Roboto Mono','Courier New',monospace;
-  font-size:0.48rem;
-  font-weight:900;
-  line-height:1.25;
-}
-.mini-popover.open{ display:block; }
-.mini-popover input{
-  width:100%;
-  height:22px;
-  margin-top:4px;
-  border-radius:6px;
-  border:1px solid var(--border);
-  background:rgba(0,0,0,0.24);
-  color:var(--soft);
-  text-align:center;
-  font:inherit;
-}
 .shell-panel{
   display:none;
   margin-top:2px;
@@ -1929,7 +1899,7 @@ function buildPriorityRows(){
       <div class="priority-line main-line">
         <div class="req-wrap"><input class="req-target" id="topReq${l.id}" type="number" min="0" step="0.01" placeholder="00.00" oninput="onReqManualInput(${l.id})" onblur="formatReqInput(${l.id})" onkeydown="handleReqTab(event, ${l.id})"></div>
         <div class="pr-mini pct" id="topPctTile${l.id}"><small>REQ%</small><strong id="topPct${l.id}">—</strong></div>
-        <div class="pr-mini lat" id="topLatTile${l.id}"><button class="micro-dot" title="Manual LAT placeholder" onclick="toggleMiniPopover(event, 'manualLat${l.id}')">manual LAT</button><small>LAT%</small><strong id="topLat${l.id}">LAT —</strong><div class="mini-popover" id="manualLat${l.id}">Manual LAT% placeholder<input type="text" placeholder="--.--" aria-label="Manual LAT placeholder"></div></div>
+        <div class="pr-mini lat" id="topLatTile${l.id}"><button type="button" class="micro-dot" title="Manual LAT placeholder" aria-label="Manual LAT placeholder indicator">manual LAT</button><small>LAT%</small><strong id="topLat${l.id}">LAT —</strong></div>
         <div class="pr-mini heads" id="topHeadsTile${l.id}"><small id="topHeadsLabel${l.id}">HEAD</small><strong id="topHeads${l.id}">—</strong></div>
         <div class="pr-mini avail"><small>AVAIL</small><strong id="topAvail${l.id}">—</strong><span class="live-name-mini" id="topAvailName${l.id}"></span></div>
       </div>
@@ -1949,7 +1919,7 @@ function buildPriorityRows(){
           <div><small>BE Req</small><strong>placeholder</strong></div>
           <div><small>LAT%</small><strong>—</strong></div>
           <div><small>Expected LAT%</small><strong>—</strong></div>
-          <div><small>BE%</small><button class="micro-dot" title="Manual BE placeholder" onclick="toggleMiniPopover(event, 'manualBe${l.id}')">manual BE</button><strong>—</strong><div class="mini-popover" id="manualBe${l.id}">Manual BE% placeholder<input type="text" placeholder="--.--" aria-label="Manual BE placeholder"></div></div>
+          <div><small>BE%</small><button type="button" class="micro-dot" title="Manual BE placeholder" aria-label="Manual BE placeholder indicator">manual BE</button><strong>—</strong></div>
           <div><small>BE LAT%</small><strong>—</strong></div>
           <div><small>Expected BE%</small><strong>—</strong></div>
           <div><small>BE HEAD</small><strong>—</strong></div>
@@ -2706,22 +2676,7 @@ function clearMaster(){
 }
 
 function closeMiniPopovers(){
-  document.querySelectorAll('.mini-popover.open').forEach(el => el.classList.remove('open'));
-}
-
-function toggleMiniPopover(event, id){
-  event.stopPropagation();
-  event.preventDefault();
-  if (event.currentTarget?.closest('.latbe-modal')) {
-    closeMiniPopovers();
-    return;
-  }
-  const pop = document.getElementById(id);
-  if (!pop) return;
-  document.querySelectorAll('.mini-popover.open').forEach(el => {
-    if (el !== pop) el.classList.remove('open');
-  });
-  pop.classList.toggle('open');
+  // Manual LAT/BE dots are placeholder indicators only; no popup opens in this phase.
 }
 
 function updateModalBackdrop(){
