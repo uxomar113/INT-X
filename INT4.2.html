@@ -1,0 +1,1076 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>INT · AUX</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600;700&family=Bebas+Neue&family=Manrope:wght@500;700;800&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root{
+  --bg:#0e1015;
+  --surface:#14171f;
+  --card:#1c2030;
+  --border:#2e3549;
+  --text:#f3f5fb;
+  --muted:#8891ac;
+  --soft:#aab1cc;
+  --in:#1fe08c;
+  --out:#ff6680;
+  --total:#6ab8ff;
+  --accent:#ffd166;
+  --in-bg:rgba(31,224,140,0.12);
+  --out-bg:rgba(255,102,128,0.12);
+}
+
+body{
+  background:var(--bg);
+  color:var(--text);
+  font-family:'Manrope',sans-serif;
+  min-height:100vh;
+  display:flex;
+  align-items:flex-start;
+  justify-content:center;
+  padding:16px;
+}
+
+.wrapper{
+  width:400px;
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:10px;
+  box-shadow:0 8px 32px rgba(0,0,0,0.5);
+}
+
+/* minimal header */
+.hdr{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:7px 10px;
+  background:var(--card);
+  border-bottom:1px solid var(--border);
+  border-radius:10px 10px 0 0;
+}
+.hdr-title{
+  font-family:'Bebas Neue',sans-serif;
+  font-size:1.3rem;
+  letter-spacing:0.16em;
+  color:var(--accent);
+  line-height:1;
+}
+.hdr-status{
+  font-family:'IBM Plex Mono',monospace;
+  font-size:0.68rem;
+  font-weight:700;
+  color:var(--muted);
+  letter-spacing:0.03em;
+  display:flex;
+  align-items:center;
+  gap:5px;
+}
+.hdr-status .dot{
+  width:7px; height:7px; border-radius:50%;
+  background:var(--muted);
+  transition:background 0.2s;
+}
+.hdr-status.live .dot{ background:var(--in); box-shadow:0 0 4px var(--in); }
+.hdr-status.live{ color:var(--in); }
+
+/* master input row */
+.master-wrap{
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+  padding:10px;
+  border-bottom:1px solid rgba(255,255,255,0.06);
+}
+.master-area{
+  width:100%;
+  height:72px;
+  resize:vertical;
+  min-height:54px;
+  max-height:200px;
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:8px;
+  padding:8px 10px;
+  outline:none;
+  color:var(--text);
+  font-family:'IBM Plex Mono',monospace;
+  font-size:0.75rem;
+  font-weight:600;
+  line-height:1.45;
+}
+.master-area:focus{
+  border-color:rgba(77,166,255,0.4);
+  box-shadow:0 0 0 1px rgba(77,166,255,0.15);
+}
+.master-area::placeholder{ color:var(--muted); }
+
+.master-foot{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:8px;
+}
+.auto-note{
+  font-family:'IBM Plex Mono',monospace;
+  font-size:0.62rem;
+  font-weight:600;
+  color:var(--muted);
+  letter-spacing:0.01em;
+  flex:1;
+  min-width:0;
+}
+.auto-note .cnt{ color:var(--accent); font-weight:800; }
+.mbtn{
+  width:66px;
+  height:26px;
+  border-radius:6px;
+  border:1px solid var(--border);
+  background:var(--card);
+  color:var(--soft);
+  font-family:'IBM Plex Mono',monospace;
+  font-size:0.65rem;
+  font-weight:800;
+  cursor:pointer;
+  transition:all 0.12s;
+  flex-shrink:0;
+}
+.mbtn:hover{
+  border-color:var(--out);
+  color:var(--out);
+  background:var(--out-bg);
+}
+
+/* LOB block: each tier is now a stacked card, not a grid row,
+   so the whole layout can run narrower + taller */
+.lob-block{
+  border-bottom:1px solid rgba(255,255,255,0.05);
+  padding:9px 10px 10px;
+}
+.lob-block:last-child{ border-bottom:none; border-radius:0 0 10px 10px; }
+
+.lob-top{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  margin-bottom:7px;
+}
+.lob-name{
+  font-family:'IBM Plex Mono',monospace;
+  font-size:0.8rem;
+  font-weight:700;
+  color:var(--text);
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:5px;
+  padding:4px 10px;
+  letter-spacing:0.02em;
+}
+
+.lob-top-right{
+  display:flex;
+  align-items:center;
+  gap:6px;
+}
+
+.avail-timer{
+  display:flex;
+  align-items:center;
+  gap:5px;
+  font-family:'IBM Plex Mono',monospace;
+  font-size:0.72rem;
+  font-weight:800;
+  color:var(--accent);
+  background:rgba(255,209,102,0.12);
+  border:1px solid rgba(255,209,102,0.35);
+  border-radius:6px;
+  padding:4px 9px;
+  line-height:1;
+  white-space:nowrap;
+}
+.avail-timer .lbl{
+  color:var(--accent);
+  opacity:0.75;
+  font-weight:800;
+  font-size:0.56rem;
+  letter-spacing:0.05em;
+  text-transform:uppercase;
+}
+.avail-timer.none{
+  color:var(--muted);
+  background:rgba(255,255,255,0.03);
+  border-color:var(--border);
+}
+.avail-timer.none .lbl{ color:var(--muted); opacity:1; }
+
+.req-line{
+  display:flex;
+  align-items:center;
+  gap:6px;
+  margin-bottom:8px;
+}
+.req-label{
+  font-family:'IBM Plex Mono',monospace;
+  font-size:0.62rem;
+  font-weight:800;
+  color:var(--soft);
+  letter-spacing:0.06em;
+  text-transform:uppercase;
+  flex-shrink:0;
+}
+.req-target{
+  width:66px;
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:6px;
+  color:var(--accent);
+  font-family:'IBM Plex Mono',monospace;
+  font-size:0.95rem;
+  font-weight:800;
+  padding:4px 2px;
+  text-align:center;
+  outline:none;
+  height:30px;
+  -moz-appearance:textfield;
+  flex-shrink:0;
+}
+.req-target::-webkit-outer-spin-button,
+.req-target::-webkit-inner-spin-button{ -webkit-appearance:none; }
+.req-target:focus{ border-color:var(--accent); box-shadow:0 0 0 1px rgba(255,209,102,0.25); }
+.req-target::placeholder{ color:var(--muted); font-size:0.8rem; }
+
+.auto-req-btn{
+  height:30px;
+  padding:0 10px;
+  border-radius:6px;
+  border:1px solid var(--border);
+  background:var(--card);
+  color:var(--soft);
+  font-family:'IBM Plex Mono',monospace;
+  font-size:0.62rem;
+  font-weight:800;
+  letter-spacing:0.02em;
+  cursor:pointer;
+  transition:all 0.12s;
+  white-space:nowrap;
+  flex-shrink:0;
+}
+.auto-req-btn:hover{ border-color:var(--total); color:var(--total); background:rgba(106,184,255,0.1); }
+.auto-req-btn.active{ border-color:var(--total); color:var(--total); background:rgba(106,184,255,0.15); }
+
+.spacer{ flex:1; }
+
+.clear-btn{
+  width:28px;
+  height:30px;
+  border-radius:6px;
+  border:1px solid var(--border);
+  background:var(--card);
+  color:var(--soft);
+  font-size:0.75rem;
+  font-weight:700;
+  cursor:pointer;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:0;
+  transition:all 0.1s;
+  font-family:'IBM Plex Mono',monospace;
+  flex-shrink:0;
+}
+.clear-btn:hover{ border-color:var(--out); color:var(--out); background:var(--out-bg); }
+
+/* auto-req panel (collapsible) */
+.auto-panel{
+  display:none;
+  flex-direction:column;
+  gap:5px;
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:7px;
+  padding:7px;
+  margin-bottom:8px;
+}
+.auto-panel.open{ display:flex; }
+.auto-panel-hint{
+  font-family:'IBM Plex Mono',monospace;
+  font-size:0.6rem;
+  font-weight:600;
+  color:var(--soft);
+  line-height:1.55;
+  letter-spacing:0.01em;
+}
+.auto-panel-hint b{ color:var(--text); }
+.auto-textarea{
+  width:100%;
+  height:84px;
+  resize:vertical;
+  min-height:54px;
+  max-height:180px;
+  background:var(--bg);
+  border:1px solid var(--border);
+  border-radius:6px;
+  padding:7px 8px;
+  outline:none;
+  color:var(--text);
+  font-family:'IBM Plex Mono',monospace;
+  font-size:0.72rem;
+  font-weight:600;
+  line-height:1.5;
+}
+.auto-textarea:focus{ border-color:rgba(106,184,255,0.45); }
+.auto-textarea::placeholder{ color:var(--muted); }
+.auto-panel-foot{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:6px;
+}
+.auto-status{
+  font-family:'IBM Plex Mono',monospace;
+  font-size:0.6rem;
+  font-weight:600;
+  color:var(--soft);
+  letter-spacing:0.01em;
+  flex:1;
+  min-width:0;
+}
+.auto-status .next-time{ color:var(--total); font-weight:800; }
+.auto-status .err{ color:var(--out); font-weight:700; }
+.auto-panel-actions{
+  display:flex;
+  gap:5px;
+  flex-shrink:0;
+}
+.auto-save-btn, .auto-clear-btn{
+  height:24px;
+  padding:0 9px;
+  border-radius:5px;
+  border:1px solid var(--border);
+  background:var(--bg);
+  color:var(--soft);
+  font-family:'IBM Plex Mono',monospace;
+  font-size:0.6rem;
+  font-weight:700;
+  cursor:pointer;
+  transition:all 0.1s;
+}
+.auto-save-btn:hover{ border-color:var(--in); color:var(--in); background:var(--in-bg); }
+.auto-clear-btn:hover{ border-color:var(--out); color:var(--out); background:var(--out-bg); }
+
+/* value grid: IN / OUT / TOT / %REQ / HEADS, laid out as label-over-value tiles
+   so it can wrap onto multiple lines at a narrow width */
+.val-grid{
+  display:grid;
+  grid-template-columns:repeat(3, 1fr);
+  gap:6px;
+  margin-bottom:6px;
+}
+.val-tile{
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:6px;
+  padding:5px 4px 6px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:2px;
+}
+.val-tile-lbl{
+  font-size:0.56rem;
+  font-weight:800;
+  text-transform:uppercase;
+  letter-spacing:0.06em;
+  color:var(--soft);
+}
+.val-tile-lbl.in-c{ color:#3ef0a0; }
+.val-tile-lbl.out-c{ color:#ff8095; }
+.val-tile-lbl.tot-c{ color:#8ec8ff; }
+
+.val-group{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:4px;
+}
+.adj-btn{
+  width:20px;
+  height:20px;
+  border-radius:4px;
+  border:1px solid var(--border);
+  background:var(--bg);
+  color:var(--soft);
+  font-family:'IBM Plex Mono',monospace;
+  font-size:0.85rem;
+  font-weight:800;
+  cursor:pointer;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:0;
+  transition:all 0.1s;
+  user-select:none;
+  flex-shrink:0;
+}
+.val-group.in .adj-btn:hover { border-color:var(--in); color:var(--in); background:var(--in-bg); }
+.val-group.out .adj-btn:hover{ border-color:var(--out); color:var(--out); background:var(--out-bg); }
+.adj-btn:active{ transform:scale(0.9); }
+
+.num-stack{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  line-height:1;
+  min-width:34px;
+}
+.val-num{
+  font-family:'Bebas Neue',sans-serif;
+  font-size:1.55rem;
+  letter-spacing:0.03em;
+  line-height:1;
+}
+.val-sub{
+  margin-top:3px;
+  font-family:'IBM Plex Mono',monospace;
+  font-size:0.58rem;
+  font-weight:800;
+  color:var(--soft);
+  letter-spacing:0.01em;
+  line-height:1;
+}
+.val-sub .pos{ color:var(--total); }
+.val-sub .neg{ color:var(--out); }
+
+.val-group.in .val-num{ color:var(--in); }
+.val-group.out .val-num{ color:var(--out); }
+
+.val-tot{
+  font-family:'Bebas Neue',sans-serif;
+  font-size:1.55rem;
+  color:var(--total);
+  text-align:center;
+  line-height:1;
+  letter-spacing:0.03em;
+}
+
+.stat-row{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:6px;
+}
+.stat-tile{
+  background:var(--card);
+  border:1px solid transparent;
+  border-radius:6px;
+  padding:6px 4px 7px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:3px;
+}
+.stat-tile-lbl{
+  font-size:0.56rem;
+  font-weight:800;
+  text-transform:uppercase;
+  letter-spacing:0.06em;
+  color:var(--soft);
+}
+.val-pct{
+  font-family:'Bebas Neue',sans-serif;
+  font-size:1.3rem;
+  font-weight:400;
+  text-align:center;
+  color:var(--soft);
+  line-height:1;
+  letter-spacing:0.02em;
+}
+.stat-tile.pct-good{ border-color:rgba(31,224,140,0.35); background:var(--in-bg); }
+.stat-tile.pct-good .val-pct{ color:var(--in); }
+.stat-tile.pct-bad{ border-color:rgba(255,102,128,0.35); background:var(--out-bg); }
+.stat-tile.pct-bad .val-pct{ color:var(--out); }
+
+.val-heads{
+  font-family:'Bebas Neue',sans-serif;
+  font-size:1.3rem;
+  color:var(--soft);
+  text-align:center;
+  line-height:1;
+  letter-spacing:0.02em;
+}
+.val-heads.avail{ color:var(--accent); }
+.val-heads.zero{ color:var(--muted); }
+</style>
+</head>
+
+<body>
+<div class="wrapper">
+  <div class="hdr">
+    <span class="hdr-title">AUX · INT</span>
+    <span class="hdr-status" id="hdrStatus"><span class="dot"></span><span id="hdrStatusTxt">idle</span></span>
+  </div>
+
+  <!-- single input: auto-runs on input, self-clears 10s after last change -->
+  <div class="master-wrap">
+    <textarea id="masterInput" class="master-area"
+      placeholder="Paste here... (parses automatically, clears in 10s)"
+      oninput="masterChanged()"
+      spellcheck="false" autocomplete="off"></textarea>
+    <div class="master-foot">
+      <span class="auto-note" id="autoNote">auto-parses on input</span>
+      <button class="mbtn" onclick="clearMaster()">CLEAR</button>
+    </div>
+  </div>
+
+  <div id="lobs"></div>
+</div>
+
+<script>
+const IN_KW  = new Set(['auxin','auxout','available','followup/outboundout','hold','busyin','acw','acwout']);
+const OUT_KW = new Set(['personal','system problems','break','lunch','coaching','nps','project','followup/outbound','auxwk','meeting']);
+
+/* LOB definitions: each LOB is matched by any of its aliases (case-insensitive,
+   exact line match) as the block-start label. Block ends at next "Employees :" line. */
+const LOBS = [
+  { id: 1, label: 'CSA T2', aliases: ['csa tier2','csa t2','t2','tier2'] },
+  { id: 2, label: 'CSA T1', aliases: ['csa tier1','csa t1','t1','tier1'] },
+  { id: 3, label: 'CSA SP', aliases: ['csa sp','sp','spanish'] }
+];
+
+const state = LOBS.map(l => ({
+  id: l.id,
+  baseIn: 0, baseOut: 0,
+  adjIn:  0, adjOut:  0,
+  lockCleared: false,
+  maxAvailSec: null,       // highest "Available" duration in this block, in seconds
+  autoSchedule: [],        // [{h,m,val}] parsed schedule for this LOB, sorted by time
+  autoPanelOpen: false,
+  autoLastAppliedKey: null // "HH:MM" of the last schedule point applied, to avoid re-applying
+}));
+
+let masterCache = '';
+let clearTimerHandle = null;
+const CLEAR_DELAY_MS = 10000;
+
+function buildRows(){
+  const container = document.getElementById('lobs');
+  LOBS.forEach(l => {
+    const s = state[l.id-1];
+    const block = document.createElement('div');
+    block.className = 'lob-block';
+    block.id = `lobBlock${s.id}`;
+    block.innerHTML = `
+      <div class="lob-top">
+        <span class="lob-name">${l.label}</span>
+        <div class="lob-top-right">
+          <span class="avail-timer" id="availTimer${s.id}">
+            <span class="lbl">AVAIL</span><span id="availTimerVal${s.id}">No avail</span>
+          </span>
+        </div>
+      </div>
+
+      <div class="req-line">
+        <span class="req-label">Req</span>
+        <input class="req-target" id="req${s.id}" type="number" min="1"
+               placeholder="—" oninput="onReqManualInput(${s.id})">
+        <button class="auto-req-btn" id="autoBtn${s.id}" onclick="toggleAutoPanel(${s.id})">AUTO REQ</button>
+        <span class="spacer"></span>
+        <button class="clear-btn" onclick="clearSlot(${s.id})">✕</button>
+      </div>
+
+      <div class="auto-panel" id="autoPanel${s.id}">
+        <div class="auto-panel-hint">Format <b>HH:MM value</b>, one per line (24h). REQ <b>auto-updates at each time</b>, overwriting any current value.<br>e.g. <b>10:00 6.3</b></div>
+        <textarea class="auto-textarea" id="autoText${s.id}" placeholder="10:00 6.3&#10;10:30 8.0&#10;13:30 11.2" spellcheck="false" autocomplete="off" oninput="onAutoScheduleInput(${s.id})"></textarea>
+        <div class="auto-panel-foot">
+          <span class="auto-status" id="autoStatus${s.id}">no schedule set</span>
+          <div class="auto-panel-actions">
+            <button class="auto-clear-btn" onclick="clearAutoSchedule(${s.id})">CLEAR</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="val-grid">
+        <div class="val-tile">
+          <span class="val-tile-lbl in-c">● In</span>
+          <div class="val-group in">
+            <button class="adj-btn" onclick="adj(${s.id},'in',-1)">−</button>
+            <div class="num-stack">
+              <span class="val-num" id="in${s.id}">0</span>
+              <span class="val-sub" id="inSub${s.id}">0</span>
+            </div>
+            <button class="adj-btn" onclick="adj(${s.id},'in',+1)">+</button>
+          </div>
+        </div>
+
+        <div class="val-tile">
+          <span class="val-tile-lbl out-c">● Out</span>
+          <div class="val-group out">
+            <button class="adj-btn" onclick="adj(${s.id},'out',-1)">−</button>
+            <div class="num-stack">
+              <span class="val-num" id="out${s.id}">0</span>
+              <span class="val-sub" id="outSub${s.id}">0</span>
+            </div>
+            <button class="adj-btn" onclick="adj(${s.id},'out',+1)">+</button>
+          </div>
+        </div>
+
+        <div class="val-tile">
+          <span class="val-tile-lbl tot-c">Tot</span>
+          <span class="val-tot" id="tot${s.id}">0</span>
+        </div>
+      </div>
+
+      <div class="stat-row">
+        <div class="stat-tile" id="pctTile${s.id}">
+          <span class="stat-tile-lbl">% Req</span>
+          <span class="val-pct" id="pct${s.id}">—</span>
+        </div>
+        <div class="stat-tile">
+          <span class="stat-tile-lbl">Heads</span>
+          <span class="val-heads" id="heads${s.id}">—</span>
+        </div>
+      </div>
+    `;
+    container.appendChild(block);
+  });
+}
+
+/* ---------------- master input: auto-run + self-clear ---------------- */
+
+function masterChanged(){
+  const raw = document.getElementById('masterInput').value;
+  if (raw !== masterCache) {
+    state.forEach(s => s.lockCleared = false);
+    masterCache = raw;
+  }
+  reparse();
+  scheduleAutoClear();
+  setLiveStatus(raw.trim().length > 0);
+}
+
+function scheduleAutoClear(){
+  if (clearTimerHandle) clearTimeout(clearTimerHandle);
+  const note = document.getElementById('autoNote');
+  const raw = document.getElementById('masterInput').value;
+
+  if (!raw.trim()) {
+    note.textContent = 'auto-parses on input';
+    return;
+  }
+
+  let remaining = 10;
+  note.innerHTML = `parsed · clearing in <span class="cnt">${remaining}s</span>`;
+  const tick = setInterval(() => {
+    remaining -= 1;
+    if (remaining <= 0) {
+      clearInterval(tick);
+      return;
+    }
+    note.innerHTML = `parsed · clearing in <span class="cnt">${remaining}s</span>`;
+  }, 1000);
+
+  clearTimerHandle = setTimeout(() => {
+    clearInterval(tick);
+    document.getElementById('masterInput').value = '';
+    masterCache = '';
+    note.textContent = 'auto-parses on input';
+    setLiveStatus(false);
+    // NOTE: clearing the textarea intentionally keeps parsed state (counts stay on screen)
+  }, CLEAR_DELAY_MS);
+}
+
+function setLiveStatus(isLive){
+  const wrap = document.getElementById('hdrStatus');
+  const txt = document.getElementById('hdrStatusTxt');
+  if (isLive) { wrap.classList.add('live'); txt.textContent = 'parsed'; }
+  else { wrap.classList.remove('live'); txt.textContent = 'idle'; }
+}
+
+/* ---------------- parsing ---------------- */
+
+/* find each LOB's block by alias label and load into its row */
+function reparse(){
+  const raw = document.getElementById('masterInput').value;
+  const cleaned = decodeEntities(raw);
+  const lines = cleaned.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
+
+  LOBS.forEach(l => {
+    const s = state[l.id-1];
+    const blk = extractLOBBlock(lines, l.aliases);
+    if (!blk || s.lockCleared) ingestSegment(l.id, []);
+    else ingestSegment(l.id, blk);
+  });
+}
+
+/* find first line matching any alias (case-insensitive), then
+   collect lines until the next "Employees :" line (excluded).
+   Real dashboard exports often glue a suffix onto the label, e.g.
+   "T1Actions" instead of "T1" — so before matching we strip a trailing
+   "actions" word (with or without a space before it) and collapse
+   whitespace, then require the remainder to exactly equal an alias. */
+function extractLOBBlock(lines, aliases){
+  const aliasSet = new Set(aliases.map(a => a.toLowerCase()));
+  for (let i = 0; i < lines.length; i++){
+    if (aliasSet.has(normalizeLobLabel(lines[i]))) {
+      let j = i + 1;
+      while (j < lines.length && !/^employees\s*:/i.test(lines[j])) j++;
+      return lines.slice(i + 1, j); // exclude the label line itself
+    }
+  }
+  return null;
+}
+
+/* lowercase, collapse whitespace, strip a trailing "actions" suffix
+   (dashboard exports glue this onto the tier label with no space) */
+function normalizeLobLabel(line){
+  return line
+    .toLowerCase()
+    .replace(/\s+/g, ' ')
+    .trim()
+    .replace(/\s*actions\s*$/i, '');
+}
+
+/* count base IN/OUT from lines, and find max "Available" duration.
+   Real data comes as separate lines per agent, e.g.:
+     Saleh - 100067669, Sarah
+     Available
+     05:17
+   So: whole-line keyword match still drives IN/OUT counts, and separately,
+   whenever a line is exactly "Available" we look at the NEXT line for a
+   standalone duration (HH:MM or HH:MM:SS). */
+function ingestSegment(id, segLines){
+  const s = state[id-1];
+  s.baseIn = 0;
+  s.baseOut = 0;
+  s.maxAvailSec = null;
+
+  const durOnlyRe = /^(\d{1,3}):(\d{2})(?::(\d{2}))?$/;
+
+  segLines.forEach((line, i) => {
+    const lower = line.toLowerCase();
+
+    // classify whole-line keyword matches (existing behavior)
+    if (IN_KW.has(lower)) s.baseIn++;
+    else if (OUT_KW.has(lower)) s.baseOut++;
+
+    // "Available" as its own line -> look at the next line for a duration.
+    // Two-part durations are MM:SS (e.g. "05:17", "28:06"); three-part are
+    // HH:MM:SS (e.g. "01:53:17").
+    if (lower === 'available') {
+      const next = segLines[i + 1];
+      if (next) {
+        const m = next.trim().match(durOnlyRe);
+        if (m) {
+          let totalSec;
+          if (m[3] !== undefined) {
+            // HH:MM:SS
+            const hh = parseInt(m[1], 10) || 0;
+            const mm = parseInt(m[2], 10) || 0;
+            const ss = parseInt(m[3], 10) || 0;
+            totalSec = hh * 3600 + mm * 60 + ss;
+          } else {
+            // MM:SS
+            const mm = parseInt(m[1], 10) || 0;
+            const ss = parseInt(m[2], 10) || 0;
+            totalSec = mm * 60 + ss;
+          }
+          if (s.maxAvailSec === null || totalSec > s.maxAvailSec) s.maxAvailSec = totalSec;
+        }
+      }
+    }
+  });
+
+  refreshRow(id);
+}
+
+/* ---------------- manual adjustments ---------------- */
+
+function adj(id, side, delta){
+  const s = state[id-1];
+
+  if (side === 'in') {
+    const newVal = Math.max(0, s.baseIn + s.adjIn + delta);
+    s.adjIn = newVal - s.baseIn;
+  } else {
+    const newVal = Math.max(0, s.baseOut + s.adjOut + delta);
+    s.adjOut = newVal - s.baseOut;
+  }
+  refreshRow(id);
+}
+
+/* ---------------- row display ---------------- */
+
+function refreshRow(id){
+  const s = state[id-1];
+  const curIn  = Math.max(0, s.baseIn + s.adjIn);
+  const curOut = Math.max(0, s.baseOut + s.adjOut);
+  const total  = curIn + curOut;
+
+  document.getElementById(`in${id}`).textContent = curIn;
+  document.getElementById(`out${id}`).textContent = curOut;
+  document.getElementById(`tot${id}`).textContent = total;
+
+  renderDelta(`inSub${id}`, s.baseIn, s.adjIn);
+  renderDelta(`outSub${id}`, s.baseOut, s.adjOut);
+
+  renderAvailTimer(id);
+  updatePct(id);
+}
+
+function renderDelta(elId, base, adj){
+  const el = document.getElementById(elId);
+  if (!adj) { el.textContent = `${base}`; return; }
+
+  const sign = adj > 0 ? '+' : '−';
+  const abs  = Math.abs(adj);
+  const cls  = adj > 0 ? 'pos' : 'neg';
+  el.innerHTML = `${base} (<span class="${cls}">${sign}${abs}</span>)`;
+}
+
+/* always show the badge: highest "Available" duration when one exists,
+   otherwise an explicit "No avail" state */
+function renderAvailTimer(id){
+  const s = state[id-1];
+  const wrap = document.getElementById(`availTimer${id}`);
+  const val = document.getElementById(`availTimerVal${id}`);
+
+  wrap.classList.remove('hidden');
+
+  if (s.maxAvailSec === null) {
+    wrap.classList.add('none');
+    val.textContent = 'No avail';
+    return;
+  }
+
+  wrap.classList.remove('none');
+  val.textContent = formatDuration(s.maxAvailSec);
+}
+
+function formatDuration(totalSec){
+  const h = Math.floor(totalSec / 3600);
+  const m = Math.floor((totalSec % 3600) / 60);
+  const sec = totalSec % 60;
+  if (h > 0) return `${pad2(h)}:${pad2(m)}:${pad2(sec)}`;
+  return `${pad2(m)}:${pad2(sec)}`;
+}
+function pad2(n){ return String(n).padStart(2,'0'); }
+
+/* pct = IN / REQ */
+function updatePct(id){
+  const s = state[id-1];
+  const req = parseFloat(document.getElementById(`req${id}`).value);
+  const pctEl = document.getElementById(`pct${id}`);
+  const pctTile = document.getElementById(`pctTile${id}`);
+  const headsEl = document.getElementById(`heads${id}`);
+  const curIn = Math.max(0, s.baseIn + s.adjIn);
+  const total = Math.max(0, s.baseIn + s.adjIn + s.baseOut + s.adjOut);
+
+  pctTile.classList.remove('pct-good','pct-bad');
+
+  if (!req || req <= 0 || total === 0) {
+    pctEl.textContent = '—';
+    headsEl.textContent = '—';
+    headsEl.className = 'val-heads';
+    return;
+  }
+
+  const pct = (curIn / req) * 100;
+  pctEl.textContent = pct.toFixed(1) + '%';
+  pctTile.classList.add(pct >= 92 ? 'pct-good' : 'pct-bad');
+
+  updateHeads(id, curIn, req);
+}
+
+/* Heads = how many agents can move IN -> OUT while curIn/req stays >= 92% */
+function updateHeads(id, curIn, req){
+  const headsEl = document.getElementById(`heads${id}`);
+  const minIn = Math.ceil(0.92 * req);
+  const heads = Math.max(0, curIn - minIn);
+
+  headsEl.textContent = heads;
+  headsEl.className = 'val-heads ' + (heads > 0 ? 'avail' : 'zero');
+}
+
+/* a manual edit to REQ holds only until the next scheduled auto-req point fires */
+function onReqManualInput(id){
+  updatePct(id);
+}
+
+/* ---------------- row / master clear ---------------- */
+
+function clearSlot(id){
+  const s = state[id-1];
+  s.baseIn = 0; s.baseOut = 0;
+  s.adjIn  = 0; s.adjOut  = 0;
+  s.lockCleared = true;
+  s.maxAvailSec = null;
+
+  document.getElementById(`req${id}`).value = '';
+
+  refreshRow(id);
+  const pctEl = document.getElementById(`pct${id}`);
+  pctEl.textContent = '—';
+  document.getElementById(`pctTile${id}`).classList.remove('pct-good','pct-bad');
+  const headsEl = document.getElementById(`heads${id}`);
+  headsEl.textContent = '—';
+  headsEl.className = 'val-heads';
+}
+
+function clearMaster(){
+  if (clearTimerHandle) { clearTimeout(clearTimerHandle); clearTimerHandle = null; }
+  document.getElementById('masterInput').value = '';
+  masterCache = '';
+  document.getElementById('autoNote').textContent = 'auto-parses on input';
+  setLiveStatus(false);
+
+  state.forEach(s => {
+    s.baseIn = 0; s.baseOut = 0;
+    s.adjIn = 0;  s.adjOut = 0;
+    s.lockCleared = false;
+    s.maxAvailSec = null;
+  });
+
+  for (let i = 1; i <= 3; i++){
+    refreshRow(i);
+    updatePct(i);
+  }
+}
+
+/* ---------------- Auto REQ scheduler (per LOB) ---------------- */
+
+function toggleAutoPanel(id){
+  const s = state[id-1];
+  s.autoPanelOpen = !s.autoPanelOpen;
+  const panel = document.getElementById(`autoPanel${id}`);
+  const btn = document.getElementById(`autoBtn${id}`);
+  panel.classList.toggle('open', s.autoPanelOpen);
+  btn.classList.toggle('active', s.autoSchedule.length > 0);
+}
+
+/* parse "HH:MM value" lines as the user types; keep valid entries live immediately */
+function onAutoScheduleInput(id){
+  const s = state[id-1];
+  const text = document.getElementById(`autoText${id}`).value;
+  const statusEl = document.getElementById(`autoStatus${id}`);
+  const btn = document.getElementById(`autoBtn${id}`);
+
+  const lines = text.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
+  const parsed = [];
+  let badLines = 0;
+
+  lines.forEach(line => {
+    const m = line.match(/^(\d{1,2}):(\d{2})\s+([0-9]+(?:\.[0-9]+)?)$/);
+    if (!m) { badLines++; return; }
+    const h = parseInt(m[1], 10);
+    const mi = parseInt(m[2], 10);
+    const val = parseFloat(m[3]);
+    if (h < 0 || h > 23 || mi < 0 || mi > 59) { badLines++; return; }
+    parsed.push({ h, m: mi, val, key: `${pad2(h)}:${pad2(mi)}` });
+  });
+
+  parsed.sort((a,b) => (a.h*60+a.m) - (b.h*60+b.m));
+  s.autoSchedule = parsed;
+  s.autoLastAppliedKey = null; // allow re-checking against current time on any edit
+
+  btn.classList.toggle('active', parsed.length > 0);
+
+  if (parsed.length === 0) {
+    statusEl.innerHTML = badLines > 0
+      ? `<span class="err">no valid lines yet</span>`
+      : 'no schedule set';
+    return;
+  }
+
+  const nextPoint = findNextSchedulePoint(parsed);
+  const suffix = badLines > 0 ? ` · <span class="err">${badLines} line${badLines>1?'s':''} ignored</span>` : '';
+  if (nextPoint) {
+    statusEl.innerHTML = `${parsed.length} pts · next <span class="next-time">${nextPoint.key} → ${nextPoint.val}</span>${suffix}`;
+  } else {
+    statusEl.innerHTML = `${parsed.length} pts · all times passed today${suffix}`;
+  }
+
+  // try applying immediately in case a scheduled time is already due
+  checkAutoScheduleForLOB(id);
+}
+
+function clearAutoSchedule(id){
+  const s = state[id-1];
+  s.autoSchedule = [];
+  s.autoLastAppliedKey = null;
+  document.getElementById(`autoText${id}`).value = '';
+  document.getElementById(`autoStatus${id}`).textContent = 'no schedule set';
+  document.getElementById(`autoBtn${id}`).classList.remove('active');
+}
+
+function findNextSchedulePoint(schedule, excludeKey){
+  const now = new Date();
+  const nowMin = now.getHours() * 60 + now.getMinutes();
+  for (const pt of schedule) {
+    if (pt.key === excludeKey) continue;
+    if (pt.h * 60 + pt.m >= nowMin) return pt;
+  }
+  return null;
+}
+
+/* runs every tick: for each LOB, find the latest schedule point whose time
+   has passed today, and if it's newer than the last applied point, overwrite
+   REQ with that point's value. Auto-schedule always wins the moment its time
+   arrives; a manual edit made between two scheduled points is only kept until
+   the next point fires. */
+function checkAutoScheduleForLOB(id){
+  const s = state[id-1];
+  if (!s.autoSchedule.length) return;
+
+  const now = new Date();
+  const nowMin = now.getHours() * 60 + now.getMinutes();
+
+  let due = null;
+  for (const pt of s.autoSchedule) {
+    if (pt.h * 60 + pt.m <= nowMin) due = pt;
+    else break;
+  }
+  if (!due) return;
+  if (s.autoLastAppliedKey === due.key) return;
+
+  s.autoLastAppliedKey = due.key;
+
+  const reqInput = document.getElementById(`req${id}`);
+  reqInput.value = due.val;
+  updatePct(id);
+
+  // refresh status line if panel is open/has content
+  const statusEl = document.getElementById(`autoStatus${id}`);
+  const nextPoint = findNextSchedulePoint(s.autoSchedule, due.key);
+  if (nextPoint) {
+    statusEl.innerHTML = `applied <span class="next-time">${due.key} → ${due.val}</span> · next ${nextPoint.key} → ${nextPoint.val}`;
+  } else {
+    statusEl.innerHTML = `applied <span class="next-time">${due.key} → ${due.val}</span> · all times passed today`;
+  }
+}
+
+function checkAllAutoSchedules(){
+  LOBS.forEach(l => checkAutoScheduleForLOB(l.id));
+}
+
+/* ---------------- utils ---------------- */
+
+function decodeEntities(s){
+  return String(s)
+    .replace(/&amp;/gi, '&')
+    .replace(/&lt;/gi, '<')
+    .replace(/&gt;/gi, '>')
+    .replace(/&nbsp;/gi, ' ')
+    .replace(/&#39;/gi, "'")
+    .replace(/&quot;/gi, '"');
+}
+
+/* init */
+buildRows();
+reparse();
+setInterval(checkAllAutoSchedules, 15000); // check schedules every 15s
+</script>
+</body>
+</html>
