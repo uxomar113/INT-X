@@ -1,160 +1,196 @@
-# INT 4.2 LAT/BE Expansion Specification — UI Phase
+# INT 4.2 LAT / BE Expansion — Phase 1 UI Specification
 
-## Source File
-Current stable source file: `INT4.2.html`.
+## 1. Authority and source baseline
 
-This specification is intentionally limited to the UI preparation required for future LAT% and BE% calculation phases.
+This file is the authoritative specification for Phase 1 only.
 
-## Non-Negotiable Scope Rule
-Do not modify, rewrite, rename, remove, or weaken any current working behavior in the existing file.
+Source application:
 
-The following existing systems must remain functionally unchanged:
-- Snapshot paste behavior
-- Auto-parse behavior
-- 10-second input clear behavior
-- Current LOB parsing
-- Current IN / OUT counting
-- Current manual IN adjustment
-- Current manual OUT adjustment
-- Current REQ input behavior
-- Current AUTO REQ panel behavior
-- Current AUTO REQ schedule parsing
-- Current AUTO REQ timed application
-- Current `% Req` calculation
-- Current `Heads` calculation
-- Current AVAIL timer
-- Current clear buttons
-- Current visual style direction
+- Repository: `uxomar113/INT-X`
+- Branch baseline: `main`
+- File to modify: `INT4.2.html`
+- Frozen baseline blob SHA: `161ac4d2054cc4279653f062477c0507704b2dcd`
 
-This phase may only add UI surfaces needed for future LAT% and BE% values.
+Phase 1 prepares the existing stable interface for the later LAT and BE calculation phases. It must not implement calculation logic.
 
-Do not implement LAT% math in this phase.
-Do not implement BE% math in this phase.
-Do not add storage in this phase.
-Do not change the parser in this phase.
-Do not change current formulas in this phase.
+## 2. Non-negotiable scope boundary
 
----
+Phase 1 may change only HTML and CSS required to display the future LAT / BE controls and metrics.
 
-# Phase 1 — UI Preparation for LAT% / EXP% / BE% / EXP2%
+Do not modify, replace, simplify, rename, or remove any current working behavior.
 
-## Goal
-Prepare the existing stable UI so the application has visible, stable locations for:
-- LAT%
-- EXP%
-- BE%
-- EXP2%
+The following systems are frozen:
 
-without changing any current working calculation or behavior.
+- Snapshot paste input.
+- Automatic parsing on input.
+- Ten-second textarea self-clear.
+- T2 / T1 / SP LOB detection and order.
+- Current IN and OUT keyword classification.
+- Current IN / OUT counting.
+- Manual IN `+` and `-` adjustment.
+- Manual OUT `+` and `-` adjustment.
+- Current TOTAL calculation.
+- Current REQ input.
+- Current AUTO REQ panel, schedule parser, timing, and overwrite priority.
+- Current `% Req` formula and display.
+- Current `Heads` formula and display.
+- AVAIL timer extraction and display.
+- Per-LOB clear behavior.
+- Master clear behavior.
+- Current initialization and timers.
 
-## Required UI Additions
-For each LOB card, add a new metrics area below the current `% Req / Heads` row.
+Do not touch `index.html` or any other application file.
 
-The new area must display four tiles:
-1. `LAT%`
-2. `EXP%`
-3. `BE%`
-4. `EXP2%`
+## 3. Phase 1 objective
 
-Initial display values:
-- `LAT%` = `—`
-- `EXP%` = `—`
-- `BE%` = `—`
-- `EXP2%` = `—`
+Prepare each existing LOB card for these four future metrics:
 
-These values are placeholders only in Phase 1.
-
-## Naming Rules
-Use these exact labels:
 - `LAT%`
 - `EXP%`
 - `BE%`
 - `EXP2%`
 
-Do not rename them to Expected LAT, Expected, BE LAT, BE Expected, EXP LAT, or EXP BE.
+Also reserve a location for a future per-LOB `BE Req` input.
 
-## UI Placement
-The new metric row must appear after the existing stat row that currently contains `% Req` and `Heads`.
+All four metric values must display `—` in Phase 1. They must not read or modify application state.
 
-Recommended structure:
+## 4. Required UI structure
+
+Preserve the existing card hierarchy and visual direction. Do not replace the application with a new dashboard, modal system, drawer, tab system, or active-card architecture.
+
+For every existing LOB card:
+
+### 4.1 Existing REQ controls
+
+Keep the current REQ line and all existing controls operational:
+
+- `Req` label.
+- Existing REQ number input.
+- Existing `AUTO REQ` button.
+- Existing clear button.
+
+Add one compact, disabled Phase 1 field labelled `BE Req` near the existing REQ controls.
+
+Required Phase 1 behavior for `BE Req`:
+
+- It is a visual reservation only.
+- It must be disabled.
+- Its displayed value is blank with placeholder `—`.
+- It must not have an input handler.
+- It must not affect REQ, AUTO REQ, `% Req`, `Heads`, IN, OUT, TOTAL, or AVAIL.
+- It will be enabled and wired only in Phase 3.
+
+### 4.2 Existing metrics
+
+Keep the existing metric blocks unchanged in meaning and behavior:
+
+- IN
+- OUT
+- TOT
+- `% Req`
+- Heads
+
+Do not rename `% Req` to LAT or change its formula.
+
+### 4.3 New metric area
+
+Add a compact metric area below the existing `% Req` and `Heads` row.
+
+Use two columns so the card remains usable at the current narrow width:
+
+First new row:
+
+- `LAT%` with value `—`
+- `EXP%` with value `—`
+
+Second new row:
+
+- `BE%` with value `—`
+- `EXP2%` with value `—`
+
+Every new value needs a stable per-LOB DOM id for later phases.
+
+Recommended ids:
 
 ```text
-Current:
-[ % Req ] [ Heads ]
-
-Add below:
-[ LAT% ] [ EXP% ]
-[ BE%  ] [ EXP2% ]
+latPct1 / latPct2 / latPct3
+expPct1 / expPct2 / expPct3
+bePct1 / bePct2 / bePct3
+exp2Pct1 / exp2Pct2 / exp2Pct3
+beReq1 / beReq2 / beReq3
 ```
 
-For narrow mobile screens, use a 2-column grid.
-For wider screens, a 4-column grid is acceptable only if it does not squeeze or break the current layout.
+Equivalent consistent ids are acceptable, but they must be predictable and unique.
 
-## Styling Rules
-Reuse the current design language:
-- Same card background
-- Same border style
-- Same font family
-- Same rounded tile style
-- Same compact spacing
+## 5. Styling rules
 
-Do not introduce a new design system.
-Do not add animations.
-Do not add glow effects.
-Do not add modal windows.
-Do not add new popups.
+- Match the current dark-card visual language.
+- Reuse current CSS variables.
+- Do not import another font, framework, icon set, or stylesheet.
+- Do not remove the current font import in this phase.
+- Do not create fixed overlays or popups.
+- Do not use absolute positioning for the new metric tiles.
+- Do not create horizontal page scrolling.
+- Preserve the existing wrapper width and natural vertical page scrolling.
+- The new metric area must remain readable at 320 px viewport width.
+- Labels may use a smaller font, but values must not clip or overlap.
+- Placeholder values use the current muted color.
+- Do not add pass/fail colors to placeholder metrics in Phase 1.
 
-## DOM / ID Requirements
-Each LOB must have stable IDs for the four new values.
+## 6. JavaScript restrictions
 
-Recommended value IDs:
-```text
-latPct1 / expPct1 / bePct1 / exp2Pct1
-latPct2 / expPct2 / bePct2 / exp2Pct2
-latPct3 / expPct3 / bePct3 / exp2Pct3
-```
+Phase 1 must not add a LAT / BE calculation engine.
 
-Recommended tile IDs:
-```text
-latTile1 / expTile1 / beTile1 / exp2Tile1
-latTile2 / expTile2 / beTile2 / exp2Tile2
-latTile3 / expTile3 / beTile3 / exp2Tile3
-```
+Do not add:
 
-Do not reuse existing IDs.
-Do not rename existing IDs.
+- Interval state.
+- Half-hour timers.
+- Weighted averages.
+- Projection formulas.
+- History arrays.
+- localStorage.
+- Manual LAT override.
+- Manual BE override.
+- Velocity.
+- Operating-window logic.
+- Stale or frozen modes.
+- New AUTO REQ behavior.
 
-## JavaScript Requirements
-Add safe render helpers only.
+The only JavaScript changes allowed are those strictly necessary to generate the new static markup inside the existing `buildRows()` flow.
 
-Recommended helper:
-```text
-renderLatBePlaceholders(id)
-```
+The new placeholder nodes must not be written by `refreshRow()`, `updatePct()`, or AUTO REQ in Phase 1.
 
-Behavior in Phase 1:
-- Writes `—` into LAT%, EXP%, BE%, and EXP2%.
-- Does not read or change current REQ values.
-- Does not read or change current IN/OUT values.
-- Does not change `% Req`.
-- Does not change `Heads`.
-- Does not change AUTO REQ.
-- Does not write localStorage.
+## 7. Regression acceptance criteria
 
-Call it from `refreshRow(id)` only after the existing current values are rendered.
+Phase 1 passes only when all statements are true:
 
-## Acceptance Criteria
-Phase 1 is complete only if:
-- Current parser still works.
-- Current IN/OUT counts still work.
-- Current manual IN +/- still works.
-- Current manual OUT +/- still works.
-- Current REQ input still updates `% Req`.
-- Current Heads calculation remains unchanged.
-- Current AUTO REQ remains unchanged.
-- New LAT% / EXP% / BE% / EXP2% tiles are visible.
-- New tiles show `—`.
-- No console errors.
-- No broken IDs.
-- No layout overflow on 360px mobile width.
-- No existing UI behavior changes.
+1. A snapshot still parses exactly as it did in the frozen baseline.
+2. T2, T1, and SP still populate the same cards.
+3. IN / OUT / TOT values are unchanged for identical input.
+4. IN and OUT adjustment buttons still work.
+5. REQ input still updates `% Req` and `Heads` immediately.
+6. AUTO REQ still parses, displays, and applies schedule points exactly as before.
+7. Ten-second input self-clear still keeps parsed values on screen.
+8. Per-LOB clear still works.
+9. Master clear still works.
+10. AVAIL remains unchanged.
+11. The four new metrics display `—` only.
+12. `BE Req` is visible but disabled.
+13. No existing function is removed or renamed.
+14. No new console error is introduced.
+15. No horizontal overflow or control overlap exists at 320 px, 400 px, and desktop width.
+
+## 8. Phase 1 output contract
+
+Codex must modify only `INT4.2.html`.
+
+The Phase 1 pull request must contain:
+
+- One changed application file: `INT4.2.html`.
+- No Phase 2 or Phase 3 formulas.
+- A concise summary of the UI-only changes.
+- Static JavaScript syntax validation.
+- HTML parse validation.
+- `git diff --check` validation.
+
+Phase 2 must not begin until Phase 1 is audited and approved.
