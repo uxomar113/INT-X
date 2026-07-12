@@ -1,342 +1,398 @@
-# INT 4.2 LAT% and BE% Calculation Specification — Phases 2 and 3
+# INT 4.2 LAT / BE Expansion — Phase 2 and Phase 3 Calculation Specification
 
-## Source File
-Current stable source file: `INT4.2.html`.
+## 1. Authority and dependency
 
-This specification depends on the UI surfaces from Phase 1:
-- `LAT%`
-- `EXP%`
-- `BE%`
-- `EXP2%`
+This file is the authoritative calculation specification for Phase 2 and Phase 3.
 
-## Non-Negotiable Scope Rule
-Do not modify current working systems unless this specification explicitly requires it.
+Source application:
 
-The following systems must remain unchanged:
+- Repository: `uxomar113/INT-X`
+- File: `INT4.2.html`
+- Frozen baseline blob SHA before Phase 1: `161ac4d2054cc4279653f062477c0507704b2dcd`
+
+Phase 2 starts only after Phase 1 passes audit. Phase 3 starts only after Phase 2 passes audit.
+
+## 2. Permanent scope boundary
+
+This update adds only:
+
+- LAT%
+- EXP%
+- BE Req
+- BE%
+- EXP2%
+- Minimal in-memory 30-minute interval state required for these metrics
+
+Do not redesign or replace:
+
 - Snapshot parser
-- LOB block detection
+- LOB detection
 - IN / OUT status classification
-- Manual IN / OUT adjustment behavior
-- Existing `% Req` calculation
-- Existing `Heads` calculation
-- Existing AUTO REQ schedule parser
-- Existing AUTO REQ timed application
-- Existing AVAIL timer
-- Existing clear behavior
-- Existing 10-second input clear behavior
+- IN / OUT counting
+- Manual IN / OUT adjustment
+- Existing REQ input
+- Existing AUTO REQ scheduler
+- Existing `% Req` formula
+- Existing `Heads` formula
+- AVAIL timer
+- Existing clear behavior except resetting the new interval state
 
-The goal is to add LAT% and BE% calculation layers without breaking the stable operational calculator.
+Do not add localStorage, history UI, operating-window restrictions, stale/frozen modes, duplicate-snapshot logic, parser redesign, manual LAT/BE override, LAT velocity, new roster behavior, or new AUTO REQ syntax.
 
----
+## 3. Shared definitions
 
-# Shared Definitions
-
-## Effective IN
-Use the existing current IN value after manual adjustment:
+All state and calculations are per LOB.
 
 ```text
 effectiveIn = max(0, baseIn + adjIn)
-```
-
-## Effective OUT
-Use the existing current OUT value after manual adjustment:
-
-```text
 effectiveOut = max(0, baseOut + adjOut)
+effectiveReq = parseFloat(existing REQ input)
 ```
 
-## Effective REQ
-Use the current visible REQ input value for that LOB.
+REQ is valid only when finite and greater than zero.
+
+AUTO REQ already writes into the existing REQ input. LAT and BE must naturally use the updated value without changing AUTO REQ priority or syntax.
+
+All four metrics display two decimals:
 
 ```text
-effectiveReq = parseFloat(req input)
+00.00%
 ```
 
-If REQ is blank, invalid, or less than or equal to zero, LAT% / EXP% / BE% / EXP2% must display `—`.
-
-Do not introduce a new REQ source in this phase.
-Do not change AUTO REQ priority.
-
-If AUTO REQ writes into the existing REQ input, LAT/BE calculations must naturally use that updated value.
-
----
-
-# Phase 2 — LAT% and EXP% Using REQ 92%
-
-## Goal
-Add LAT% and EXP% calculation using the existing current IN and REQ values.
-
-This phase introduces the `REQ 92` target only.
-
-Do not add BE% in Phase 2.
-BE% and EXP2% must remain `—` until Phase 3.
-
-## Required New Target
-Add a fixed LAT target:
+Invalid or unavailable values display:
 
 ```text
-REQ_TARGET_92 = 0.92
+—
 ```
 
-This target is used only by Phase 2 LAT calculations.
+Never display `NaN%` or `Infinity%`.
 
-Do not replace the existing `% Req` calculation.
-Do not replace the existing `Heads` calculation.
+## 4. Thirty-minute interval model
 
-## LAT% Formula
-LAT% represents current staffing performance against the 92% requirement target.
-
-Formula:
+Use local device time and standard wall-clock intervals:
 
 ```text
-requiredIn92 = effectiveReq * 0.92
-LAT% = effectiveIn / requiredIn92 * 100
+HH:00–HH:30
+HH:30–next HH:00
 ```
 
-If `requiredIn92 <= 0`, display `—`.
+The engine must work at all times of day. Do not add an operating-hours filter.
 
-Display format:
+Maintain minimal in-memory state per LOB, equivalent to:
 
 ```text
-LAT% = 00.00%
+intervalStartMs
+intervalEndMs
+lastSampleMs
+currentReqPctRaw
+currentBePctRaw
+latWeightedSum
+beWeightedSum
+latHasValidData
+beHasValidData
 ```
 
-Use two decimals.
+Do not persist this state.
 
-Example:
+### First valid observation
+
+When the first valid value is observed during an interval, treat that value as applying from the interval start to the observation time. This is required because no earlier sample exists.
+
+LAT and BE are tracked independently. LAT may be valid while BE is unavailable.
+
+### Segment update rule
+
+When a value-changing event occurs:
+
+1. Accumulate the prior instantaneous percentage from `lastSampleMs` to the event timestamp.
+2. Replace it with the newly calculated instantaneous value.
+3. Set `lastSampleMs` to the event timestamp.
+4. Recalculate the displayed average and projection.
+
+Repeated rendering without a value change must not duplicate time.
+
+### Interval rollover
+
+At each half-hour boundary:
+
+1. Accumulate the final segment through the old interval end.
+2. Discard old interval calculation state after finalization; no history UI is required.
+3. Start a clean new interval.
+4. Seed it at the boundary from the current effective IN, REQ, and BE Req values when valid.
+
+At most one new recurring timer may be added for the LAT/BE engine. A one-second tick is acceptable.
+
+## 5. Phase 2 — LAT% and EXP%
+
+Phase 2 implements LAT% and EXP% only. BE Req remains disabled. BE% and EXP2% remain `—`.
+
+### Instantaneous REQ percentage
+
+Use the same raw ratio as the existing `% Req` metric:
+
 ```text
-REQ = 10
-effectiveIn = 9
-requiredIn92 = 10 * 0.92 = 9.2
-LAT% = 9 / 9.2 * 100 = 97.83%
+currentReqPctRaw = effectiveIn / effectiveReq * 100
 ```
 
-## EXP% Formula
-EXP% is the expected target reference for Phase 2.
+Do not divide REQ by `0.92`. Do not alter the existing `% Req` calculation.
 
-For this phase, EXP% must display:
+LAT pass target:
+
 ```text
 92.00%
 ```
-when REQ is valid.
 
-If REQ is blank, invalid, or less than or equal to zero:
+The target is for pass/fail styling only; it is not part of the denominator.
+
+### LAT% definition
+
+LAT% is the time-weighted average of `currentReqPctRaw` over the elapsed portion of the active 30-minute interval.
+
 ```text
+elapsedSeconds = (now - intervalStartMs) / 1000
+latNumerator = sum(segmentReqPctRaw * segmentDurationSeconds)
+LAT% = latNumerator / elapsedSeconds
+```
+
+Include the open current segment through `now`.
+
+### EXP% definition
+
+EXP% projects the final 30-minute LAT average assuming the current instantaneous REQ percentage continues for the rest of the interval.
+
+```text
+remainingSeconds = (intervalEndMs - now) / 1000
+EXP% = (latNumerator + currentReqPctRaw * remainingSeconds) / 1800
+```
+
+At interval end, `EXP% = LAT%`.
+
+### Phase 2 update triggers
+
+Close the previous LAT segment and update LAT/EXP when:
+
+- A new snapshot changes effective IN
+- Manual IN `+` or `-` changes effective IN
+- Existing REQ changes
+- AUTO REQ applies a new REQ
+- Per-LOB clear resets that LOB
+- Master clear resets all LOB LAT state
+- A half-hour boundary occurs
+
+Manual OUT changes do not mathematically change LAT, but existing refresh behavior must remain untouched.
+
+### Invalid LAT state
+
+If REQ is blank, non-finite, or less than or equal to zero:
+
+```text
+LAT% = —
 EXP% = —
 ```
 
-## Phase 2 Display Rules
-When valid REQ exists:
-- `LAT%` shows calculated LAT% against REQ 92.
-- `EXP%` shows `92.00%`.
-- `BE%` remains `—`.
-- `EXP2%` remains `—`.
+When REQ becomes valid again during the same interval, reset that LOB's LAT accumulator and apply the first-valid-observation rule from the current interval start.
 
-When REQ is invalid:
-- `LAT%` = `—`
-- `EXP%` = `—`
-- `BE%` = `—`
-- `EXP2%` = `—`
+### Phase 2 example
 
-## Phase 2 Update Triggers
-LAT% and EXP% must update whenever any of these happen:
-- New snapshot is parsed.
-- Manual IN adjustment changes.
-- Manual OUT adjustment changes if refreshRow is called.
-- REQ input changes.
-- AUTO REQ applies a scheduled REQ value.
-- Clear LOB is used.
-- Clear Master is used.
-
-Recommended implementation:
-```text
-updateLatBeMetrics(id)
-```
-
-Call it from existing `refreshRow(id)` and from any existing REQ update path if needed.
-
-## Phase 2 Safety Requirements
-Do not write localStorage.
-Do not add history.
-Do not add interval timers.
-Do not add LAT accumulation.
-Do not add velocity.
-Do not add manual LAT override.
-Do not change existing current `% Req`.
-Do not change existing current `Heads`.
-
----
-
-# Phase 3 — BE% and EXP2% Using REQ 100%
-
-## Goal
-Add BE% and EXP2% calculation using the `REQ 100` target.
-
-The user requirement:
-```text
-the 100 req is with BE% phase
-```
-
-This means REQ 100 belongs to Phase 3 only.
-
-## Required New Target
-Add a fixed BE target:
+Current interval: 10:00–10:30.
 
 ```text
-REQ_TARGET_100 = 1.00
+10:00–10:10 current REQ% = 80%
+10:10–10:15 current REQ% = 100%
+now = 10:15
 ```
 
-This target is used only by Phase 3 BE calculations.
-
-Do not use 100% for LAT%.
-LAT% remains based on REQ 92.
-
-## BE% Formula
-BE% represents current staffing performance against the 100% requirement target.
-
-Formula:
 ```text
-requiredIn100 = effectiveReq * 1.00
-BE% = effectiveIn / requiredIn100 * 100
+LAT numerator = 80 * 600 + 100 * 300 = 78,000
+LAT% = 78,000 / 900 = 86.67%
+EXP% = (78,000 + 100 * 900) / 1800 = 93.33%
 ```
 
-Because `requiredIn100 = effectiveReq`, this is equivalent to:
+## 6. Phase 3 — BE Req, BE%, and EXP2%
+
+Phase 3 enables the Phase 1 BE Req field and implements BE% and EXP2%. It must not alter the completed LAT/EXP engine.
+
+### BE Req rules
+
+BE Req is:
+
+- Per LOB
+- Manual input only
+- Integer
+- Minimum `0`
+- Step `1`
+- Blank is invalid
+- Zero is valid
+- Independent from existing REQ and AUTO REQ
+
+### Approved BE denominator and current value
+
 ```text
-BE% = effectiveIn / effectiveReq * 100
+BE denominator = effectiveReq + beReq
+currentBePctRaw = effectiveIn / (effectiveReq + beReq) * 100
 ```
 
-Display format:
-```text
-BE% = 00.00%
-```
+BE pass target:
 
-Use two decimals.
-
-Example:
-```text
-REQ = 10
-effectiveIn = 9
-BE% = 9 / 10 * 100 = 90.00%
-```
-
-## EXP2% Formula
-EXP2% is the expected target reference for Phase 3.
-
-For this phase, EXP2% must display:
 ```text
 100.00%
 ```
-when REQ is valid.
 
-If REQ is blank, invalid, or less than or equal to zero:
+REQ is the existing visible REQ value. BE Req is added only to the BE denominator.
+
+### BE% definition
+
+BE% is the time-weighted average of `currentBePctRaw` over the elapsed portion of the active 30-minute interval.
+
 ```text
+elapsedSeconds = (now - intervalStartMs) / 1000
+beNumerator = sum(segmentBePctRaw * segmentDurationSeconds)
+BE% = beNumerator / elapsedSeconds
+```
+
+Include the open current segment through `now`.
+
+### EXP2% definition
+
+EXP2% projects the final 30-minute BE average assuming the current instantaneous BE percentage continues for the rest of the interval.
+
+```text
+remainingSeconds = (intervalEndMs - now) / 1000
+EXP2% = (beNumerator + currentBePctRaw * remainingSeconds) / 1800
+```
+
+At interval end, `EXP2% = BE%`.
+
+### Phase 3 update triggers
+
+Close the prior BE segment and update BE/EXP2 when:
+
+- A new snapshot changes effective IN
+- Manual IN `+` or `-` changes effective IN
+- Existing REQ changes
+- AUTO REQ applies a new REQ
+- BE Req changes
+- Per-LOB clear resets that LOB and clears its BE Req
+- Master clear resets all BE interval state
+- A half-hour boundary occurs
+
+Changing BE Req must not modify LAT history. Changing REQ affects both LAT and BE.
+
+### Invalid BE state
+
+BE and EXP2 are valid only when:
+
+```text
+effectiveReq is finite and > 0
+beReq is an integer and >= 0
+(effectiveReq + beReq) > 0
+```
+
+Otherwise:
+
+```text
+BE% = —
 EXP2% = —
 ```
 
-## Phase 3 Display Rules
-When valid REQ exists:
-- `LAT%` shows calculated LAT% against REQ 92.
-- `EXP%` shows `92.00%`.
-- `BE%` shows calculated BE% against REQ 100.
-- `EXP2%` shows `100.00%`.
+When BE becomes valid again during the same interval, reset that LOB's BE accumulator and apply the first-valid-observation rule from the interval start.
 
-When REQ is invalid:
-- `LAT%` = `—`
-- `EXP%` = `—`
-- `BE%` = `—`
-- `EXP2%` = `—`
+### Phase 3 examples
 
-## Phase 3 Update Triggers
-BE% and EXP2% must update whenever LAT% updates:
-- New snapshot parse
-- Manual IN adjustment
-- Manual OUT adjustment if refreshRow is called
-- REQ input change
-- AUTO REQ scheduled application
-- Clear LOB
-- Clear Master
+Current BE value:
 
-## Styling Pass/Fail Rules
-Do not change current `% Req` pass/fail colors.
-
-LAT% tile:
-- Good when `LAT% >= 100.00%`
-- Bad when `LAT% < 100.00%`
-
-BE% tile:
-- Good when `BE% >= 100.00%`
-- Bad when `BE% < 100.00%`
-
-EXP% and EXP2% are reference tiles only.
-They should not show pass/fail state.
-
-## Important Distinction
-Existing `% Req` is not the same as LAT%.
-
-Existing `% Req` must remain unchanged.
-
-New LAT% uses the 92% required staffing denominator:
 ```text
-LAT% = effectiveIn / (REQ * 0.92) * 100
+effectiveReq = 10
+beReq = 2
+effectiveIn = 12
+current BE = 12 / (10 + 2) * 100 = 100.00%
 ```
 
-New BE% uses the 100% required staffing denominator:
+Mixed interval:
+
 ```text
-BE% = effectiveIn / (REQ * 1.00) * 100
+first 10 minutes = 75%
+next 5 minutes = 100%
+now = minute 15
 ```
 
-## Example
-Input:
 ```text
-REQ = 10
-effectiveIn = 9
-effectiveOut = 4
+BE% = (75 * 600 + 100 * 300) / 900 = 83.33%
+EXP2% = (75 * 600 + 100 * 300 + 100 * 900) / 1800 = 91.67%
 ```
 
-Existing current `% Req` remains whatever the current app already calculates.
+## 7. Rendering rules
 
-New Phase 2/3 metrics:
+LAT and EXP:
+
+- `>= 92.00%`: good style
+- `< 92.00%`: bad style
+- `—`: neutral style
+
+BE and EXP2:
+
+- `>= 100.00%`: good style
+- `< 100.00%`: bad style
+- `—`: neutral style
+
+Do not alter existing `% Req` or `Heads` styling beyond current behavior.
+
+## 8. Integration requirements
+
+Use one centralized update path, for example:
+
 ```text
-LAT required = 10 * 0.92 = 9.2
-LAT% = 9 / 9.2 * 100 = 97.83%
-EXP% = 92.00%
-
-BE required = 10 * 1.00 = 10
-BE% = 9 / 10 * 100 = 90.00%
-EXP2% = 100.00%
+updateLatBeMetrics(id, timestamp)
 ```
 
-Visible result:
-```text
-LAT%  = 97.83%
-EXP%  = 92.00%
-BE%   = 90.00%
-EXP2% = 100.00%
-```
+Equivalent naming is acceptable.
 
-## Acceptance Criteria
-Phase 2 is complete only if:
-- LAT% is visible.
-- EXP% is visible.
-- LAT% updates when REQ or IN changes.
-- EXP% displays 92.00% when REQ is valid.
-- BE% and EXP2% remain placeholders.
-- Existing current behavior is unchanged.
+The engine must use event timestamps and interval boundaries, not render-count approximations.
 
-Phase 3 is complete only if:
-- BE% is visible.
-- EXP2% is visible.
-- BE% updates when REQ or IN changes.
-- EXP2% displays 100.00% when REQ is valid.
-- LAT% remains based on 92.
-- BE% is based on 100.
-- Existing current behavior is unchanged.
+Do not rebuild the full LOB DOM every second. Update only the four new metric text nodes and classes.
 
-Final acceptance:
-- No parser changes.
-- No REQ behavior changes.
-- No AUTO REQ behavior changes.
-- No manual adjustment behavior changes.
-- No storage changes.
-- No console errors.
-- No layout overflow at 400px width.
+## 9. Audit tests
+
+Regression tests for every phase:
+
+- Same snapshot produces the same IN / OUT / TOT as the frozen baseline
+- Existing `% Req` remains `IN / REQ * 100`
+- Existing `Heads` remains unchanged
+- AUTO REQ syntax and timing remain unchanged
+- Ten-second textarea clear remains unchanged
+- AVAIL remains unchanged
+- No external dependency is added
+
+Phase 2 tests:
+
+- Constant 100% gives LAT 100.00% and EXP 100.00%
+- Constant 80% gives LAT 80.00% and EXP 80.00%
+- Mixed example gives LAT 86.67% and EXP 93.33%
+- REQ change closes the previous segment at the change timestamp
+- AUTO REQ change closes the previous segment at the application timestamp
+- Half-hour rollover starts a clean accumulator
+- Invalid REQ displays `—`
+
+Phase 3 tests:
+
+- IN 12, REQ 10, BE Req 2 gives current BE 100.00%
+- Constant 100% gives BE 100.00% and EXP2 100.00%
+- Mixed example gives BE 83.33% and EXP2 91.67%
+- BE Req change closes only the BE segment and does not corrupt LAT
+- REQ change closes both LAT and BE segments
+- Blank BE Req leaves LAT/EXP operational while BE/EXP2 show `—`
+- BE Req `0` is accepted
+
+## 10. Phase gates
+
+Phase 2 must modify only `INT4.2.html` and must not implement Phase 3 early.
+
+Phase 3 must modify only `INT4.2.html` and must not expand scope.
+
+Each phase requires:
+
+- JavaScript syntax check
+- HTML parse check
+- Deterministic formula tests
+- `git diff --check`
+- Explicit confirmation that parser, AUTO REQ, `% Req`, Heads, AVAIL, and clear behavior remain preserved
